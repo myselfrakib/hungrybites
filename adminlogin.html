@@ -95,6 +95,12 @@
             box-shadow: 0 5px 15px rgba(44, 62, 80, 0.4);
         }
 
+        .btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .back-link {
             text-align: center;
             margin-top: 1.5rem;
@@ -191,7 +197,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -200,12 +206,13 @@
             storageBucket: "hungrybites-c7930.firebasestorage.app",
             messagingSenderId: "346758544945",
             appId: "1:346758544945:web:4bcad30016540d18e79f10",
-            measurementId: "G-B5GP5SYMRC"
+            measurementId: "G-B5GP5SYMRC",
+            databaseURL: "https://hungrybites-c7930-default-rtdb.firebaseio.com"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const database = getDatabase(app);
 
         window.handleAdminLogin = async function(e) {
             e.preventDefault();
@@ -216,18 +223,40 @@
             showLoading(true);
 
             try {
+                // First authenticate with Firebase Auth
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
-                // Check if user is admin
-                const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+                // Then check if user is admin in Realtime Database
+                const dbRef = ref(database);
+                const snapshot = await get(child(dbRef, `admins/${user.uid}`));
                 
-                if (adminDoc.exists() && adminDoc.data().isAdmin === true) {
-                    showSuccess('Login successful! Redirecting to dashboard...');
-                    setTimeout(() => {
-                        window.location.href = 'admin.html';
-                    }, 1000);
+                if (snapshot.exists()) {
+                    const adminData = snapshot.val();
+                    
+                    // Check if admin flag is true
+                    if (adminData.admin === true) {
+                        showSuccess(`Welcome ${adminData.name || 'Admin'}! Redirecting to dashboard...`);
+                        
+                        // Store admin info in sessionStorage for the dashboard
+                        sessionStorage.setItem('adminData', JSON.stringify({
+                            uid: user.uid,
+                            email: adminData.email,
+                            name: adminData.name,
+                            role: adminData.role
+                        }));
+                        
+                        setTimeout(() => {
+                            window.location.href = 'admin.html';
+                        }, 1000);
+                    } else {
+                        // Admin flag is false or doesn't exist
+                        await auth.signOut();
+                        showLoading(false);
+                        showError('Access denied. Admin privileges not granted.');
+                    }
                 } else {
+                    // User not found in admins database
                     await auth.signOut();
                     showLoading(false);
                     showError('Access denied. You are not an admin.');
@@ -244,6 +273,8 @@
                     errorMessage = 'Incorrect password.';
                 } else if (error.code === 'auth/invalid-credential') {
                     errorMessage = 'Invalid credentials. Please check your email and password.';
+                } else if (error.code === 'auth/too-many-requests') {
+                    errorMessage = 'Too many failed attempts. Please try again later.';
                 }
                 
                 showError(errorMessage);
