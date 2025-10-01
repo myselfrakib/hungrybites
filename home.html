@@ -133,6 +133,12 @@
             font-size: 4rem;
         }
 
+        .food-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .food-details {
             padding: 1.5rem;
         }
@@ -288,7 +294,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -297,12 +303,13 @@
             storageBucket: "hungrybites-c7930.firebasestorage.app",
             messagingSenderId: "346758544945",
             appId: "1:346758544945:web:4bcad30016540d18e79f10",
-            measurementId: "G-B5GP5SYMRC"
+            measurementId: "G-B5GP5SYMRC",
+            databaseURL: "https://hungrybites-c7930-default-rtdb.firebaseio.com"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const database = getDatabase(app);
 
         let cart = JSON.parse(localStorage.getItem('cart') || '[]');
         updateCartBadge();
@@ -320,9 +327,10 @@
             foodGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Loading menu...</div>';
 
             try {
-                const querySnapshot = await getDocs(collection(db, 'foodItems'));
+                const foodItemsRef = ref(database, 'foodItems');
+                const snapshot = await get(foodItemsRef);
                 
-                if (querySnapshot.empty) {
+                if (!snapshot.exists()) {
                     foodGrid.innerHTML = `
                         <div class="empty-menu">
                             <div class="empty-menu-icon">🍽️</div>
@@ -333,18 +341,24 @@
                     return;
                 }
 
+                const foodItems = snapshot.val();
                 let foodHTML = '';
-                querySnapshot.forEach((doc) => {
-                    const item = doc.data();
+                
+                Object.keys(foodItems).forEach((key) => {
+                    const item = foodItems[key];
+                    const imageHtml = item.imageurl 
+                        ? `<img src="${item.imageurl}" alt="${item.name}">`
+                        : item.emoji || '🍔';
+                    
                     foodHTML += `
                         <div class="food-card">
-                            <div class="food-image">${item.emoji || '🍔'}</div>
+                            <div class="food-image">${imageHtml}</div>
                             <div class="food-details">
                                 <div class="food-name">${item.name}</div>
                                 <div class="food-description">${item.description || 'Delicious food item'}</div>
                                 <div class="food-footer">
                                     <div class="food-price">₹${item.price}</div>
-                                    <button class="add-btn" onclick="addToCart('${doc.id}', '${item.name}', ${item.price}, '${item.emoji || '🍔'}')">Add +</button>
+                                    <button class="add-btn" onclick="addToCart('${key}', '${item.name}', ${item.price}, '${item.emoji || '🍔'}', '${item.imageurl || ''}')">Add +</button>
                                 </div>
                             </div>
                         </div>
@@ -363,7 +377,7 @@
             }
         }
 
-        window.addToCart = function(id, name, price, emoji) {
+        window.addToCart = function(id, name, price, emoji, imageurl) {
             const existingItem = cart.find(item => item.id === id);
             
             if (existingItem) {
@@ -374,6 +388,7 @@
                     name: name,
                     price: price,
                     emoji: emoji,
+                    imageurl: imageurl,
                     quantity: 1
                 });
             }
