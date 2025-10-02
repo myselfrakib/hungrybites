@@ -272,6 +272,52 @@
             margin-bottom: 1.5rem;
         }
 
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+            font-size: clamp(0.95rem, 2.5vw, 1rem);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.9rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: clamp(0.95rem, 2.5vw, 1rem);
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #fc8019;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 480px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .payment-option {
             display: flex;
             align-items: center;
@@ -516,6 +562,39 @@
             <div id="cartContent"></div>
         </div>
 
+        <div class="payment-section" id="addressSection" style="display: none;">
+            <h2>Delivery Address</h2>
+            <form id="addressForm" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="fullName">Full Name *</label>
+                    <input type="text" id="fullName" required placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input type="tel" id="phone" required placeholder="Enter 10 digit mobile number" pattern="[0-9]{10}">
+                </div>
+                <div class="form-group">
+                    <label for="address">Complete Address *</label>
+                    <textarea id="address" required placeholder="House No., Building, Street, Area" rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="city">City *</label>
+                        <input type="text" id="city" required placeholder="City">
+                    </div>
+                    <div class="form-group">
+                        <label for="pincode">Pincode *</label>
+                        <input type="text" id="pincode" required placeholder="Pincode" pattern="[0-9]{6}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="landmark">Landmark (Optional)</label>
+                    <input type="text" id="landmark" placeholder="Nearby landmark">
+                </div>
+                <button type="button" class="btn" onclick="proceedToPayment()">Proceed to Payment</button>
+            </form>
+        </div>
+
         <div class="payment-section" id="paymentSection" style="display: none;">
             <h2>Payment Method</h2>
             <div class="payment-option" onclick="selectPayment('cod')">
@@ -563,6 +642,7 @@
         let cart = [];
         let currentUser = null;
         let selectedPayment = null;
+        let deliveryAddress = null;
 
         // Razorpay Key - Replace with your actual key
         const RAZORPAY_KEY = 'rzp_test_your_key_here'; // Replace with your Razorpay test/live key
@@ -584,7 +664,7 @@
 
         function renderCart() {
             const cartContent = document.getElementById('cartContent');
-            const paymentSection = document.getElementById('paymentSection');
+            const addressSection = document.getElementById('addressSection');
             
             if (cart.length === 0) {
                 cartContent.innerHTML = `
@@ -595,11 +675,11 @@
                         <a href="home.html" class="continue-shopping">Browse Menu</a>
                     </div>
                 `;
-                paymentSection.style.display = 'none';
+                addressSection.style.display = 'none';
                 return;
             }
 
-            paymentSection.style.display = 'block';
+            addressSection.style.display = 'block';
 
             const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             const deliveryFee = 40;
@@ -665,7 +745,42 @@
             }
         };
 
-        window.selectPayment = function(method) {
+        window.proceedToPayment = function() {
+            const fullName = document.getElementById('fullName').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const pincode = document.getElementById('pincode').value.trim();
+            const landmark = document.getElementById('landmark').value.trim();
+
+            if (!fullName || !phone || !address || !city || !pincode) {
+                showError('Please fill all required fields');
+                return;
+            }
+
+            if (!/^[0-9]{10}$/.test(phone)) {
+                showError('Please enter a valid 10-digit phone number');
+                return;
+            }
+
+            if (!/^[0-9]{6}$/.test(pincode)) {
+                showError('Please enter a valid 6-digit pincode');
+                return;
+            }
+
+            deliveryAddress = {
+                fullName,
+                phone,
+                address,
+                city,
+                pincode,
+                landmark
+            };
+
+            document.getElementById('addressSection').style.display = 'none';
+            document.getElementById('paymentSection').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
             selectedPayment = method;
             document.querySelectorAll('.payment-option').forEach(opt => {
                 opt.classList.remove('selected');
@@ -749,6 +864,7 @@
                     subtotal: subtotal,
                     deliveryFee: deliveryFee,
                     total: total,
+                    deliveryAddress: deliveryAddress,
                     paymentMethod: paymentMethod,
                     paymentStatus: paymentMethod === 'online' ? 'paid' : 'pending',
                     status: 'pending',
