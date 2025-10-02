@@ -544,7 +544,7 @@
                     }
                     
                     foodHTML += `
-                        <div class="food-card" style="${item.isActive === false ? 'opacity: 0.6;' : ''}">
+                        <div class="food-card" data-food-id="${key}" data-name="${item.name}" data-price="${item.price}" data-emoji="${item.emoji || '🍔'}" style="${item.isActive === false ? 'opacity: 0.6;' : ''}">
                             <div class="food-image">${imageHTML}</div>
                             <div class="food-details">
                                 <div class="food-name">${item.name}</div>
@@ -588,7 +588,7 @@
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartBadge();
             showNotification();
-            loadFoodItems(); // Reload to update buttons
+            updateButtonUI(id, 1);
         };
 
         window.increaseQuantity = function(id) {
@@ -597,7 +597,7 @@
                 item.quantity += 1;
                 localStorage.setItem('cart', JSON.stringify(cart));
                 updateCartBadge();
-                loadFoodItems(); // Reload to update buttons
+                updateButtonUI(id, item.quantity);
             }
         };
 
@@ -606,14 +606,39 @@
             if (item) {
                 if (item.quantity > 1) {
                     item.quantity -= 1;
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartBadge();
+                    updateButtonUI(id, item.quantity);
                 } else {
                     cart = cart.filter(cartItem => cartItem.id !== id);
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartBadge();
+                    updateButtonUI(id, 0);
                 }
-                localStorage.setItem('cart', JSON.stringify(cart));
-                updateCartBadge();
-                loadFoodItems(); // Reload to update buttons
             }
         };
+
+        function updateButtonUI(id, quantity) {
+            const foodCard = document.querySelector(`[data-food-id="${id}"]`);
+            if (!foodCard) return;
+            
+            const buttonContainer = foodCard.querySelector('.food-footer');
+            const priceDiv = buttonContainer.querySelector('.food-price');
+            
+            let buttonHTML;
+            if (quantity > 0) {
+                buttonHTML = `<div class="quantity-control">
+                       <button class="quantity-btn" onclick="decreaseQuantity('${id}')">−</button>
+                       <span class="quantity-display">${quantity}</span>
+                       <button class="quantity-btn" onclick="increaseQuantity('${id}')">+</button>
+                   </div>`;
+            } else {
+                const foodData = foodCard.dataset;
+                buttonHTML = `<button class="add-btn" onclick="addToCart('${id}', '${foodData.name}', ${foodData.price}, '${foodData.emoji}')">Add +</button>`;
+            }
+            
+            buttonContainer.innerHTML = priceDiv.outerHTML + buttonHTML;
+        }
 
         function updateCartBadge() {
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
