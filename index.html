@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>HungryBites - Login</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -18,20 +19,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 1rem;
         }
 
         .auth-container {
             max-width: 450px;
-            width: 90%;
+            width: 100%;
             background: white;
-            padding: 3rem;
+            padding: 2rem 1.5rem;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
         .logo {
             text-align: center;
-            font-size: 2.5rem;
+            font-size: clamp(2rem, 5vw, 2.5rem);
             font-weight: bold;
             color: #fc8019;
             margin-bottom: 0.5rem;
@@ -41,17 +43,18 @@
             text-align: center;
             color: #666;
             margin-bottom: 2rem;
-            font-size: 0.9rem;
+            font-size: clamp(0.85rem, 2vw, 0.9rem);
         }
 
         h2 {
             margin-bottom: 2rem;
             color: #333;
             text-align: center;
+            font-size: clamp(1.5rem, 4vw, 1.8rem);
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
         .form-group label {
@@ -59,6 +62,7 @@
             margin-bottom: 0.5rem;
             font-weight: 500;
             color: #333;
+            font-size: 0.95rem;
         }
 
         .form-group input {
@@ -66,8 +70,9 @@
             padding: 1rem;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
-            font-size: 1rem;
+            font-size: 16px;
             transition: border-color 0.3s;
+            touch-action: manipulation;
         }
 
         .form-group input:focus {
@@ -77,7 +82,7 @@
 
         .btn {
             width: 100%;
-            padding: 1rem;
+            padding: 1.1rem;
             background: #fc8019;
             color: white;
             border: none;
@@ -87,18 +92,29 @@
             cursor: pointer;
             transition: all 0.3s;
             margin-top: 1rem;
+            touch-action: manipulation;
+            min-height: 48px;
         }
 
         .btn:hover {
             background: #e67316;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(252, 128, 25, 0.4);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .toggle-auth {
             text-align: center;
             margin-top: 1.5rem;
             color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
 
         .toggle-auth span {
@@ -106,28 +122,9 @@
             cursor: pointer;
             text-decoration: underline;
             font-weight: 600;
-        }
-
-        .error {
-            color: #e74c3c;
-            margin-top: 1rem;
-            text-align: center;
-            font-size: 0.9rem;
-            background: #fadbd8;
-            padding: 0.8rem;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .success {
-            color: #27ae60;
-            margin-top: 1rem;
-            text-align: center;
-            font-size: 0.9rem;
-            background: #d4edda;
-            padding: 0.8rem;
-            border-radius: 8px;
-            display: none;
+            display: inline-block;
+            padding: 0.25rem 0;
+            min-height: 32px;
         }
 
         .admin-link {
@@ -142,10 +139,29 @@
             text-decoration: none;
             font-weight: 600;
             font-size: 0.9rem;
+            display: inline-block;
+            padding: 0.5rem;
+            min-height: 40px;
         }
 
-        .admin-link a:hover {
-            text-decoration: underline;
+        .error, .success {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none;
+            word-wrap: break-word;
+        }
+
+        .error {
+            color: #e74c3c;
+            background: #fadbd8;
+        }
+
+        .success {
+            color: #27ae60;
+            background: #d4edda;
         }
 
         .loading {
@@ -168,6 +184,27 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 1.75rem 1.25rem;
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .auth-container {
+                padding: 3rem;
+            }
+
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(252, 128, 25, 0.4);
+            }
+        }
     </style>
 </head>
 <body>
@@ -179,12 +216,12 @@
         
         <form id="authForm" onsubmit="handleAuth(event)">
             <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="authEmail" placeholder="Enter your email" required>
+                <label for="authEmail">Email</label>
+                <input type="email" id="authEmail" placeholder="Enter your email" required autocomplete="email">
             </div>
             <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="authPassword" placeholder="Enter your password" required>
+                <label for="authPassword">Password</label>
+                <input type="password" id="authPassword" placeholder="Enter your password" required autocomplete="current-password">
             </div>
             <button type="submit" class="btn" id="authBtn">Login</button>
         </form>
