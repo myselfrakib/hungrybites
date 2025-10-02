@@ -390,6 +390,105 @@
             transform: none;
         }
 
+        .btn-secondary {
+            width: 100%;
+            padding: 1.1rem;
+            background: white;
+            color: #fc8019;
+            border: 2px solid #fc8019;
+            border-radius: 12px;
+            font-size: clamp(1.05rem, 3vw, 1.2rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            touch-action: manipulation;
+            min-height: 52px;
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.98);
+        }
+
+        .address-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .address-card:hover {
+            border-color: #fc8019;
+            background: #fff8f3;
+        }
+
+        .address-card.selected {
+            border-color: #fc8019;
+            background: #fff8f3;
+        }
+
+        .address-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .address-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .address-phone {
+            color: #666;
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+
+        .address-details {
+            color: #666;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .address-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            touch-action: manipulation;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:active {
+            transform: scale(0.95);
+        }
+
+        .default-badge {
+            background: #60b246;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
         .empty-cart {
             text-align: center;
             padding: 3rem 1.5rem;
@@ -564,35 +663,53 @@
 
         <div class="payment-section" id="addressSection" style="display: none;">
             <h2>Delivery Address</h2>
-            <form id="addressForm" onsubmit="return false;">
-                <div class="form-group">
-                    <label for="fullName">Full Name *</label>
-                    <input type="text" id="fullName" required placeholder="Enter your full name">
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone Number *</label>
-                    <input type="tel" id="phone" required placeholder="Enter 10 digit mobile number" pattern="[0-9]{10}">
-                </div>
-                <div class="form-group">
-                    <label for="address">Complete Address *</label>
-                    <textarea id="address" required placeholder="House No., Building, Street, Area" rows="3"></textarea>
-                </div>
-                <div class="form-row">
+            
+            <div id="savedAddressesList" style="display: none;">
+                <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: #666;">Select Saved Address</h3>
+                <div id="addressCards"></div>
+                <button type="button" class="btn-secondary" onclick="showAddressForm()" style="margin-top: 1rem;">+ Add New Address</button>
+            </div>
+
+            <div id="addressFormContainer">
+                <form id="addressForm" onsubmit="return false;">
                     <div class="form-group">
-                        <label for="city">City *</label>
-                        <input type="text" id="city" required placeholder="City">
+                        <label for="fullName">Full Name *</label>
+                        <input type="text" id="fullName" required placeholder="Enter your full name">
                     </div>
                     <div class="form-group">
-                        <label for="pincode">Pincode *</label>
-                        <input type="text" id="pincode" required placeholder="Pincode" pattern="[0-9]{6}">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" required placeholder="Enter 10 digit mobile number" pattern="[0-9]{10}">
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="landmark">Landmark (Optional)</label>
-                    <input type="text" id="landmark" placeholder="Nearby landmark">
-                </div>
-                <button type="button" class="btn" onclick="proceedToPayment()">Proceed to Payment</button>
-            </form>
+                    <div class="form-group">
+                        <label for="address">Complete Address *</label>
+                        <textarea id="address" required placeholder="House No., Building, Street, Area" rows="3"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">City *</label>
+                            <input type="text" id="city" required placeholder="City">
+                        </div>
+                        <div class="form-group">
+                            <label for="pincode">Pincode *</label>
+                            <input type="text" id="pincode" required placeholder="Pincode" pattern="[0-9]{6}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="landmark">Landmark (Optional)</label>
+                        <input type="text" id="landmark" placeholder="Nearby landmark">
+                    </div>
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="saveAddress" checked style="width: auto;">
+                            <span>Save this address for future orders</span>
+                        </label>
+                    </div>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button type="button" class="btn" onclick="proceedToPayment()" style="flex: 1; min-width: 200px;">Proceed to Payment</button>
+                        <button type="button" class="btn-secondary" onclick="showSavedAddresses()" id="backToSavedBtn" style="display: none; flex: 1; min-width: 200px;">Back to Saved Addresses</button>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <div class="payment-section" id="paymentSection" style="display: none;">
@@ -622,7 +739,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        import { getDatabase, ref, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { getDatabase, ref, push, set, get, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -643,6 +760,8 @@
         let currentUser = null;
         let selectedPayment = null;
         let deliveryAddress = null;
+        let savedAddresses = [];
+        let selectedAddressId = null;
 
         // Razorpay Key - Replace with your actual key
         const RAZORPAY_KEY = 'rzp_test_your_key_here'; // Replace with your Razorpay test/live key
@@ -651,6 +770,7 @@
             if (user) {
                 currentUser = user;
                 loadCart();
+                loadSavedAddresses();
             } else {
                 window.location.href = 'index.html';
             }
@@ -745,7 +865,128 @@
             }
         };
 
-        window.proceedToPayment = function() {
+        async function loadSavedAddresses() {
+            if (!currentUser) return;
+
+            try {
+                const addressesRef = ref(db, `users/${currentUser.uid}/addresses`);
+                const snapshot = await get(addressesRef);
+                
+                if (snapshot.exists()) {
+                    savedAddresses = [];
+                    snapshot.forEach((childSnapshot) => {
+                        savedAddresses.push({
+                            id: childSnapshot.key,
+                            ...childSnapshot.val()
+                        });
+                    });
+                    
+                    if (savedAddresses.length > 0) {
+                        renderSavedAddresses();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading addresses:', error);
+            }
+        }
+
+        function renderSavedAddresses() {
+            const savedList = document.getElementById('savedAddressesList');
+            const formContainer = document.getElementById('addressFormContainer');
+            const addressCards = document.getElementById('addressCards');
+            const backBtn = document.getElementById('backToSavedBtn');
+
+            if (savedAddresses.length === 0) {
+                savedList.style.display = 'none';
+                formContainer.style.display = 'block';
+                backBtn.style.display = 'none';
+                return;
+            }
+
+            savedList.style.display = 'block';
+            formContainer.style.display = 'none';
+
+            let html = '';
+            savedAddresses.forEach((addr, index) => {
+                const isDefault = index === 0;
+                html += `
+                    <div class="address-card ${selectedAddressId === addr.id ? 'selected' : ''}" onclick="selectSavedAddress('${addr.id}')">
+                        <div class="address-card-header">
+                            <div>
+                                <div class="address-name">${addr.fullName}</div>
+                                <div class="address-phone">${addr.phone}</div>
+                            </div>
+                            ${isDefault ? '<span class="default-badge">Default</span>' : ''}
+                        </div>
+                        <div class="address-details">
+                            ${addr.address}<br>
+                            ${addr.city}, ${addr.pincode}
+                            ${addr.landmark ? `<br>Landmark: ${addr.landmark}` : ''}
+                        </div>
+                        <div class="address-actions">
+                            <button class="btn-small btn-delete" onclick="event.stopPropagation(); deleteAddress('${addr.id}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            addressCards.innerHTML = html;
+        }
+
+        window.selectSavedAddress = function(addressId) {
+            selectedAddressId = addressId;
+            deliveryAddress = savedAddresses.find(addr => addr.id === addressId);
+            
+            document.querySelectorAll('.address-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            setTimeout(() => {
+                document.getElementById('addressSection').style.display = 'none';
+                document.getElementById('paymentSection').style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 300);
+        };
+
+        window.deleteAddress = async function(addressId) {
+            if (!confirm('Delete this address?')) return;
+
+            try {
+                const addressRef = ref(db, `users/${currentUser.uid}/addresses/${addressId}`);
+                await remove(addressRef);
+                
+                savedAddresses = savedAddresses.filter(addr => addr.id !== addressId);
+                
+                if (selectedAddressId === addressId) {
+                    selectedAddressId = null;
+                    deliveryAddress = null;
+                }
+                
+                renderSavedAddresses();
+                showSuccess('Address deleted successfully');
+            } catch (error) {
+                console.error('Error deleting address:', error);
+                showError('Failed to delete address');
+            }
+        };
+
+        window.showAddressForm = function() {
+            document.getElementById('savedAddressesList').style.display = 'none';
+            document.getElementById('addressFormContainer').style.display = 'block';
+            document.getElementById('backToSavedBtn').style.display = savedAddresses.length > 0 ? 'block' : 'none';
+            
+            // Clear form
+            document.getElementById('addressForm').reset();
+            document.getElementById('saveAddress').checked = true;
+        };
+
+        window.showSavedAddresses = function() {
+            if (savedAddresses.length > 0) {
+                document.getElementById('savedAddressesList').style.display = 'block';
+                document.getElementById('addressFormContainer').style.display = 'none';
+            }
+        };
             const fullName = document.getElementById('fullName').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const address = document.getElementById('address').value.trim();
