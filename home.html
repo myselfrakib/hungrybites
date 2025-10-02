@@ -184,6 +184,45 @@
             transform: scale(0.95);
         }
 
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #fc8019;
+            border-radius: 10px;
+            padding: 0.5rem 0.75rem;
+            min-height: 44px;
+        }
+
+        .quantity-btn {
+            background: white;
+            color: #fc8019;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-btn:active {
+            transform: scale(0.9);
+        }
+
+        .quantity-display {
+            color: white;
+            font-weight: 600;
+            min-width: 24px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
         .loading {
             text-align: center;
             padding: 3rem 1rem;
@@ -378,6 +417,17 @@
                 
                 Object.keys(foodItems).forEach((key) => {
                     const item = foodItems[key];
+                    const cartItem = cart.find(c => c.id === key);
+                    const quantity = cartItem ? cartItem.quantity : 0;
+                    
+                    const buttonHTML = quantity > 0 
+                        ? `<div class="quantity-control">
+                               <button class="quantity-btn" onclick="decreaseQuantity('${key}')">−</button>
+                               <span class="quantity-display">${quantity}</span>
+                               <button class="quantity-btn" onclick="increaseQuantity('${key}')">+</button>
+                           </div>`
+                        : `<button class="add-btn" onclick="addToCart('${key}', '${item.name}', ${item.price}, '${item.emoji || '🍔'}')">Add +</button>`;
+                    
                     foodHTML += `
                         <div class="food-card">
                             <div class="food-image">${item.emoji || '🍔'}</div>
@@ -386,7 +436,7 @@
                                 <div class="food-description">${item.description || 'Delicious food item'}</div>
                                 <div class="food-footer">
                                     <div class="food-price">₹${item.price}</div>
-                                    <button class="add-btn" onclick="addToCart('${key}', '${item.name}', ${item.price}, '${item.emoji || '🍔'}')">Add +</button>
+                                    ${buttonHTML}
                                 </div>
                             </div>
                         </div>
@@ -423,6 +473,31 @@
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartBadge();
             showNotification();
+            loadFoodItems(); // Reload to update buttons
+        };
+
+        window.increaseQuantity = function(id) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                item.quantity += 1;
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartBadge();
+                loadFoodItems(); // Reload to update buttons
+            }
+        };
+
+        window.decreaseQuantity = function(id) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                if (item.quantity > 1) {
+                    item.quantity -= 1;
+                } else {
+                    cart = cart.filter(cartItem => cartItem.id !== id);
+                }
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartBadge();
+                loadFoodItems(); // Reload to update buttons
+            }
         };
 
         function updateCartBadge() {
