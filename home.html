@@ -440,29 +440,24 @@
 </head>
 <body>
     <div class="navbar">
-        <div class="logo">🍔 HungryBites</div>
         <div class="nav-right">
             <div class="hamburger" onclick="toggleMenu()">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
-            <a href="checkout.html" class="cart-item">
-                Cart 🛒
-                <span class="cart-badge" id="cartBadge">0</span>
-            </a>
+            <div class="logo">🍔 HungryBites</div>
         </div>
+        <a href="checkout.html" class="cart-item">
+            Cart 🛒
+            <span class="cart-badge" id="cartBadge">0</span>
+        </a>
     </div>
 
     <div class="nav-items" id="navMenu">
         <a href="home.html" class="nav-item">🏠 Home</a>
         <a href="orders.html" class="nav-item">📦 Orders</a>
         <span class="nav-item" onclick="logout()">🚪 Logout</span>
-    </div>
-
-    <div class="hero">
-        <h1>Welcome to HungryBites! 🍕</h1>
-        <p>Delicious food delivered to your doorstep</p>
     </div>
 
     <div class="container">
@@ -535,16 +530,21 @@
                            <div class="food-image-emoji" style="display: none; position: absolute;">${item.emoji || '🍔'}</div>`
                         : `<div class="food-image-emoji">${item.emoji || '🍔'}</div>`;
                     
-                    const buttonHTML = quantity > 0 
-                        ? `<div class="quantity-control">
+                    let buttonHTML;
+                    if (item.isActive === false) {
+                        buttonHTML = `<button class="add-btn" style="background: #999; cursor: not-allowed;" disabled>Unavailable</button>`;
+                    } else if (quantity > 0) {
+                        buttonHTML = `<div class="quantity-control">
                                <button class="quantity-btn" onclick="decreaseQuantity('${key}')">−</button>
                                <span class="quantity-display">${quantity}</span>
                                <button class="quantity-btn" onclick="increaseQuantity('${key}')">+</button>
-                           </div>`
-                        : `<button class="add-btn" onclick="addToCart('${key}', '${item.name}', ${item.price}, '${item.emoji || '🍔'}')">Add +</button>`;
+                           </div>`;
+                    } else {
+                        buttonHTML = `<button class="add-btn" onclick="addToCart('${key}', '${item.name}', ${item.price}, '${item.emoji || '🍔'}')">Add +</button>`;
+                    }
                     
                     foodHTML += `
-                        <div class="food-card">
+                        <div class="food-card" style="${item.isActive === false ? 'opacity: 0.6;' : ''}">
                             <div class="food-image">${imageHTML}</div>
                             <div class="food-details">
                                 <div class="food-name">${item.name}</div>
