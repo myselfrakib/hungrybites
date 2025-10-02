@@ -836,6 +836,8 @@
                         `${order.deliveryAddress.streetAddress}, ${order.deliveryAddress.landmark}, ${order.deliveryAddress.city} - ${order.deliveryAddress.pincode}` : 
                         'No address provided';
 
+                    const isAccepted = order.status !== 'pending' && order.status !== 'cancelled';
+                    
                     html += `
                         <div class="order-card-admin">
                             <div class="order-header-admin">
@@ -851,23 +853,28 @@
                             <div class="order-items-list">${itemsList}</div>
                             <div class="order-total-admin">Total: ₹${order.total || 0}</div>
                             <div class="order-actions">
-                                <select class="status-select" onchange="updateOrderStatus('${order.userId}', '${order.id}', this.value)">
-                                    <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
-                                    <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
-                                    <option value="cooking" ${order.status === 'cooking' ? 'selected' : ''}>Cooking</option>
-                                    <option value="packed" ${order.status === 'packed' ? 'selected' : ''}>Packed</option>
-                                    <option value="out-for-delivery" ${order.status === 'out-for-delivery' ? 'selected' : ''}>Out for Delivery</option>
-                                    <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
-                                    <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
-                                </select>
-                                <div class="action-buttons">
-                                    <button class="btn-accept" onclick="acceptOrder('${order.userId}', '${order.id}')">Accept</button>
-                                    <button class="btn-reject" onclick="rejectOrder('${order.userId}', '${order.id}')">Reject</button>
-                                </div>
-                                <div class="action-buttons">
-                                    <button class="btn-call" onclick="callCustomer('${phone}')">📞 Call</button>
-                                    <button class="btn-map" onclick="openMap('${fullAddress}')">🗺️ Map</button>
-                                </div>
+                                ${!isAccepted ? `
+                                    <div class="action-buttons">
+                                        <button class="btn-call" onclick="callCustomer('${phone}')">📞 Call</button>
+                                        <button class="btn-map" onclick="openMap('${fullAddress}')">🗺️ Map</button>
+                                    </div>
+                                    <div class="action-buttons">
+                                        <button class="btn-accept" onclick="acceptOrder('${order.userId}', '${order.id}')">Accept Order</button>
+                                        <button class="btn-reject" onclick="rejectOrder('${order.userId}', '${order.id}')">Reject</button>
+                                    </div>
+                                ` : `
+                                    <select class="status-select" onchange="updateOrderStatus('${order.userId}', '${order.id}', this.value)">
+                                        <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                                        <option value="cooking" ${order.status === 'cooking' ? 'selected' : ''}>Cooking</option>
+                                        <option value="packed" ${order.status === 'packed' ? 'selected' : ''}>Packed</option>
+                                        <option value="out-for-delivery" ${order.status === 'out-for-delivery' ? 'selected' : ''}>Out for Delivery</option>
+                                        <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                                    </select>
+                                    <div class="action-buttons">
+                                        <button class="btn-call" onclick="callCustomer('${phone}')">📞 Call</button>
+                                        <button class="btn-map" onclick="openMap('${fullAddress}')">🗺️ Map</button>
+                                    </div>
+                                `}
                             </div>
                         </div>
                     `;
