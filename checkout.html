@@ -568,33 +568,10 @@
             100% { transform: rotate(360deg); }
         }
 
-        @media (min-width: 480px) {
-            .navbar {
-                padding: 1rem 2rem;
-            }
-
-            .nav-items {
-                gap: 1rem;
-            }
-
-            .container {
-                margin: 2rem auto;
-            }
-
-            .cart-container, .payment-section {
-                padding: 2rem;
-            }
-        }
-
         @media (min-width: 768px) {
             .cart-item {
                 flex-direction: row;
                 align-items: center;
-                padding: 1.5rem;
-            }
-
-            .cart-item-actions {
-                flex-wrap: nowrap;
             }
 
             .quantity-btn:hover {
@@ -610,25 +587,6 @@
                 background: #54a03d;
                 transform: translateY(-2px);
                 box-shadow: 0 5px 15px rgba(96, 178, 70, 0.4);
-            }
-
-            .continue-shopping:hover {
-                background: #e67316;
-                transform: translateY(-2px);
-            }
-
-            .cart-container, .payment-section {
-                padding: 2.5rem;
-            }
-
-            .nav-item:hover {
-                background: #f8f9fa;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .nav-items {
-                gap: 1rem;
             }
         }
     </style>
@@ -763,8 +721,7 @@
         let savedAddresses = [];
         let selectedAddressId = null;
 
-        // Razorpay Key - Replace with your actual key
-        const RAZORPAY_KEY = 'rzp_test_your_key_here'; // Replace with your Razorpay test/live key
+        const RAZORPAY_KEY = 'rzp_test_your_key_here';
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -976,7 +933,6 @@
             document.getElementById('addressFormContainer').style.display = 'block';
             document.getElementById('backToSavedBtn').style.display = savedAddresses.length > 0 ? 'block' : 'none';
             
-            // Clear form
             document.getElementById('addressForm').reset();
             document.getElementById('saveAddress').checked = true;
         };
@@ -987,12 +943,15 @@
                 document.getElementById('addressFormContainer').style.display = 'none';
             }
         };
+
+        window.proceedToPayment = async function() {
             const fullName = document.getElementById('fullName').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const address = document.getElementById('address').value.trim();
             const city = document.getElementById('city').value.trim();
             const pincode = document.getElementById('pincode').value.trim();
             const landmark = document.getElementById('landmark').value.trim();
+            const saveAddress = document.getElementById('saveAddress').checked;
 
             if (!fullName || !phone || !address || !city || !pincode) {
                 showError('Please fill all required fields');
@@ -1018,10 +977,29 @@
                 landmark
             };
 
+            if (saveAddress && currentUser) {
+                try {
+                    const addressesRef = ref(db, `users/${currentUser.uid}/addresses`);
+                    const newAddressRef = push(addressesRef);
+                    await set(newAddressRef, deliveryAddress);
+                    
+                    savedAddresses.push({
+                        id: newAddressRef.key,
+                        ...deliveryAddress
+                    });
+                    
+                    showSuccess('Address saved successfully');
+                } catch (error) {
+                    console.error('Error saving address:', error);
+                }
+            }
+
             document.getElementById('addressSection').style.display = 'none';
             document.getElementById('paymentSection').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
+
+        window.selectPayment = function(method) {
             selectedPayment = method;
             document.querySelectorAll('.payment-option').forEach(opt => {
                 opt.classList.remove('selected');
@@ -1054,7 +1032,7 @@
 
             const options = {
                 key: RAZORPAY_KEY,
-                amount: total * 100, // Amount in paise
+                amount: total * 100,
                 currency: 'INR',
                 name: 'HungryBites',
                 description: 'Food Order Payment',
@@ -1063,9 +1041,9 @@
                     await placeOrder('online', response.razorpay_payment_id);
                 },
                 prefill: {
-                    name: currentUser.displayName || '',
-                    email: currentUser.email,
-                    contact: currentUser.phoneNumber || ''
+                    name: deliveryAddress.fullName || '',
+                    email: currentUser.email || '',
+                    contact: deliveryAddress.phone || ''
                 },
                 theme: {
                     color: '#fc8019'
@@ -1162,7 +1140,6 @@
             navMenu.classList.toggle('active');
         };
 
-        // Close menu when clicking outside
         document.addEventListener('click', function(event) {
             const hamburger = document.querySelector('.hamburger');
             const navMenu = document.getElementById('navMenu');
