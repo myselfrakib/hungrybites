@@ -19,7 +19,7 @@
 
         .navbar {
             background: white;
-            padding: 1rem 2rem;
+            padding: 1rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
@@ -30,7 +30,7 @@
         }
 
         .logo {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: #fc8019;
             cursor: pointer;
@@ -38,18 +38,19 @@
 
         .nav-items {
             display: flex;
-            gap: 2rem;
+            gap: 1rem;
             align-items: center;
         }
 
         .nav-item {
             cursor: pointer;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 0.8rem;
             border-radius: 8px;
             transition: background 0.3s;
             text-decoration: none;
             color: #333;
             font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .nav-item:hover {
@@ -59,58 +60,68 @@
         .container {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 3rem 2rem;
+            padding: 1.5rem 1rem;
         }
 
         h2 {
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
             color: #333;
         }
 
         .orders-list {
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            gap: 1rem;
         }
 
         .order-card {
             background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            padding: 1.2rem;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
             transition: transform 0.3s;
         }
 
         .order-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 30px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
         }
 
         .order-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
+            align-items: flex-start;
+            margin-bottom: 1rem;
             padding-bottom: 1rem;
             border-bottom: 2px solid #f0f0f0;
+            gap: 1rem;
+        }
+
+        .order-number {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #fc8019;
+            margin-bottom: 0.3rem;
         }
 
         .order-id {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #666;
         }
 
         .order-date {
             color: #888;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            margin-top: 0.2rem;
         }
 
         .order-status {
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.8rem;
             border-radius: 20px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            white-space: nowrap;
         }
 
         .status-pending {
@@ -133,34 +144,15 @@
             color: #721c24;
         }
 
-        .delivery-info {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-        }
-
-        .delivery-info h4 {
-            margin-bottom: 0.5rem;
-            color: #333;
-            font-size: 1rem;
-        }
-
-        .delivery-info p {
-            color: #666;
-            font-size: 0.9rem;
-            margin: 0.25rem 0;
-        }
-
         .order-items {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .order-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.8rem 0;
+            padding: 0.6rem 0;
             border-bottom: 1px solid #f0f0f0;
         }
 
@@ -171,81 +163,60 @@
         .item-details {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.8rem;
+            flex: 1;
         }
 
         .item-emoji {
-            font-size: 2rem;
-        }
-
-        .item-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            object-fit: cover;
+            font-size: 1.8rem;
         }
 
         .item-info {
             display: flex;
             flex-direction: column;
+            flex: 1;
         }
 
         .item-name {
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .item-quantity {
             color: #666;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .item-price {
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #60b246;
+            white-space: nowrap;
+            margin-left: 0.5rem;
         }
 
-        .order-summary {
-            border-top: 2px solid #f0f0f0;
-            padding-top: 1rem;
-        }
-
-        .summary-row {
+        .order-total {
             display: flex;
             justify-content: space-between;
-            padding: 0.5rem 0;
-            font-size: 1rem;
-        }
-
-        .summary-row.total {
-            font-size: 1.3rem;
-            font-weight: bold;
-            border-top: 2px solid #f0f0f0;
-            margin-top: 0.5rem;
+            align-items: center;
             padding-top: 1rem;
+            border-top: 2px solid #f0f0f0;
+            font-size: 1.2rem;
+            font-weight: bold;
         }
 
-        .summary-label {
-            color: #666;
-        }
-
-        .summary-value {
+        .total-label {
             color: #333;
         }
 
-        .summary-row.total .summary-label {
-            color: #333;
-        }
-
-        .summary-row.total .summary-value {
+        .total-amount {
             color: #60b246;
         }
 
         .loading {
             text-align: center;
-            padding: 4rem;
-            font-size: 1.2rem;
+            padding: 3rem 1rem;
+            font-size: 1rem;
             color: #666;
         }
 
@@ -253,8 +224,8 @@
             border: 4px solid #f3f3f3;
             border-top: 4px solid #fc8019;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
             margin: 0 auto 1rem;
         }
@@ -266,17 +237,18 @@
 
         .empty-orders {
             text-align: center;
-            padding: 4rem 2rem;
+            padding: 3rem 1rem;
         }
 
         .empty-orders-icon {
-            font-size: 5rem;
+            font-size: 4rem;
             margin-bottom: 1rem;
         }
 
         .empty-orders h3 {
             color: #666;
             margin-bottom: 1rem;
+            font-size: 1.3rem;
         }
 
         .order-now-btn {
@@ -296,25 +268,44 @@
             transform: translateY(-2px);
         }
 
-        @media (max-width: 768px) {
-            .order-header {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.2rem;
             }
 
-            .order-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-
-            .container {
-                padding: 2rem 1rem;
+            .nav-item {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.6rem;
             }
 
             h2 {
-                font-size: 2rem;
+                font-size: 1.5rem;
+            }
+
+            .order-header {
+                flex-direction: column;
+                gap: 0.8rem;
+                align-items: flex-start;
+            }
+
+            .order-status {
+                align-self: flex-start;
+            }
+
+            .item-emoji {
+                font-size: 1.5rem;
+            }
+
+            .item-name {
+                font-size: 0.9rem;
+            }
+
+            .item-price {
+                font-size: 0.9rem;
+            }
+
+            .order-total {
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -338,12 +329,11 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { getFirestore, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
             authDomain: "hungrybites-c7930.firebaseapp.com",
-            databaseURL: "https://hungrybites-c7930-default-rtdb.firebaseio.com",
             projectId: "hungrybites-c7930",
             storageBucket: "hungrybites-c7930.firebasestorage.app",
             messagingSenderId: "346758544945",
@@ -353,7 +343,7 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getDatabase(app);
+        const db = getFirestore(app);
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -363,16 +353,20 @@
             }
         });
 
-        function loadOrders(userId) {
+        async function loadOrders(userId) {
             const ordersList = document.getElementById('ordersList');
             ordersList.innerHTML = '<div class="loading"><div class="spinner"></div>Loading your orders...</div>';
 
-            // Reference to user's orders: /orders/userId
-            const userOrdersRef = ref(db, `orders/${userId}`);
+            try {
+                const q = query(
+                    collection(db, 'orders'),
+                    where('userId', '==', userId),
+                    orderBy('createdAt', 'desc')
+                );
+                
+                const querySnapshot = await getDocs(q);
 
-            // Listen for real-time updates
-            onValue(userOrdersRef, (snapshot) => {
-                if (!snapshot.exists()) {
+                if (querySnapshot.empty) {
                     ordersList.innerHTML = `
                         <div class="empty-orders">
                             <div class="empty-orders-icon">📦</div>
@@ -384,82 +378,49 @@
                     return;
                 }
 
-                const orders = [];
-                snapshot.forEach((childSnapshot) => {
-                    orders.push({
-                        id: childSnapshot.key,
-                        ...childSnapshot.val()
-                    });
-                });
-
-                // Sort by createdAt in descending order (newest first)
-                orders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
                 let ordersHTML = '';
-                orders.forEach((order) => {
-                    const orderDate = order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A';
-                    const address = order.deliveryAddress || {};
+                let orderNumber = querySnapshot.size;
+                querySnapshot.forEach((doc) => {
+                    const order = doc.data();
+                    const orderDate = order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleString() : 'N/A';
                     
                     ordersHTML += `
                         <div class="order-card">
                             <div class="order-header">
                                 <div>
-                                    <div class="order-id">Order #${order.id.substring(0, 8).toUpperCase()}</div>
+                                    <div class="order-number">#${orderNumber}</div>
+                                    <div class="order-id">Order ID: ${doc.id.substring(0, 8)}</div>
                                     <div class="order-date">${orderDate}</div>
                                 </div>
-                                <div class="order-status status-${order.status || 'pending'}">
-                                    ${(order.status || 'pending').charAt(0).toUpperCase() + (order.status || 'pending').slice(1)}
+                                <div class="order-status status-${order.status}">
+                                    ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                                 </div>
                             </div>
-                            
-                            ${address.fullName ? `
-                                <div class="delivery-info">
-                                    <h4>📍 Delivery Address</h4>
-                                    <p><strong>${address.fullName}</strong> ${address.label ? `(${address.label})` : ''}</p>
-                                    <p>${address.streetAddress}${address.landmark ? ', ' + address.landmark : ''}</p>
-                                    <p>${address.city}, ${address.pincode}</p>
-                                    <p>📞 ${address.phone}</p>
-                                </div>
-                            ` : ''}
-                            
                             <div class="order-items">
                                 ${order.items.map(item => `
                                     <div class="order-item">
                                         <div class="item-details">
-                                            ${item.imageurl ? 
-                                                `<img src="${item.imageurl}" alt="${item.name}" class="item-image">` : 
-                                                `<div class="item-emoji">${item.emoji || '🍔'}</div>`
-                                            }
+                                            <div class="item-emoji">${item.emoji || '🍔'}</div>
                                             <div class="item-info">
                                                 <div class="item-name">${item.name}</div>
-                                                <div class="item-quantity">Quantity: ${item.quantity}</div>
+                                                <div class="item-quantity">Qty: ${item.quantity}</div>
                                             </div>
                                         </div>
                                         <div class="item-price">₹${item.price * item.quantity}</div>
                                     </div>
                                 `).join('')}
                             </div>
-                            
-                            <div class="order-summary">
-                                <div class="summary-row">
-                                    <span class="summary-label">Subtotal:</span>
-                                    <span class="summary-value">₹${order.subtotal || 0}</span>
-                                </div>
-                                <div class="summary-row">
-                                    <span class="summary-label">Delivery Fee:</span>
-                                    <span class="summary-value">₹${order.deliveryFee || 0}</span>
-                                </div>
-                                <div class="summary-row total">
-                                    <span class="summary-label">Total Amount:</span>
-                                    <span class="summary-value">₹${order.total || 0}</span>
-                                </div>
+                            <div class="order-total">
+                                <span class="total-label">Total:</span>
+                                <span class="total-amount">₹${order.total}</span>
                             </div>
                         </div>
                     `;
+                    orderNumber--;
                 });
 
                 ordersList.innerHTML = ordersHTML;
-            }, (error) => {
+            } catch (error) {
                 console.error('Error loading orders:', error);
                 ordersList.innerHTML = `
                     <div class="empty-orders">
@@ -468,7 +429,7 @@
                         <p>Please try again later</p>
                     </div>
                 `;
-            });
+            }
         }
 
         window.logout = async function() {
