@@ -20,49 +20,44 @@
         .navbar {
             background: #2c3e50;
             color: white;
-            padding: 1rem 2rem;
+            padding: 1rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-        }
-
-        .nav-right {
+        .navbar-left {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 1rem;
         }
 
-        .admin-info {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            display: none;
         }
 
-        .admin-name {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .admin-role {
-            font-size: 0.8rem;
-            opacity: 0.8;
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
         }
 
         .logout-btn {
             background: #e74c3c;
             color: white;
             border: none;
-            padding: 0.6rem 1.5rem;
+            padding: 0.6rem 1.2rem;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
+            font-size: 0.9rem;
         }
 
         .logout-btn:hover {
@@ -72,23 +67,90 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 1.5rem 1rem;
         }
 
         .tabs {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
             border-bottom: 2px solid #e0e0e0;
+            overflow-x: auto;
+        }
+
+        .tabs.mobile-hidden {
+            display: none;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 100vh;
+            background: #2c3e50;
+            z-index: 2000;
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+            overflow-y: auto;
+        }
+
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+
+        .mobile-menu-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .mobile-menu-title {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .mobile-menu-item {
+            padding: 1rem 1.5rem;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .mobile-menu-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .mobile-menu-item.active {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1999;
+        }
+
+        .overlay.active {
+            display: block;
         }
 
         .tab {
-            padding: 1rem 2rem;
+            padding: 1rem 1.5rem;
             cursor: pointer;
             font-weight: 600;
             color: #666;
             border-bottom: 3px solid transparent;
             transition: all 0.3s;
+            white-space: nowrap;
+            font-size: 0.9rem;
         }
 
         .tab:hover {
@@ -109,24 +171,24 @@
         }
 
         .section-title {
-            font-size: 2rem;
-            margin-bottom: 2rem;
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
             color: #2c3e50;
         }
 
         .add-item-form {
             background: white;
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
         }
 
         .form-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
         }
 
         .form-group {
@@ -138,6 +200,7 @@
             margin-bottom: 0.5rem;
             font-weight: 600;
             color: #333;
+            font-size: 0.9rem;
         }
 
         .form-group input,
@@ -157,19 +220,20 @@
 
         .form-group textarea {
             resize: vertical;
-            min-height: 100px;
+            min-height: 80px;
         }
 
         .btn-primary {
             background: #2c3e50;
             color: white;
             border: none;
-            padding: 1rem 2rem;
+            padding: 1rem;
             border-radius: 10px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            width: 100%;
         }
 
         .btn-primary:hover {
@@ -179,40 +243,40 @@
 
         .items-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: 1fr;
+            gap: 1rem;
         }
 
         .item-card {
             background: white;
             border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 1.2rem;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
         }
 
         .item-emoji {
-            font-size: 3rem;
+            font-size: 2.5rem;
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
         }
 
         .item-name {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 600;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
 
         .item-description {
             color: #666;
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
             font-size: 0.9rem;
         }
 
         .item-price {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: bold;
             color: #60b246;
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
         }
 
         .item-actions {
@@ -220,9 +284,8 @@
             gap: 0.5rem;
         }
 
-        .btn-delete {
+        .btn-delete, .btn-toggle {
             flex: 1;
-            background: #e74c3c;
             color: white;
             border: none;
             padding: 0.6rem;
@@ -230,68 +293,162 @@
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
         }
 
         .btn-delete:hover {
             background: #c0392b;
         }
 
-        .orders-table {
+        .btn-toggle {
+            background: #3498db;
+        }
+
+        .btn-toggle.inactive {
+            background: #95a5a6;
+        }
+
+        .btn-toggle:hover {
+            opacity: 0.9;
+        }
+
+        .orders-container {
             background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            overflow-x: auto;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background: #2c3e50;
-            color: white;
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        tr:hover {
+        .order-card-admin {
             background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            border: 2px solid #e0e0e0;
+        }
+
+        .order-header-admin {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .order-sl {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .order-info {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+
+        .order-customer {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .order-items-list {
+            background: white;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .order-total-admin {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #60b246;
+            margin-bottom: 0.8rem;
+        }
+
+        .order-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
         .status-select {
-            padding: 0.5rem;
+            padding: 0.6rem;
             border: 2px solid #e0e0e0;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 0.9rem;
             cursor: pointer;
+            width: 100%;
         }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-accept, .btn-reject, .btn-call, .btn-map {
+            flex: 1;
+            padding: 0.6rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .btn-accept {
+            background: #60b246;
+            color: white;
+        }
+
+        .btn-reject {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-call {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-map {
+            background: #9b59b6;
+            color: white;
+        }
+
+        .btn-accept:hover { opacity: 0.9; }
+        .btn-reject:hover { opacity: 0.9; }
+        .btn-call:hover { opacity: 0.9; }
+        .btn-map:hover { opacity: 0.9; }
 
         .notification {
             position: fixed;
-            top: 100px;
-            right: 2rem;
+            top: 80px;
+            right: 1rem;
+            left: 1rem;
             background: #60b246;
             color: white;
-            padding: 1rem 1.5rem;
+            padding: 1rem;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
             opacity: 0;
-            transform: translateX(400px);
+            transform: translateY(-20px);
             transition: all 0.3s;
             z-index: 2000;
+            text-align: center;
         }
 
         .notification.show {
             opacity: 1;
-            transform: translateX(0);
+            transform: translateY(0);
         }
 
         .notification.error {
@@ -319,38 +476,72 @@
             100% { transform: rotate(360deg); }
         }
 
-        @media (max-width: 768px) {
-            .tabs {
-                overflow-x: auto;
-            }
-
+        @media (min-width: 768px) {
             .form-row {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(3, 1fr);
             }
 
             .items-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
             }
 
-            .admin-info {
+            .notification {
+                left: auto;
+                right: 2rem;
+                max-width: 400px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .items-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .menu-btn {
+                display: block;
+            }
+
+            .tabs {
                 display: none;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .logo {
+                font-size: 1.2rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <div class="logo">🔐 Admin Dashboard</div>
-        <div class="nav-right">
-            <div class="admin-info" id="adminInfo"></div>
-            <button class="logout-btn" onclick="logout()">Logout</button>
+        <div class="navbar-left">
+            <button class="menu-btn" onclick="toggleMenu()">☰</button>
+            <div class="logo">🍔 Admin</div>
         </div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
+
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <div class="mobile-menu-title">Menu</div>
+        </div>
+        <div class="mobile-menu-item active" onclick="switchTab('food')">🍕 Food Items</div>
+        <div class="mobile-menu-item" onclick="switchTab('orders')">📦 Orders</div>
+        <div class="mobile-menu-item" onclick="switchTab('menu')">📋 Menu Status</div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
     <div class="container">
         <div class="tabs">
             <div class="tab active" onclick="switchTab('food')">Food Items</div>
             <div class="tab" onclick="switchTab('orders')">Orders</div>
+            <div class="tab" onclick="switchTab('menu')">Menu Status</div>
         </div>
 
         <!-- Food Items Tab -->
@@ -358,7 +549,7 @@
             <h2 class="section-title">Manage Food Items</h2>
             
             <div class="add-item-form">
-                <h3 style="margin-bottom: 1.5rem;">Add New Item</h3>
+                <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Add New Item</h3>
                 <form onsubmit="addFoodItem(event)">
                     <div class="form-row">
                         <div class="form-group">
@@ -388,21 +579,15 @@
         <!-- Orders Tab -->
         <div id="ordersTab" class="tab-content">
             <h2 class="section-title">Manage Orders</h2>
-            <div class="orders-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Customer</th>
-                            <th>Items</th>
-                            <th>Total</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ordersTableBody"></tbody>
-                </table>
+            <div class="orders-container">
+                <div id="ordersContainer"></div>
             </div>
+        </div>
+
+        <!-- Menu Status Tab -->
+        <div id="menuTab" class="tab-content">
+            <h2 class="section-title">Menu Item Status</h2>
+            <div id="menuItemsGrid" class="items-grid"></div>
         </div>
     </div>
 
@@ -411,8 +596,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        import { getDatabase, ref, get, set, remove, update, push, child } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
-        import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, orderBy, query, getDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -421,38 +605,20 @@
             storageBucket: "hungrybites-c7930.firebasestorage.app",
             messagingSenderId: "346758544945",
             appId: "1:346758544945:web:4bcad30016540d18e79f10",
-            measurementId: "G-B5GP5SYMRC",
-            databaseURL: "https://hungrybites-c7930-default-rtdb.firebaseio.com"
+            measurementId: "G-B5GP5SYMRC"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const database = getDatabase(app);
-        const firestore = getFirestore(app);
-
-        let currentAdmin = null;
+        const db = getFirestore(app);
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // Verify admin from Realtime Database
-                const dbRef = ref(database);
-                const snapshot = await get(child(dbRef, `admins/${user.uid}`));
-                
-                if (snapshot.exists() && snapshot.val().admin === true) {
-                    currentAdmin = {
-                        uid: user.uid,
-                        ...snapshot.val()
-                    };
-                    
-                    // Display admin info
-                    const adminInfoEl = document.getElementById('adminInfo');
-                    adminInfoEl.innerHTML = `
-                        <div class="admin-name">${currentAdmin.name || 'Admin'}</div>
-                        <div class="admin-role">${currentAdmin.role || 'Administrator'}</div>
-                    `;
-                    
+                const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+                if (adminDoc.exists() && adminDoc.data().isAdmin === true) {
                     loadFoodItems();
                     loadOrders();
+                    loadMenuItems();
                 } else {
                     window.location.href = 'adminlogin.html';
                 }
@@ -461,16 +627,39 @@
             }
         });
 
+        window.toggleMenu = function() {
+            const menu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('overlay');
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        };
+
         window.switchTab = function(tab) {
+            // Close mobile menu
+            document.getElementById('mobileMenu').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+
+            // Update desktop tabs
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             
+            // Update mobile menu
+            document.querySelectorAll('.mobile-menu-item').forEach(item => item.classList.remove('active'));
+
             if (tab === 'food') {
                 document.querySelectorAll('.tab')[0].classList.add('active');
                 document.getElementById('foodTab').classList.add('active');
-            } else {
+                document.querySelectorAll('.mobile-menu-item')[0].classList.add('active');
+            } else if (tab === 'orders') {
                 document.querySelectorAll('.tab')[1].classList.add('active');
                 document.getElementById('ordersTab').classList.add('active');
+                document.querySelectorAll('.mobile-menu-item')[1].classList.add('active');
+                loadOrders();
+            } else if (tab === 'menu') {
+                document.querySelectorAll('.tab')[2].classList.add('active');
+                document.getElementById('menuTab').classList.add('active');
+                document.querySelectorAll('.mobile-menu-item')[2].classList.add('active');
+                loadMenuItems();
             }
         };
 
@@ -483,19 +672,19 @@
             const description = document.getElementById('itemDescription').value;
 
             try {
-                // Add to Firestore (keeping compatibility with existing user app)
-                const docRef = await push(ref(database, 'foodItems'));
-                await set(docRef, {
+                await addDoc(collection(db, 'foodItems'), {
                     name,
                     price,
                     emoji,
                     description,
-                    createdAt: new Date().toISOString()
+                    isActive: true,
+                    createdAt: new Date()
                 });
 
                 showNotification('Item added successfully!');
                 e.target.reset();
                 loadFoodItems();
+                loadMenuItems();
             } catch (error) {
                 console.error('Error adding item:', error);
                 showNotification('Error adding item', true);
@@ -507,8 +696,7 @@
             grid.innerHTML = '<div class="loading"><div class="spinner"></div>Loading items...</div>';
 
             try {
-                // Load from Firestore for compatibility
-                const querySnapshot = await getDocs(collection(firestore, 'foodItems'));
+                const querySnapshot = await getDocs(collection(db, 'foodItems'));
                 
                 if (querySnapshot.empty) {
                     grid.innerHTML = '<p style="text-align: center; color: #666;">No food items yet</p>';
@@ -537,16 +725,64 @@
             }
         }
 
+        async function loadMenuItems() {
+            const grid = document.getElementById('menuItemsGrid');
+            grid.innerHTML = '<div class="loading"><div class="spinner"></div>Loading menu items...</div>';
+
+            try {
+                const querySnapshot = await getDocs(collection(db, 'foodItems'));
+                
+                if (querySnapshot.empty) {
+                    grid.innerHTML = '<p style="text-align: center; color: #666;">No food items yet</p>';
+                    return;
+                }
+
+                let html = '';
+                querySnapshot.forEach((doc) => {
+                    const item = doc.data();
+                    const isActive = item.isActive !== false;
+                    html += `
+                        <div class="item-card">
+                            <div class="item-emoji">${item.emoji}</div>
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-description">${item.description || 'No description'}</div>
+                            <div class="item-price">₹${item.price}</div>
+                            <div class="item-actions">
+                                <button class="btn-toggle ${!isActive ? 'inactive' : ''}" onclick="toggleItemStatus('${doc.id}', ${isActive})">
+                                    ${isActive ? 'Active ✓' : 'Inactive ✗'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                grid.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading menu items:', error);
+                grid.innerHTML = '<p style="text-align: center; color: #e74c3c;">Error loading items</p>';
+            }
+        }
+
+        window.toggleItemStatus = async function(itemId, currentStatus) {
+            try {
+                await updateDoc(doc(db, 'foodItems', itemId), {
+                    isActive: !currentStatus
+                });
+                showNotification(`Item ${!currentStatus ? 'activated' : 'deactivated'} successfully!`);
+                loadMenuItems();
+            } catch (error) {
+                console.error('Error toggling item status:', error);
+                showNotification('Error updating item status', true);
+            }
+        };
+
         window.deleteItem = async function(itemId) {
             if (!confirm('Are you sure you want to delete this item?')) return;
 
             try {
-                // Delete from Firestore
-                const { deleteDoc, doc } = await import("https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js");
-                await deleteDoc(doc(firestore, 'foodItems', itemId));
-                
+                await deleteDoc(doc(db, 'foodItems', itemId));
                 showNotification('Item deleted successfully!');
                 loadFoodItems();
+                loadMenuItems();
             } catch (error) {
                 console.error('Error deleting item:', error);
                 showNotification('Error deleting item', true);
@@ -554,54 +790,74 @@
         };
 
         async function loadOrders() {
-            const tbody = document.getElementById('ordersTableBody');
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Loading orders...</td></tr>';
+            const container = document.getElementById('ordersContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading orders...</div>';
 
             try {
-                // Load orders from Firestore
-                const q = query(collection(firestore, 'orders'), orderBy('createdAt', 'desc'));
+                const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
                 const querySnapshot = await getDocs(q);
 
                 if (querySnapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">No orders yet</td></tr>';
+                    container.innerHTML = '<p style="text-align: center; color: #666;">No orders yet</p>';
                     return;
                 }
 
                 let html = '';
+                let slNumber = 1;
                 querySnapshot.forEach((docSnap) => {
                     const order = docSnap.data();
                     const orderDate = order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleString() : 'N/A';
                     const itemsList = order.items.map(item => `${item.name} (${item.quantity})`).join(', ');
+                    const phone = order.phone || 'N/A';
+                    const address = order.address || 'No address provided';
 
                     html += `
-                        <tr>
-                            <td>#${docSnap.id.substring(0, 8)}</td>
-                            <td>${order.userEmail}</td>
-                            <td>${itemsList}</td>
-                            <td>₹${order.total}</td>
-                            <td>${orderDate}</td>
-                            <td>
+                        <div class="order-card-admin">
+                            <div class="order-header-admin">
+                                <div>
+                                    <div class="order-sl">#${slNumber}</div>
+                                    <div class="order-info">ID: ${docSnap.id.substring(0, 8)}</div>
+                                    <div class="order-info">${orderDate}</div>
+                                </div>
+                            </div>
+                            <div class="order-customer">${order.userEmail}</div>
+                            <div class="order-info">📞 ${phone}</div>
+                            <div class="order-info">📍 ${address}</div>
+                            <div class="order-items-list">${itemsList}</div>
+                            <div class="order-total-admin">Total: ₹${order.total}</div>
+                            <div class="order-actions">
                                 <select class="status-select" onchange="updateOrderStatus('${docSnap.id}', this.value)" value="${order.status}">
                                     <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
                                     <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                                    <option value="cooking" ${order.status === 'cooking' ? 'selected' : ''}>Cooking</option>
+                                    <option value="packed" ${order.status === 'packed' ? 'selected' : ''}>Packed</option>
+                                    <option value="out-for-delivery" ${order.status === 'out-for-delivery' ? 'selected' : ''}>Out for Delivery</option>
                                     <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
                                     <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
                                 </select>
-                            </td>
-                        </tr>
+                                <div class="action-buttons">
+                                    <button class="btn-accept" onclick="acceptOrder('${docSnap.id}')">Accept</button>
+                                    <button class="btn-reject" onclick="rejectOrder('${docSnap.id}')">Reject</button>
+                                </div>
+                                <div class="action-buttons">
+                                    <button class="btn-call" onclick="callCustomer('${phone}')">📞 Call</button>
+                                    <button class="btn-map" onclick="openMap('${address}')">🗺️ Map</button>
+                                </div>
+                            </div>
+                        </div>
                     `;
+                    slNumber++;
                 });
-                tbody.innerHTML = html;
+                container.innerHTML = html;
             } catch (error) {
                 console.error('Error loading orders:', error);
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #e74c3c;">Error loading orders</td></tr>';
+                container.innerHTML = '<p style="text-align: center; color: #e74c3c;">Error loading orders</p>';
             }
         }
 
         window.updateOrderStatus = async function(orderId, newStatus) {
             try {
-                const { updateDoc, doc } = await import("https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js");
-                await updateDoc(doc(firestore, 'orders', orderId), {
+                await updateDoc(doc(db, 'orders', orderId), {
                     status: newStatus
                 });
                 showNotification('Order status updated!');
@@ -609,6 +865,50 @@
                 console.error('Error updating order:', error);
                 showNotification('Error updating order', true);
             }
+        };
+
+        window.acceptOrder = async function(orderId) {
+            try {
+                await updateDoc(doc(db, 'orders', orderId), {
+                    status: 'confirmed'
+                });
+                showNotification('Order accepted!');
+                loadOrders();
+            } catch (error) {
+                console.error('Error accepting order:', error);
+                showNotification('Error accepting order', true);
+            }
+        };
+
+        window.rejectOrder = async function(orderId) {
+            if (!confirm('Are you sure you want to reject this order?')) return;
+            try {
+                await updateDoc(doc(db, 'orders', orderId), {
+                    status: 'cancelled'
+                });
+                showNotification('Order rejected!');
+                loadOrders();
+            } catch (error) {
+                console.error('Error rejecting order:', error);
+                showNotification('Error rejecting order', true);
+            }
+        };
+
+        window.callCustomer = function(phone) {
+            if (phone === 'N/A') {
+                showNotification('Phone number not available', true);
+                return;
+            }
+            window.location.href = `tel:${phone}`;
+        };
+
+        window.openMap = function(address) {
+            if (!address || address === 'No address provided') {
+                showNotification('Address not available', true);
+                return;
+            }
+            const encodedAddress = encodeURIComponent(address);
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
         };
 
         function showNotification(message, isError = false) {
@@ -625,7 +925,6 @@
         window.logout = async function() {
             try {
                 await signOut(auth);
-                sessionStorage.removeItem('adminData');
                 window.location.href = 'adminlogin.html';
             } catch (error) {
                 console.error('Error logging out:', error);
