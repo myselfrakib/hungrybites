@@ -223,6 +223,18 @@
             min-height: 80px;
         }
 
+        .image-preview {
+            margin-top: 0.5rem;
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .image-preview.show {
+            display: block;
+        }
+
         .btn-primary {
             background: #2c3e50;
             color: white;
@@ -252,6 +264,14 @@
             border-radius: 12px;
             padding: 1.2rem;
             box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        }
+
+        .item-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
         }
 
         .item-emoji {
@@ -321,6 +341,36 @@
             border-radius: 12px;
             padding: 1.5rem;
             box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        }
+
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .sort-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .sort-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .sort-select {
+            padding: 0.6rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background: white;
         }
 
         .order-card-admin {
@@ -566,6 +616,11 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label>Image URL</label>
+                        <input type="url" id="itemImageUrl" placeholder="https://example.com/image.jpg" onchange="previewImage()">
+                        <img id="imagePreview" class="image-preview" alt="Image preview">
+                    </div>
+                    <div class="form-group">
                         <label>Description</label>
                         <textarea id="itemDescription" placeholder="Describe the food item..."></textarea>
                     </div>
@@ -580,6 +635,16 @@
         <div id="ordersTab" class="tab-content">
             <h2 class="section-title">Manage Orders</h2>
             <div class="orders-container">
+                <div class="orders-header">
+                    <div style="font-size: 1.1rem; font-weight: 600; color: #2c3e50;">All Orders</div>
+                    <div class="sort-controls">
+                        <span class="sort-label">Sort by:</span>
+                        <select class="sort-select" id="orderSort" onchange="loadOrders()">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                        </select>
+                    </div>
+                </div>
                 <div id="ordersContainer"></div>
             </div>
         </div>
@@ -596,7 +661,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-        import { getDatabase, ref, get, set, update, remove, push, onValue, query, orderByChild } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+        import { getDatabase, ref, get, set, update, remove, push } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -628,6 +693,22 @@
                 window.location.href = 'adminlogin.html';
             }
         });
+
+        window.previewImage = function() {
+            const imageUrl = document.getElementById('itemImageUrl').value;
+            const preview = document.getElementById('imagePreview');
+            
+            if (imageUrl) {
+                preview.src = imageUrl;
+                preview.classList.add('show');
+                preview.onerror = function() {
+                    preview.classList.remove('show');
+                    showNotification('Invalid image URL', true);
+                };
+            } else {
+                preview.classList.remove('show');
+            }
+        };
 
         window.toggleMenu = function() {
             const menu = document.getElementById('mobileMenu');
@@ -667,23 +748,31 @@
             const name = document.getElementById('itemName').value;
             const price = parseFloat(document.getElementById('itemPrice').value);
             const emoji = document.getElementById('itemEmoji').value;
+            const imageUrl = document.getElementById('itemImageUrl').value;
             const description = document.getElementById('itemDescription').value;
 
             try {
                 const foodItemsRef = ref(db, 'foodItems');
                 const newItemRef = push(foodItemsRef);
                 
-                await set(newItemRef, {
+                const itemData = {
                     name,
                     price,
                     emoji,
                     description,
                     isActive: true,
                     createdAt: new Date().toISOString()
-                });
+                };
+
+                if (imageUrl) {
+                    itemData.imageurl = imageUrl;
+                }
+                
+                await set(newItemRef, itemData);
 
                 showNotification('Item added successfully!');
                 e.target.reset();
+                document.getElementById('imagePreview').classList.remove('show');
                 loadFoodItems();
                 loadMenuItems();
             } catch (error) {
@@ -711,7 +800,7 @@
                 Object.entries(items).forEach(([itemId, item]) => {
                     html += `
                         <div class="item-card">
-                            <div class="item-emoji">${item.emoji}</div>
+                            ${item.imageurl ? `<img src="${item.imageurl}" alt="${item.name}" class="item-image">` : `<div class="item-emoji">${item.emoji}</div>`}
                             <div class="item-name">${item.name}</div>
                             <div class="item-description">${item.description || 'No description'}</div>
                             <div class="item-price">₹${item.price}</div>
@@ -748,7 +837,7 @@
                     const isActive = item.isActive !== false;
                     html += `
                         <div class="item-card">
-                            <div class="item-emoji">${item.emoji}</div>
+                            ${item.imageurl ? `<img src="${item.imageurl}" alt="${item.name}" class="item-image">` : `<div class="item-emoji">${item.emoji}</div>`}
                             <div class="item-name">${item.name}</div>
                             <div class="item-description">${item.description || 'No description'}</div>
                             <div class="item-price">₹${item.price}</div>
@@ -823,7 +912,12 @@
                     });
                 });
 
-                allOrders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                const sortOrder = document.getElementById('orderSort').value;
+                if (sortOrder === 'newest') {
+                    allOrders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                } else {
+                    allOrders.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+                }
 
                 let html = '';
                 let slNumber = 1;
