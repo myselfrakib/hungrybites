@@ -588,6 +588,25 @@
                 transform: translateY(-2px);
                 box-shadow: 0 5px 15px rgba(96, 178, 70, 0.4);
             }
+
+            .hamburger {
+                display: none;
+            }
+
+            .nav-items {
+                display: flex !important;
+                position: static;
+                flex-direction: row;
+                padding: 0;
+                box-shadow: none;
+                gap: 1rem;
+            }
+
+            .nav-item {
+                border-bottom: none;
+                padding: 0.5rem 0.75rem;
+                min-height: 40px;
+            }
         }
     </style>
 </head>
@@ -697,7 +716,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        import { getDatabase, ref, push, set, get, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { getDatabase, ref, push, set, get, remove } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -876,7 +895,7 @@
                             ${isDefault ? '<span class="default-badge">Default</span>' : ''}
                         </div>
                         <div class="address-details">
-                            ${addr.address}<br>
+                            ${addr.streetAddress || addr.address}<br>
                             ${addr.city}, ${addr.pincode}
                             ${addr.landmark ? `<br>Landmark: ${addr.landmark}` : ''}
                         </div>
@@ -971,7 +990,7 @@
             deliveryAddress = {
                 fullName,
                 phone,
-                address,
+                streetAddress: address,
                 city,
                 pincode,
                 landmark
@@ -981,7 +1000,10 @@
                 try {
                     const addressesRef = ref(db, `users/${currentUser.uid}/addresses`);
                     const newAddressRef = push(addressesRef);
-                    await set(newAddressRef, deliveryAddress);
+                    await set(newAddressRef, {
+                        ...deliveryAddress,
+                        createdAt: Date.now()
+                    });
                     
                     savedAddresses.push({
                         id: newAddressRef.key,
@@ -1083,11 +1105,18 @@
                     subtotal: subtotal,
                     deliveryFee: deliveryFee,
                     total: total,
-                    deliveryAddress: deliveryAddress,
+                    deliveryAddress: {
+                        address: deliveryAddress.streetAddress || deliveryAddress.address,
+                        fullName: deliveryAddress.fullName,
+                        phone: deliveryAddress.phone,
+                        city: deliveryAddress.city,
+                        pincode: deliveryAddress.pincode,
+                        landmark: deliveryAddress.landmark || ''
+                    },
                     paymentMethod: paymentMethod,
                     paymentStatus: paymentMethod === 'online' ? 'paid' : 'pending',
                     status: 'pending',
-                    createdAt: serverTimestamp()
+                    createdAt: Date.now()
                 };
 
                 if (paymentId) {
@@ -1165,4 +1194,3 @@
     </script>
 </body>
 </html>
-
