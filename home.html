@@ -366,10 +366,6 @@
             flex: 1;
         }
 
-        .notification-text {
-            font-weight: 500;
-        }
-
         .view-cart-btn {
             background: white;
             color: #60b246;
@@ -505,9 +501,6 @@
     </div>
 
     <div class="notification" id="notification">
-        <div class="notification-content">
-            <span class="notification-text">Added to cart! 🎉</span>
-        </div>
         <a href="checkout.html" class="view-cart-btn">🛒 Order Now</a>
     </div>
 
@@ -533,6 +526,7 @@
 
         let cart = JSON.parse(localStorage.getItem('cart') || '[]');
         updateCartBadge();
+        updateNotificationVisibility();
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -631,7 +625,7 @@
 
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartBadge();
-            showNotification();
+            updateNotificationVisibility();
             updateButtonUI(id, 1);
         };
 
@@ -641,6 +635,7 @@
                 item.quantity += 1;
                 localStorage.setItem('cart', JSON.stringify(cart));
                 updateCartBadge();
+                updateNotificationVisibility();
                 updateButtonUI(id, item.quantity);
             }
         };
@@ -652,11 +647,13 @@
                     item.quantity -= 1;
                     localStorage.setItem('cart', JSON.stringify(cart));
                     updateCartBadge();
+                    updateNotificationVisibility();
                     updateButtonUI(id, item.quantity);
                 } else {
                     cart = cart.filter(cartItem => cartItem.id !== id);
                     localStorage.setItem('cart', JSON.stringify(cart));
                     updateCartBadge();
+                    updateNotificationVisibility();
                     updateButtonUI(id, 0);
                 }
             }
@@ -689,12 +686,15 @@
             document.getElementById('cartBadge').textContent = totalItems;
         }
 
-        function showNotification() {
+        function updateNotificationVisibility() {
             const notification = document.getElementById('notification');
-            notification.classList.add('show');
-            setTimeout(() => {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            if (totalItems > 0) {
+                notification.classList.add('show');
+            } else {
                 notification.classList.remove('show');
-            }, 3000);
+            }
         }
 
         window.logout = async function() {
