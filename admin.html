@@ -740,7 +740,6 @@
             <div class="tab" onclick="switchTab('menu')">📋 Menu Status</div>
         </div>
 
-        <!-- Food Items Tab -->
         <div id="foodTab" class="tab-content active">
             <h2 class="section-title">Manage Food Items</h2>
             
@@ -777,7 +776,6 @@
             <div id="itemsGrid" class="items-grid"></div>
         </div>
 
-        <!-- Orders Tab -->
         <div id="ordersTab" class="tab-content">
             <h2 class="section-title">Manage Orders</h2>
             <div class="orders-container">
@@ -795,7 +793,6 @@
             </div>
         </div>
 
-        <!-- Menu Status Tab -->
         <div id="menuTab" class="tab-content">
             <h2 class="section-title">Menu Item Status</h2>
             <div id="menuItemsGrid" class="items-grid"></div>
@@ -1089,19 +1086,14 @@
                 }
 
                 const allOrders = [];
-                snapshot.forEach((userSnapshot) => {
-                    const userId = userSnapshot.key;
-                    const userOrders = userSnapshot.val();
-                    
-                    if (userOrders && typeof userOrders === 'object') {
-                        Object.entries(userOrders).forEach(([orderId, order]) => {
-                            if (order && typeof order === 'object') {
-                                allOrders.push({
-                                    id: orderId,
-                                    userId: userId,
-                                    ...order
-                                });
-                            }
+                const ordersData = snapshot.val();
+                
+                Object.entries(ordersData).forEach(([orderId, order]) => {
+                    if (order && typeof order === 'object' && order.createdAt) {
+                        allOrders.push({
+                            id: orderId,
+                            userId: order.userId || 'unknown',
+                            ...order
                         });
                     }
                 });
@@ -1135,20 +1127,12 @@
                         'No items';
                     
                     const phone = order.deliveryAddress?.phone || 'N/A';
+                    const fullName = order.deliveryAddress?.fullName || 'Unknown';
                     const fullAddress = order.deliveryAddress ? 
-                        `${order.deliveryAddress.streetAddress || ''}, ${order.deliveryAddress.landmark || ''}, ${order.deliveryAddress.city || ''} - ${order.deliveryAddress.pincode || ''}`.replace(/^[,\s]+|[,\s]+$/g, '') : 
+                        `${order.deliveryAddress.address || ''}, ${order.deliveryAddress.landmark || ''}, ${order.deliveryAddress.city || ''} - ${order.deliveryAddress.pincode || ''}`.replace(/^[,\s]+|[,\s]+$/g, '').replace(/,\s*,/g, ',') : 
                         'No address provided';
 
                     const isAccepted = order.status && order.status !== 'pending' && order.status !== 'cancelled';
-                    const statusDisplayMap = {
-                        'pending': 'Pending',
-                        'confirmed': 'Confirmed',
-                        'cooking': 'Cooking',
-                        'packed': 'Packed',
-                        'out-for-delivery': 'Out for Delivery',
-                        'delivered': 'Delivered',
-                        'cancelled': 'Cancelled'
-                    };
                     
                     html += `
                         <div class="order-card-admin">
@@ -1159,7 +1143,8 @@
                                     <div class="order-info">📅 ${orderDate}</div>
                                 </div>
                             </div>
-                            <div class="order-customer">👤 ${order.userEmail || 'Unknown User'}</div>
+                            <div class="order-customer">👤 ${fullName}</div>
+                            <div class="order-info">📧 ${order.userEmail || 'Unknown User'}</div>
                             <div class="order-info">📞 ${phone}</div>
                             <div class="order-info">📍 ${fullAddress}</div>
                             <div class="order-items-list"><strong>Items:</strong> ${itemsList}</div>
@@ -1171,15 +1156,15 @@
                                         <button class="btn-map" onclick="openMap('${encodeURIComponent(fullAddress)}')">🗺️ Map</button>
                                     </div>
                                     <div class="action-buttons">
-                                        <button class="btn-accept" onclick="acceptOrder('${order.userId}', '${order.id}')">✓ Accept Order</button>
-                                        <button class="btn-reject" onclick="rejectOrder('${order.userId}', '${order.id}')">✗ Reject</button>
+                                        <button class="btn-accept" onclick="acceptOrder('${order.id}')">✓ Accept Order</button>
+                                        <button class="btn-reject" onclick="rejectOrder('${order.id}')">✗ Reject</button>
                                     </div>
                                 ` : order.status === 'cancelled' ? `
                                     <div style="text-align: center; padding: 0.8rem; background: #fee; color: #c33; border-radius: 8px; font-weight: 600;">
                                         ✗ Order Cancelled
                                     </div>
                                 ` : `
-                                    <select class="status-select" onchange="updateOrderStatus('${order.userId}', '${order.id}', this.value)">
+                                    <select class="status-select" onchange="updateOrderStatus('${order.id}', this.value)">
                                         <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
                                         <option value="cooking" ${order.status === 'cooking' ? 'selected' : ''}>Cooking</option>
                                         <option value="packed" ${order.status === 'packed' ? 'selected' : ''}>Packed</option>
@@ -1203,9 +1188,9 @@
             }
         }
 
-        window.updateOrderStatus = async function(userId, orderId, newStatus) {
+        window.updateOrderStatus = async function(orderId, newStatus) {
             try {
-                const orderRef = ref(db, `orders/${userId}/${orderId}`);
+                const orderRef = ref(db, `orders/${orderId}`);
                 await update(orderRef, {
                     status: newStatus,
                     updatedAt: new Date().toISOString()
@@ -1218,9 +1203,9 @@
             }
         };
 
-        window.acceptOrder = async function(userId, orderId) {
+        window.acceptOrder = async function(orderId) {
             try {
-                const orderRef = ref(db, `orders/${userId}/${orderId}`);
+                const orderRef = ref(db, `orders/${orderId}`);
                 await update(orderRef, {
                     status: 'confirmed',
                     acceptedAt: new Date().toISOString()
@@ -1233,10 +1218,10 @@
             }
         };
 
-        window.rejectOrder = async function(userId, orderId) {
+        window.rejectOrder = async function(orderId) {
             if (!confirm('Are you sure you want to reject this order?')) return;
             try {
-                const orderRef = ref(db, `orders/${userId}/${orderId}`);
+                const orderRef = ref(db, `orders/${orderId}`);
                 await update(orderRef, {
                     status: 'cancelled',
                     cancelledAt: new Date().toISOString()
