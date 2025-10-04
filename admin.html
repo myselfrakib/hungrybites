@@ -365,10 +365,12 @@
         .item-actions {
             display: flex;
             gap: 0.6rem;
+            flex-wrap: wrap;
         }
 
-        .btn-delete, .btn-toggle {
+        .btn-delete, .btn-toggle, .btn-edit {
             flex: 1;
+            min-width: 100px;
             color: white;
             border: none;
             padding: 0.7rem;
@@ -388,6 +390,15 @@
             transform: translateY(-1px);
         }
 
+        .btn-edit {
+            background: #3498db;
+        }
+
+        .btn-edit:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+
         .btn-toggle {
             background: #60b246;
         }
@@ -399,6 +410,108 @@
         .btn-toggle:hover {
             opacity: 0.9;
             transform: translateY(-1px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 3000;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #666;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #e74c3c;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-save {
+            flex: 1;
+            background: #60b246;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-save:hover {
+            background: #4a9635;
         }
 
         .orders-container {
@@ -588,7 +701,7 @@
             opacity: 0;
             transform: translateY(-20px);
             transition: all 0.3s;
-            z-index: 3000;
+            z-index: 3001;
             text-align: center;
             font-weight: 500;
         }
@@ -799,6 +912,45 @@
         </div>
     </div>
 
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Item</h3>
+                <button class="modal-close" onclick="closeEditModal()">×</button>
+            </div>
+            <form onsubmit="saveEditItem(event)">
+                <input type="hidden" id="editItemId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Item Name *</label>
+                        <input type="text" id="editItemName" required placeholder="e.g., Burger">
+                    </div>
+                    <div class="form-group">
+                        <label>Price (₹) *</label>
+                        <input type="number" id="editItemPrice" min="0" step="0.01" required placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Emoji *</label>
+                        <input type="text" id="editItemEmoji" placeholder="🍔" maxlength="2" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="url" id="editItemImageUrl" placeholder="https://example.com/image.jpg" onchange="previewEditImage()">
+                    <img id="editImagePreview" class="image-preview" alt="Image preview">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="editItemDescription" placeholder="Describe the food item..."></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="notification" id="notification"></div>
 
     <script type="module">
@@ -857,6 +1009,22 @@
         window.previewImage = function() {
             const imageUrl = document.getElementById('itemImageUrl').value;
             const preview = document.getElementById('imagePreview');
+            
+            if (imageUrl) {
+                preview.src = imageUrl;
+                preview.classList.add('show');
+                preview.onerror = function() {
+                    preview.classList.remove('show');
+                    showNotification('Invalid image URL', true);
+                };
+            } else {
+                preview.classList.remove('show');
+            }
+        };
+
+        window.previewEditImage = function() {
+            const imageUrl = document.getElementById('editItemImageUrl').value;
+            const preview = document.getElementById('editImagePreview');
             
             if (imageUrl) {
                 preview.src = imageUrl;
@@ -984,6 +1152,7 @@
                             <div class="item-description">${item.description || 'No description available'}</div>
                             <div class="item-price">₹${item.price.toFixed(2)}</div>
                             <div class="item-actions">
+                                <button class="btn-edit" onclick="openEditModal('${itemId}')">✏️ Edit</button>
                                 <button class="btn-delete" onclick="deleteItem('${itemId}')">🗑️ Delete</button>
                             </div>
                         </div>
@@ -1042,6 +1211,91 @@
                 grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Error loading items. Please try again.</div></div>';
             }
         }
+
+        window.openEditModal = async function(itemId) {
+            try {
+                const itemRef = ref(db, `foodItems/${itemId}`);
+                const snapshot = await get(itemRef);
+                
+                if (!snapshot.exists()) {
+                    showNotification('Item not found', true);
+                    return;
+                }
+
+                const item = snapshot.val();
+                
+                document.getElementById('editItemId').value = itemId;
+                document.getElementById('editItemName').value = item.name || '';
+                document.getElementById('editItemPrice').value = item.price || '';
+                document.getElementById('editItemEmoji').value = item.emoji || '';
+                document.getElementById('editItemImageUrl').value = item.imageurl || '';
+                document.getElementById('editItemDescription').value = item.description || '';
+                
+                const preview = document.getElementById('editImagePreview');
+                if (item.imageurl) {
+                    preview.src = item.imageurl;
+                    preview.classList.add('show');
+                } else {
+                    preview.classList.remove('show');
+                }
+
+                document.getElementById('editModal').classList.add('active');
+            } catch (error) {
+                console.error('Error loading item:', error);
+                showNotification('Error loading item details', true);
+            }
+        };
+
+        window.closeEditModal = function() {
+            document.getElementById('editModal').classList.remove('active');
+        };
+
+        window.saveEditItem = async function(e) {
+            e.preventDefault();
+            
+            const itemId = document.getElementById('editItemId').value;
+            const name = document.getElementById('editItemName').value.trim();
+            const price = parseFloat(document.getElementById('editItemPrice').value);
+            const emoji = document.getElementById('editItemEmoji').value.trim();
+            const imageUrl = document.getElementById('editItemImageUrl').value.trim();
+            const description = document.getElementById('editItemDescription').value.trim();
+
+            if (!name || !price || !emoji) {
+                showNotification('Please fill all required fields', true);
+                return;
+            }
+
+            if (price <= 0) {
+                showNotification('Price must be greater than 0', true);
+                return;
+            }
+
+            try {
+                const itemRef = ref(db, `foodItems/${itemId}`);
+                
+                const updateData = {
+                    name,
+                    price,
+                    emoji,
+                    description: description || '',
+                    updatedAt: new Date().toISOString()
+                };
+
+                if (imageUrl) {
+                    updateData.imageurl = imageUrl;
+                }
+                
+                await update(itemRef, updateData);
+
+                showNotification('Item updated successfully!');
+                closeEditModal();
+                loadFoodItems();
+                loadMenuItems();
+            } catch (error) {
+                console.error('Error updating item:', error);
+                showNotification('Error updating item: ' + error.message, true);
+            }
+        };
 
         window.toggleItemStatus = async function(itemId, currentStatus) {
             try {
