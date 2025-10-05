@@ -1407,7 +1407,7 @@
                                 ${!isAccepted && order.status !== 'cancelled' ? `
                                     <div class="action-buttons">
                                         <button class="btn-call" onclick="callCustomer('${phone}')">📞 Call</button>
-                                        <button class="btn-map" onclick="openMap('${encodeURIComponent(fullAddress)}')">🗺️ Map</button>
+                                        <button class="btn-map" onclick="openMap('${order.id}')">🗺️ Map</button>
                                     </div>
                                     <div class="action-buttons">
                                         <button class="btn-accept" onclick="acceptOrder('${order.id}')">✓ Accept Order</button>
@@ -1427,7 +1427,7 @@
                                     </select>
                                     <div class="action-buttons">
                                         <button class="btn-call" onclick="callCustomer('${phone}')">📞 Call</button>
-                                        <button class="btn-map" onclick="openMap('${encodeURIComponent(fullAddress)}')">🗺️ Map</button>
+                                        <button class="btn-map" onclick="openMap('${order.id}')">🗺️ Map</button>
                                     </div>
                                 `}
                             </div>
@@ -1496,12 +1496,36 @@
             window.location.href = `tel:${phone}`;
         };
 
-        window.openMap = function(address) {
-            if (!address || address === 'No address provided') {
-                showNotification('Address not available', true);
-                return;
+        window.openMap = async function(orderId) {
+            try {
+                const orderRef = ref(db, `orders/${orderId}`);
+                const snapshot = await get(orderRef);
+                
+                if (!snapshot.exists()) {
+                    showNotification('Order not found', true);
+                    return;
+                }
+                
+                const order = snapshot.val();
+                const coordinates = order.deliveryAddress?.coordinates;
+                
+                if (coordinates && coordinates.lat && coordinates.lng) {
+                    window.open(`https://www.google.com/maps/search/?api=1&query=${coordinates.lat},${coordinates.lng}`, '_blank');
+                } else {
+                    const fullAddress = order.deliveryAddress ? 
+                        `${order.deliveryAddress.address || ''}, ${order.deliveryAddress.landmark || ''}, ${order.deliveryAddress.city || ''} - ${order.deliveryAddress.pincode || ''}`.replace(/^[,\s]+|[,\s]+$/g, '').replace(/,\s*,/g, ',') : 
+                        '';
+                    
+                    if (fullAddress && fullAddress !== 'No address provided') {
+                        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`, '_blank');
+                    } else {
+                        showNotification('Location not available', true);
+                    }
+                }
+            } catch (error) {
+                console.error('Error opening map:', error);
+                showNotification('Error opening location', true);
             }
-            window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
         };
 
         function showNotification(message, isError = false) {
