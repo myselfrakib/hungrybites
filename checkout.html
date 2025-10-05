@@ -974,26 +974,75 @@
             const geocoder = new google.maps.Geocoder();
             geocoder.geocode({ location: latLng }, (results, status) => {
                 if (status === 'OK' && results[0]) {
+                    console.log('Geocoding result:', results[0]);
+                    
                     const addressComponents = results[0].address_components;
-                    let city = '', pincode = '', area = '';
+                    let city = '', pincode = '', area = '', street = '', state = '', country = '';
                     
                     addressComponents.forEach(component => {
-                        if (component.types.includes('locality')) {
+                        const types = component.types;
+                        
+                        // City
+                        if (types.includes('locality')) {
+                            city = component.long_name;
+                        } else if (types.includes('administrative_area_level_2') && !city) {
                             city = component.long_name;
                         }
-                        if (component.types.includes('postal_code')) {
+                        
+                        // Pincode
+                        if (types.includes('postal_code')) {
                             pincode = component.long_name;
                         }
-                        if (component.types.includes('sublocality') || component.types.includes('neighborhood')) {
+                        
+                        // Area/Neighborhood
+                        if (types.includes('sublocality_level_1') || types.includes('sublocality_level_2') || 
+                            types.includes('sublocality') || types.includes('neighborhood')) {
                             area = component.long_name;
+                        }
+                        
+                        // Street
+                        if (types.includes('route') && !street) {
+                            street = component.long_name;
+                        }
+                        
+                        // State
+                        if (types.includes('administrative_area_level_1')) {
+                            state = component.long_name;
+                        }
+                        
+                        // Country
+                        if (types.includes('country')) {
+                            country = component.long_name;
                         }
                     });
                     
-                    if (city) document.getElementById('city').value = city;
-                    if (pincode) document.getElementById('pincode').value = pincode;
-                    if (area && !document.getElementById('address').value) {
-                        document.getElementById('address').value = area;
+                    // Auto-fill the form
+                    if (city) {
+                        document.getElementById('city').value = city;
                     }
+                    
+                    if (pincode) {
+                        document.getElementById('pincode').value = pincode;
+                    }
+                    
+                    // Build address string
+                    let addressParts = [];
+                    if (street) addressParts.push(street);
+                    if (area) addressParts.push(area);
+                    
+                    if (addressParts.length > 0) {
+                        document.getElementById('address').value = addressParts.join(', ');
+                    }
+                    
+                    // Update landmark with state info if available
+                    if (state && !document.getElementById('landmark').value) {
+                        document.getElementById('landmark').value = `Near ${area || city}, ${state}`;
+                    }
+                    
+                    showSuccess('Address auto-filled from map location');
+                } else {
+                    console.error('Geocoding failed:', status);
+                    showError('Could not auto-fill address. Please enter manually.');
                 }
             });
         }
