@@ -905,7 +905,6 @@
         </div>
     </div>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
@@ -938,12 +937,14 @@
 
         const RAZORPAY_KEY = 'rzp_test_your_key_here';
 
-        function initMap() {
+        // Wait for Google Maps to load
+        window.initMap = function() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: selectedLocation,
                 zoom: 13,
                 mapTypeControl: false,
-                streetViewControl: false
+                streetViewControl: false,
+                mapId: 'DEMO_MAP_ID'
             });
 
             marker = new google.maps.Marker({
@@ -960,7 +961,7 @@
             marker.addListener('dragend', (e) => {
                 setMarkerPosition(e.latLng);
             });
-        }
+        };
 
         function setMarkerPosition(latLng) {
             selectedLocation = {
@@ -1022,13 +1023,29 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                initMap();
+                loadGoogleMaps();
                 loadCart();
                 loadSavedAddresses();
             } else {
                 window.location.href = 'index.html';
             }
         });
+
+        function loadGoogleMaps() {
+            if (window.google && window.google.maps) {
+                window.initMap();
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDsn16p7w8b-x8pEA_WTO5F2oUk4MHwcUc&libraries=places&callback=initMap';
+            script.async = true;
+            script.defer = true;
+            script.onerror = () => {
+                showError('Failed to load Google Maps. Please check your API key.');
+            };
+            document.head.appendChild(script);
+        }
 
         function loadCart() {
             const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
