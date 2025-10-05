@@ -328,6 +328,14 @@
             font-size: 0.9rem;
         }
 
+        .coordinates-display {
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #d0e8d0;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
         .form-group {
             margin-bottom: 1rem;
         }
@@ -372,6 +380,45 @@
             .form-row {
                 grid-template-columns: 1fr;
             }
+        }
+
+        #map {
+            width: 100%;
+            height: 350px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 2px solid #e0e0e0;
+        }
+
+        .map-instruction {
+            background: #fff8f3;
+            border-left: 4px solid #fc8019;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .location-btn {
+            background: #60b246;
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+            touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .location-btn:active {
+            transform: scale(0.95);
         }
 
         .address-card {
@@ -642,7 +689,7 @@
             background: white;
             border-radius: 12px;
             padding: 1.25rem;
-            max-width: 500px;
+            max-width: 600px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -806,6 +853,16 @@
             </div>
 
             <div id="addressFormContainer">
+                <div class="map-instruction">
+                    📍 Click on the map or use "Use My Location" to set your exact delivery location
+                </div>
+                
+                <button type="button" class="location-btn" onclick="getCurrentLocation()">
+                    📍 Use My Location
+                </button>
+
+                <div id="map"></div>
+
                 <form id="addressForm" onsubmit="event.preventDefault();">
                     <div class="form-group">
                         <label for="fullName">Full Name *</label>
@@ -848,6 +905,7 @@
         </div>
     </div>
 
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
@@ -874,12 +932,97 @@
         let deliveryAddress = null;
         let savedAddresses = [];
         let selectedAddressId = null;
+        let map;
+        let marker;
+        let selectedLocation = { lat: 22.9734, lng: 78.6569 };
 
         const RAZORPAY_KEY = 'rzp_test_your_key_here';
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: selectedLocation,
+                zoom: 13,
+                mapTypeControl: false,
+                streetViewControl: false
+            });
+
+            marker = new google.maps.Marker({
+                position: selectedLocation,
+                map: map,
+                draggable: true,
+                animation: google.maps.Animation.DROP
+            });
+
+            map.addListener('click', (e) => {
+                setMarkerPosition(e.latLng);
+            });
+
+            marker.addListener('dragend', (e) => {
+                setMarkerPosition(e.latLng);
+            });
+        }
+
+        function setMarkerPosition(latLng) {
+            selectedLocation = {
+                lat: latLng.lat(),
+                lng: latLng.lng()
+            };
+            marker.setPosition(latLng);
+            map.panTo(latLng);
+            
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: latLng }, (results, status) => {
+                if (status === 'OK' && results[0]) {
+                    const addressComponents = results[0].address_components;
+                    let city = '', pincode = '', area = '';
+                    
+                    addressComponents.forEach(component => {
+                        if (component.types.includes('locality')) {
+                            city = component.long_name;
+                        }
+                        if (component.types.includes('postal_code')) {
+                            pincode = component.long_name;
+                        }
+                        if (component.types.includes('sublocality') || component.types.includes('neighborhood')) {
+                            area = component.long_name;
+                        }
+                    });
+                    
+                    if (city) document.getElementById('city').value = city;
+                    if (pincode) document.getElementById('pincode').value = pincode;
+                    if (area && !document.getElementById('address').value) {
+                        document.getElementById('address').value = area;
+                    }
+                }
+            });
+        }
+
+        window.getCurrentLocation = function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        map.setCenter(pos);
+                        map.setZoom(15);
+                        setMarkerPosition(new google.maps.LatLng(pos.lat, pos.lng));
+                        showSuccess('Location detected successfully');
+                    },
+                    () => {
+                        showError('Unable to get your location. Please select manually on map.');
+                    }
+                );
+            } else {
+                showError('Geolocation is not supported by your browser');
+            }
+        };
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
+                initMap();
                 loadCart();
                 loadSavedAddresses();
             } else {
@@ -1016,6 +1159,9 @@
                 return;
             }
 
+            const coordsDisplay = deliveryAddress.coordinates ? 
+                `<div class="coordinates-display">📍 Coordinates: ${deliveryAddress.coordinates.lat.toFixed(6)}, ${deliveryAddress.coordinates.lng.toFixed(6)}</div>` : '';
+
             addressDisplayArea.innerHTML = `
                 <div class="address-display-card">
                     <div class="address-display-header">
@@ -1030,6 +1176,7 @@
                         ${deliveryAddress.city}, ${deliveryAddress.pincode}
                         ${deliveryAddress.landmark ? `<br>Landmark: ${deliveryAddress.landmark}` : ''}
                     </div>
+                    ${coordsDisplay}
                 </div>
             `;
         }
@@ -1053,6 +1200,9 @@
             let html = '';
             savedAddresses.forEach((addr, index) => {
                 const isDefault = index === 0;
+                const coordsDisplay = addr.coordinates ? 
+                    `<br><small style="color: #999;">📍 ${addr.coordinates.lat.toFixed(4)}, ${addr.coordinates.lng.toFixed(4)}</small>` : '';
+                
                 html += `
                     <div class="address-card ${selectedAddressId === addr.id ? 'selected' : ''}" onclick="selectSavedAddress('${addr.id}')">
                         <div class="address-card-header">
@@ -1066,6 +1216,7 @@
                             ${addr.streetAddress || addr.address}<br>
                             ${addr.city}, ${addr.pincode}
                             ${addr.landmark ? `<br>Landmark: ${addr.landmark}` : ''}
+                            ${coordsDisplay}
                         </div>
                         <div class="address-actions">
                             <button class="btn-small btn-delete" onclick="event.stopPropagation(); deleteAddress('${addr.id}')">Delete</button>
@@ -1125,6 +1276,13 @@
         window.showAddressModal = function() {
             document.getElementById('addressModal').classList.add('active');
             renderSavedAddresses();
+            
+            setTimeout(() => {
+                if (map) {
+                    google.maps.event.trigger(map, 'resize');
+                    map.setCenter(selectedLocation);
+                }
+            }, 300);
         };
 
         window.closeAddressModal = function() {
@@ -1138,6 +1296,13 @@
             
             document.getElementById('addressForm').reset();
             document.getElementById('saveAddress').checked = true;
+            
+            setTimeout(() => {
+                if (map) {
+                    google.maps.event.trigger(map, 'resize');
+                    map.setCenter(selectedLocation);
+                }
+            }, 100);
         };
 
         window.showSavedAddresses = function() {
@@ -1177,7 +1342,8 @@
                 streetAddress: address,
                 city,
                 pincode,
-                landmark
+                landmark,
+                coordinates: selectedLocation
             };
 
             if (saveAddress && currentUser) {
@@ -1301,7 +1467,8 @@
                         phone: deliveryAddress.phone,
                         city: deliveryAddress.city,
                         pincode: deliveryAddress.pincode,
-                        landmark: deliveryAddress.landmark || ''
+                        landmark: deliveryAddress.landmark || '',
+                        coordinates: deliveryAddress.coordinates
                     },
                     paymentMethod: paymentMethod,
                     paymentStatus: paymentMethod === 'online' ? 'paid' : 'pending',
