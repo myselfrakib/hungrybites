@@ -151,7 +151,7 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 1.5rem 1rem;
         }
 
         .store-closed-banner {
@@ -180,10 +180,84 @@
             opacity: 0.9;
         }
 
+        .category-tabs {
+            display: flex;
+            gap: 0.75rem;
+            overflow-x: auto;
+            padding: 1rem 0;
+            margin-bottom: 1.5rem;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .category-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-tab {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            min-height: 44px;
+            touch-action: manipulation;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .category-tab:active {
+            transform: scale(0.95);
+        }
+
+        .category-tab.active {
+            background: linear-gradient(135deg, #fc8019 0%, #ff6b00 100%);
+            color: white;
+            border-color: #fc8019;
+            box-shadow: 0 4px 15px rgba(252, 128, 25, 0.3);
+        }
+
+        .category-emoji {
+            font-size: 1.3rem;
+        }
+
+        .category-count {
+            background: rgba(0,0,0,0.1);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-left: 0.3rem;
+        }
+
+        .category-tab.active .category-count {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
         .section-title {
             font-size: clamp(1.5rem, 4vw, 2rem);
-            margin-bottom: 1.5rem;
             color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .item-count {
+            color: #666;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            font-weight: 500;
         }
 
         .food-grid {
@@ -198,6 +272,18 @@
             overflow: hidden;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .food-image {
@@ -333,14 +419,14 @@
             100% { transform: rotate(360deg); }
         }
 
-        .empty-menu {
+        .empty-category {
             text-align: center;
             padding: 3rem 1rem;
             color: #666;
         }
 
-        .empty-menu-icon {
-            font-size: clamp(3rem, 10vw, 5rem);
+        .empty-category-icon {
+            font-size: clamp(3rem, 10vw, 4rem);
             margin-bottom: 1rem;
         }
 
@@ -407,13 +493,17 @@
             }
 
             .container {
-                padding: 2.5rem 1.5rem;
+                padding: 2rem 1.5rem;
+            }
+
+            .category-tabs {
+                gap: 1rem;
             }
         }
 
         @media (min-width: 768px) {
             .container {
-                padding: 3rem 2rem;
+                padding: 2.5rem 2rem;
             }
 
             .food-grid {
@@ -428,6 +518,11 @@
             .add-btn:hover {
                 background: #e67316;
                 transform: scale(1.05);
+            }
+
+            .category-tab:hover {
+                border-color: #fc8019;
+                box-shadow: 0 4px 15px rgba(252, 128, 25, 0.2);
             }
 
             .notification {
@@ -475,6 +570,10 @@
             .nav-items {
                 gap: 2rem;
             }
+
+            .category-tabs {
+                gap: 1.25rem;
+            }
         }
     </style>
 </head>
@@ -502,7 +601,17 @@
 
     <div class="container">
         <div id="storeStatusBanner"></div>
-        <h2 class="section-title" id="menuTitle">Our Menu</h2>
+        
+        <div id="categoryTabsContainer"></div>
+        
+        <div class="section-header">
+            <h2 class="section-title" id="menuTitle">
+                <span id="categoryEmoji"></span>
+                <span id="categoryName">Our Menu</span>
+            </h2>
+            <span class="item-count" id="itemCount"></span>
+        </div>
+        
         <div id="foodGrid" class="food-grid"></div>
     </div>
 
@@ -513,7 +622,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -530,8 +639,10 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        let cart = [];
         let isStoreOpen = true;
+        let allFoodItems = {};
+        let currentCategory = 'all';
         
         updateCartBadge();
         updateNotificationVisibility();
@@ -546,16 +657,23 @@
 
         async function checkStoreStatus() {
             try {
-                const storeRef = ref(db, 'storeopen');
-                const snapshot = await get(storeRef);
+                const storeRef = ref(db, 'storeStatus');
                 
-                if (snapshot.exists() && snapshot.val().inactive === true) {
-                    isStoreOpen = false;
-                    showStoreClosed();
-                } else {
-                    isStoreOpen = true;
-                    loadFoodItems();
-                }
+                onValue(storeRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const status = snapshot.val();
+                        isStoreOpen = status.isOpen !== false;
+                        
+                        if (!isStoreOpen) {
+                            showStoreClosed();
+                        } else {
+                            loadFoodItems();
+                        }
+                    } else {
+                        isStoreOpen = true;
+                        loadFoodItems();
+                    }
+                });
             } catch (error) {
                 console.error('Error checking store status:', error);
                 isStoreOpen = true;
@@ -573,78 +691,43 @@
                 </div>
             `;
             
-            const foodGrid = document.getElementById('foodGrid');
-            foodGrid.innerHTML = '';
+            document.getElementById('categoryTabsContainer').innerHTML = '';
+            document.getElementById('foodGrid').innerHTML = '';
             document.getElementById('menuTitle').style.display = 'none';
+            document.getElementById('itemCount').style.display = 'none';
         }
 
         async function loadFoodItems() {
             const foodGrid = document.getElementById('foodGrid');
             foodGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Loading menu...</div>';
-            document.getElementById('menuTitle').style.display = 'block';
+            document.getElementById('menuTitle').style.display = 'flex';
             document.getElementById('storeStatusBanner').innerHTML = '';
 
             try {
                 const foodItemsRef = ref(db, 'foodItems');
-                const snapshot = await get(foodItemsRef);
                 
-                if (!snapshot.exists()) {
-                    foodGrid.innerHTML = `
-                        <div class="empty-menu">
-                            <div class="empty-menu-icon">🍽️</div>
-                            <h3>No items available yet</h3>
-                            <p>Check back soon for delicious food!</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                const foodItems = snapshot.val();
-                let foodHTML = '';
-                
-                Object.keys(foodItems).forEach((key) => {
-                    const item = foodItems[key];
-                    const cartItem = cart.find(c => c.id === key);
-                    const quantity = cartItem ? cartItem.quantity : 0;
-                    
-                    const imageHTML = item.imageurl 
-                        ? `<img src="${item.imageurl}" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                           <div class="food-image-emoji" style="display: none; position: absolute;">${item.emoji || '🍔'}</div>`
-                        : `<div class="food-image-emoji">${item.emoji || '🍔'}</div>`;
-                    
-                    let buttonHTML;
-                    if (item.isActive === false) {
-                        buttonHTML = `<button class="add-btn" style="background: #999; cursor: not-allowed;" disabled>Unavailable</button>`;
-                    } else if (quantity > 0) {
-                        buttonHTML = `<div class="quantity-control">
-                               <button class="quantity-btn" onclick="decreaseQuantity('${key}')">−</button>
-                               <span class="quantity-display">${quantity}</span>
-                               <button class="quantity-btn" onclick="increaseQuantity('${key}')">+</button>
-                           </div>`;
-                    } else {
-                        buttonHTML = `<button class="add-btn" onclick="addToCart('${key}', '${item.name}', ${item.price}, '${item.emoji || '🍔'}')">Add +</button>`;
-                    }
-                    
-                    foodHTML += `
-                        <div class="food-card" data-food-id="${key}" data-name="${item.name}" data-price="${item.price}" data-emoji="${item.emoji || '🍔'}" style="${item.isActive === false ? 'opacity: 0.6;' : ''}">
-                            <div class="food-image">${imageHTML}</div>
-                            <div class="food-details">
-                                <div class="food-name">${item.name}</div>
-                                <div class="food-description">${item.description || 'Delicious food item'}</div>
-                                <div class="food-footer">
-                                    <div class="food-price">₹${item.price}</div>
-                                    ${buttonHTML}
-                                </div>
+                onValue(foodItemsRef, (snapshot) => {
+                    if (!snapshot.exists()) {
+                        foodGrid.innerHTML = `
+                            <div class="empty-category">
+                                <div class="empty-category-icon">🍽️</div>
+                                <h3>No items available yet</h3>
+                                <p>Check back soon for delicious food!</p>
                             </div>
-                        </div>
-                    `;
+                        `;
+                        document.getElementById('categoryTabsContainer').innerHTML = '';
+                        return;
+                    }
+
+                    allFoodItems = snapshot.val();
+                    renderCategoryTabs();
+                    renderFoodItems();
                 });
-                foodGrid.innerHTML = foodHTML;
             } catch (error) {
                 console.error('Error loading food items:', error);
                 foodGrid.innerHTML = `
-                    <div class="empty-menu">
-                        <div class="empty-menu-icon">❌</div>
+                    <div class="empty-category">
+                        <div class="empty-category-icon">❌</div>
                         <h3>Error loading menu</h3>
                         <p>Please try again later</p>
                     </div>
@@ -652,7 +735,151 @@
             }
         }
 
-        window.addToCart = function(id, name, price, emoji) {
+        function renderCategoryTabs() {
+            const container = document.getElementById('categoryTabsContainer');
+            const categories = Object.keys(allFoodItems);
+            
+            if (categories.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let totalItems = 0;
+            const categoryData = categories.map(categoryName => {
+                const categoryInfo = allFoodItems[categoryName];
+                const items = Object.keys(categoryInfo).filter(key => key !== 'emoji' && categoryInfo[key].isActive !== false);
+                totalItems += items.length;
+                
+                return {
+                    name: categoryName,
+                    emoji: categoryInfo.emoji || '🍽️',
+                    count: items.length
+                };
+            });
+
+            let tabsHTML = `
+                <div class="category-tabs">
+                    <div class="category-tab ${currentCategory === 'all' ? 'active' : ''}" onclick="filterCategory('all')">
+                        <span class="category-emoji">🍽️</span>
+                        <span>All Items</span>
+                        <span class="category-count">${totalItems}</span>
+                    </div>
+            `;
+
+            categoryData.forEach(cat => {
+                if (cat.count > 0) {
+                    tabsHTML += `
+                        <div class="category-tab ${currentCategory === cat.name ? 'active' : ''}" onclick="filterCategory('${cat.name}')">
+                            <span class="category-emoji">${cat.emoji}</span>
+                            <span>${cat.name}</span>
+                            <span class="category-count">${cat.count}</span>
+                        </div>
+                    `;
+                }
+            });
+
+            tabsHTML += '</div>';
+            container.innerHTML = tabsHTML;
+        }
+
+        window.filterCategory = function(category) {
+            currentCategory = category;
+            renderCategoryTabs();
+            renderFoodItems();
+        };
+
+        function renderFoodItems() {
+            const foodGrid = document.getElementById('foodGrid');
+            const categoryEmoji = document.getElementById('categoryEmoji');
+            const categoryNameEl = document.getElementById('categoryName');
+            const itemCountEl = document.getElementById('itemCount');
+            
+            let foodHTML = '';
+            let itemCount = 0;
+
+            if (currentCategory === 'all') {
+                categoryEmoji.textContent = '🍽️';
+                categoryNameEl.textContent = 'All Items';
+
+                Object.keys(allFoodItems).forEach(categoryName => {
+                    const category = allFoodItems[categoryName];
+                    Object.keys(category).forEach(itemId => {
+                        if (itemId === 'emoji') return;
+                        
+                        const item = category[itemId];
+                        if (item.isActive !== false) {
+                            foodHTML += createFoodCard(itemId, item, categoryName);
+                            itemCount++;
+                        }
+                    });
+                });
+            } else {
+                const category = allFoodItems[currentCategory];
+                categoryEmoji.textContent = category.emoji || '🍽️';
+                categoryNameEl.textContent = currentCategory;
+
+                Object.keys(category).forEach(itemId => {
+                    if (itemId === 'emoji') return;
+                    
+                    const item = category[itemId];
+                    if (item.isActive !== false) {
+                        foodHTML += createFoodCard(itemId, item, currentCategory);
+                        itemCount++;
+                    }
+                });
+            }
+
+            itemCountEl.textContent = `${itemCount} item${itemCount !== 1 ? 's' : ''}`;
+
+            if (itemCount === 0) {
+                foodGrid.innerHTML = `
+                    <div class="empty-category">
+                        <div class="empty-category-icon">📭</div>
+                        <h3>No items in this category</h3>
+                        <p>Try selecting another category</p>
+                    </div>
+                `;
+            } else {
+                foodGrid.innerHTML = foodHTML;
+            }
+        }
+
+        function createFoodCard(itemId, item, categoryName) {
+            const cartItem = cart.find(c => c.id === itemId);
+            const quantity = cartItem ? cartItem.quantity : 0;
+            
+            const imageHTML = item.imageurl 
+                ? `<img src="${item.imageurl}" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                   <div class="food-image-emoji" style="display: none; position: absolute;">${item.emoji || '🍔'}</div>`
+                : `<div class="food-image-emoji">${item.emoji || '🍔'}</div>`;
+            
+            let buttonHTML;
+            if (quantity > 0) {
+                buttonHTML = `<div class="quantity-control">
+                       <button class="quantity-btn" onclick="decreaseQuantity('${itemId}')">−</button>
+                       <span class="quantity-display">${quantity}</span>
+                       <button class="quantity-btn" onclick="increaseQuantity('${itemId}')">+</button>
+                   </div>`;
+            } else {
+                buttonHTML = `<button class="add-btn" onclick="addToCart('${itemId}', '${item.name}', ${item.price}, '${item.emoji || '🍔'}', '${categoryName}')">Add +</button>`;
+            }
+            
+            return `
+                <div class="food-card" data-food-id="${itemId}" data-name="${item.name}" data-price="${item.price}" data-emoji="${item.emoji || '🍔'}" data-category="${categoryName}">
+                    <div class="food-image">${imageHTML}</div>
+                    <div class="food-details">
+                        <div class="food-name">${item.name}</div>
+                        <div class="food-description">${item.description || 'Delicious food item'}</div>
+                        <div class="food-footer">
+                            <div class="food-price">₹${parseFloat(item.price).toFixed(2)}</div>
+                            ${buttonHTML}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.addToCart = function(id, name, price, emoji, category) {
             if (!isStoreOpen) {
                 alert('Sorry, the store is currently closed!');
                 return;
@@ -668,11 +895,12 @@
                     name: name,
                     price: price,
                     emoji: emoji,
+                    category: category,
                     quantity: 1
                 });
             }
 
-            localStorage.setItem('cart', JSON.stringify(cart));
+            saveCart();
             updateCartBadge();
             updateNotificationVisibility();
             updateButtonUI(id, 1);
@@ -687,7 +915,7 @@
             const item = cart.find(item => item.id === id);
             if (item) {
                 item.quantity += 1;
-                localStorage.setItem('cart', JSON.stringify(cart));
+                saveCart();
                 updateCartBadge();
                 updateNotificationVisibility();
                 updateButtonUI(id, item.quantity);
@@ -699,13 +927,13 @@
             if (item) {
                 if (item.quantity > 1) {
                     item.quantity -= 1;
-                    localStorage.setItem('cart', JSON.stringify(cart));
+                    saveCart();
                     updateCartBadge();
                     updateNotificationVisibility();
                     updateButtonUI(id, item.quantity);
                 } else {
-                    cart = cart.filter(cartItem => cartItem.id !== id);
-                    localStorage.setItem('cart', JSON.stringify(cart));
+                    cart = cart.filter(item => item.id !== id);
+                    saveCart();
                     updateCartBadge();
                     updateNotificationVisibility();
                     updateButtonUI(id, 0);
@@ -714,72 +942,98 @@
         };
 
         function updateButtonUI(id, quantity) {
-            const foodCard = document.querySelector(`[data-food-id="${id}"]`);
-            if (!foodCard) return;
+            const card = document.querySelector(`[data-food-id="${id}"]`);
+            if (!card) return;
+
+            const footer = card.querySelector('.food-footer');
+            const price = card.querySelector('.food-price');
             
-            const buttonContainer = foodCard.querySelector('.food-footer');
-            const priceDiv = buttonContainer.querySelector('.food-price');
-            
-            let buttonHTML;
             if (quantity > 0) {
-                buttonHTML = `<div class="quantity-control">
-                       <button class="quantity-btn" onclick="decreaseQuantity('${id}')">−</button>
-                       <span class="quantity-display">${quantity}</span>
-                       <button class="quantity-btn" onclick="increaseQuantity('${id}')">+</button>
-                   </div>`;
+                const quantityControl = `
+                    <div class="quantity-control">
+                        <button class="quantity-btn" onclick="decreaseQuantity('${id}')">−</button>
+                        <span class="quantity-display">${quantity}</span>
+                        <button class="quantity-btn" onclick="increaseQuantity('${id}')">+</button>
+                    </div>
+                `;
+                footer.innerHTML = price.outerHTML + quantityControl;
             } else {
-                const foodData = foodCard.dataset;
-                buttonHTML = `<button class="add-btn" onclick="addToCart('${id}', '${foodData.name}', ${foodData.price}, '${foodData.emoji}')">Add +</button>`;
+                const name = card.dataset.name;
+                const priceVal = card.dataset.price;
+                const emoji = card.dataset.emoji;
+                const category = card.dataset.category;
+                const addBtn = `<button class="add-btn" onclick="addToCart('${id}', '${name}', ${priceVal}, '${emoji}', '${category}')">Add +</button>`;
+                footer.innerHTML = price.outerHTML + addBtn;
             }
-            
-            buttonContainer.innerHTML = priceDiv.outerHTML + buttonHTML;
+        }
+
+        function saveCart() {
+            try {
+                const cartData = JSON.stringify(cart);
+                window.localStorage.setItem('cart', cartData);
+            } catch (error) {
+                console.error('Error saving cart:', error);
+            }
+        }
+
+        function loadCart() {
+            try {
+                const cartData = window.localStorage.getItem('cart');
+                if (cartData) {
+                    cart = JSON.parse(cartData);
+                }
+            } catch (error) {
+                console.error('Error loading cart:', error);
+                cart = [];
+            }
         }
 
         function updateCartBadge() {
+            const badge = document.getElementById('cartBadge');
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            document.getElementById('cartBadge').textContent = totalItems;
+            badge.textContent = totalItems;
+            
+            if (totalItems > 0) {
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
         }
 
         function updateNotificationVisibility() {
             const notification = document.getElementById('notification');
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
             
-            if (totalItems > 0 && isStoreOpen) {
+            if (totalItems > 0) {
                 notification.classList.add('show');
             } else {
                 notification.classList.remove('show');
             }
         }
 
-        window.logout = async function() {
-            if (confirm('Are you sure you want to logout?')) {
-                try {
-                    await signOut(auth);
-                    localStorage.removeItem('cart');
-                    window.location.href = 'index.html';
-                } catch (error) {
-                    console.error('Error logging out:', error);
-                }
-            }
-        };
-
         window.toggleMenu = function() {
             const hamburger = document.querySelector('.hamburger');
             const navMenu = document.getElementById('navMenu');
+            
             hamburger.classList.toggle('active');
             navMenu.classList.toggle('active');
         };
 
-        document.addEventListener('click', function(event) {
-            const hamburger = document.querySelector('.hamburger');
-            const navMenu = document.getElementById('navMenu');
-            const navRight = document.querySelector('.nav-right');
-            
-            if (!navRight.contains(event.target) && !navMenu.contains(event.target)) {
-                hamburger.classList.remove('active');
-                navMenu.classList.remove('active');
+        window.logout = function() {
+            if (confirm('Are you sure you want to logout?')) {
+                signOut(auth).then(() => {
+                    window.location.href = 'index.html';
+                }).catch((error) => {
+                    console.error('Logout error:', error);
+                    alert('Error logging out. Please try again.');
+                });
             }
-        });
+        };
+
+        // Initialize cart from storage
+        loadCart();
+        updateCartBadge();
+        updateNotificationVisibility();
     </script>
 </body>
 </html>
