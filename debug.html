@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HungryBites - Admin Debug</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #00ff00;
+        }
+        .section {
+            background: #2d2d2d;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #00ff00;
+        }
+        .error {
+            border-left-color: #ff0000;
+            color: #ff6b6b;
+        }
+        .success {
+            border-left-color: #00ff00;
+        }
+        .warning {
+            border-left-color: #ffaa00;
+            color: #ffaa00;
+        }
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #00cc00;
+        }
+        pre {
+            background: #000;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Firebase Debug Dashboard</h1>
+    
+    <div class="section">
+        <h2>1. Authentication Status</h2>
+        <div id="authStatus">Checking...</div>
+        <button onclick="forceLogin()">Force Login</button>
+        <button onclick="checkAuth()">Recheck Auth</button>
+    </div>
+
+    <div class="section">
+        <h2>2. Firebase Configuration</h2>
+        <div id="configStatus">Checking...</div>
+    </div>
+
+    <div class="section">
+        <h2>3. Database Rules Test</h2>
+        <div id="rulesStatus">Not tested yet</div>
+        <button onclick="testRead()">Test Read</button>
+        <button onclick="testWrite()">Test Write</button>
+    </div>
+
+    <div class="section">
+        <h2>4. Initialize Categories</h2>
+        <div id="initStatus">Not started</div>
+        <button onclick="tryInitCategories()">Try Initialize</button>
+    </div>
+
+    <div class="section">
+        <h2>5. Console Logs</h2>
+        <pre id="logs"></pre>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
+            authDomain: "hungrybites-c7930.firebaseapp.com",
+            databaseURL: "https://hungrybites-c7930-default-rtdb.firebaseio.com",
+            projectId: "hungrybites-c7930",
+            storageBucket: "hungrybites-c7930.firebasestorage.app",
+            messagingSenderId: "346758544945",
+            appId: "1:346758544945:web:4bcad30016540d18e79f10",
+            measurementId: "G-B5GP5SYMRC"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        let logs = [];
+        
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.push(`[${timestamp}] ${message}`);
+            document.getElementById('logs').textContent = logs.join('\n');
+            console.log(message);
+        }
+
+        // Check config
+        document.getElementById('configStatus').innerHTML = `
+            <div class="success">
+                <strong>✓ Config Loaded</strong><br>
+                Project ID: ${firebaseConfig.projectId}<br>
+                Database URL: ${firebaseConfig.databaseURL}<br>
+                Auth Domain: ${firebaseConfig.authDomain}
+            </div>
+        `;
+
+        // Monitor auth state
+        onAuthStateChanged(auth, (user) => {
+            addLog('Auth state changed');
+            if (user) {
+                document.getElementById('authStatus').innerHTML = `
+                    <div class="success">
+                        <strong>✓ AUTHENTICATED</strong><br>
+                        Email: ${user.email}<br>
+                        UID: ${user.uid}<br>
+                        Email Verified: ${user.emailVerified}
+                    </div>
+                `;
+                addLog(`✓ User authenticated: ${user.email}`);
+            } else {
+                document.getElementById('authStatus').innerHTML = `
+                    <div class="error">
+                        <strong>✗ NOT AUTHENTICATED</strong><br>
+                        No user is currently signed in.<br>
+                        This is why you're getting permission denied!
+                    </div>
+                `;
+                addLog('✗ No user authenticated');
+            }
+        });
+
+        window.checkAuth = function() {
+            const user = auth.currentUser;
+            addLog(`Manual auth check: ${user ? user.email : 'No user'}`);
+            alert(user ? `Logged in as: ${user.email}` : 'NOT LOGGED IN!');
+        };
+
+        window.forceLogin = async function() {
+            const email = prompt('Enter admin email:');
+            const password = prompt('Enter admin password:');
+            
+            if (email && password) {
+                try {
+                    addLog(`Attempting login for: ${email}`);
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    addLog(`✓ Login successful: ${userCredential.user.email}`);
+                    alert('Login successful!');
+                } catch (error) {
+                    addLog(`✗ Login failed: ${error.message}`);
+                    alert('Login failed: ' + error.message);
+                    document.getElementById('authStatus').innerHTML = `
+                        <div class="error">
+                            <strong>✗ LOGIN FAILED</strong><br>
+                            ${error.message}
+                        </div>
+                    `;
+                }
+            }
+        };
+
+        window.testRead = async function() {
+            addLog('Testing database READ...');
+            try {
+                const testRef = ref(db, 'test');
+                const snapshot = await get(testRef);
+                addLog('✓ Read successful');
+                document.getElementById('rulesStatus').innerHTML = `
+                    <div class="success">
+                        <strong>✓ READ Permission OK</strong><br>
+                        Data: ${JSON.stringify(snapshot.val())}
+                    </div>
+                `;
+            } catch (error) {
+                addLog(`✗ Read failed: ${error.message}`);
+                document.getElementById('rulesStatus').innerHTML = `
+                    <div class="error">
+                        <strong>✗ READ Permission DENIED</strong><br>
+                        ${error.message}<br><br>
+                        <strong>This means:</strong><br>
+                        1. You're not authenticated, OR<br>
+                        2. Firebase rules are blocking reads
+                    </div>
+                `;
+            }
+        };
+
+        window.testWrite = async function() {
+            addLog('Testing database WRITE...');
+            try {
+                const testRef = ref(db, 'test/timestamp');
+                await set(testRef, new Date().toISOString());
+                addLog('✓ Write successful');
+                document.getElementById('rulesStatus').innerHTML = `
+                    <div class="success">
+                        <strong>✓ WRITE Permission OK</strong><br>
+                        Successfully wrote to database!
+                    </div>
+                `;
+            } catch (error) {
+                addLog(`✗ Write failed: ${error.message}`);
+                document.getElementById('rulesStatus').innerHTML = `
+                    <div class="error">
+                        <strong>✗ WRITE Permission DENIED</strong><br>
+                        ${error.message}<br><br>
+                        <strong>This is your problem!</strong><br>
+                        1. Check if you're logged in (section 1 above)<br>
+                        2. Check Firebase Rules in console<br>
+                        3. Make sure rules allow authenticated writes
+                    </div>
+                `;
+            }
+        };
+
+        window.tryInitCategories = async function() {
+            addLog('Attempting to initialize categories...');
+            
+            if (!auth.currentUser) {
+                document.getElementById('initStatus').innerHTML = `
+                    <div class="error">
+                        <strong>✗ Cannot Initialize</strong><br>
+                        You must be logged in first!<br>
+                        Click "Force Login" button above.
+                    </div>
+                `;
+                addLog('✗ Init failed: Not authenticated');
+                return;
+            }
+
+            const CATEGORIES = {
+                'Sandwiches': '🥪',
+                'Noodles': '🍜',
+                'Chai': '☕',
+                'Cigarettes': '🚬'
+            };
+
+            try {
+                for (const [categoryName, emoji] of Object.entries(CATEGORIES)) {
+                    addLog(`Creating category: ${categoryName}`);
+                    const categoryRef = ref(db, `foodItems/${categoryName}`);
+                    const categorySnapshot = await get(categoryRef);
+                    
+                    if (!categorySnapshot.exists()) {
+                        await set(ref(db, `foodItems/${categoryName}/emoji`), emoji);
+                        addLog(`✓ Created: ${categoryName}`);
+                    } else {
+                        addLog(`- Already exists: ${categoryName}`);
+                    }
+                }
+                document.getElementById('initStatus').innerHTML = `
+                    <div class="success">
+                        <strong>✓ Categories Initialized Successfully!</strong>
+                    </div>
+                `;
+                addLog('✓ All categories initialized');
+            } catch (error) {
+                addLog(`✗ Init failed: ${error.message}`);
+                document.getElementById('initStatus').innerHTML = `
+                    <div class="error">
+                        <strong>✗ Initialization Failed</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+            }
+        };
+
+        addLog('Debug page loaded');
+    </script>
+</body>
+</html>
