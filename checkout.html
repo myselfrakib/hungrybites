@@ -938,13 +938,12 @@
         const RAZORPAY_KEY = 'rzp_test_your_key_here';
 
         // Wait for Google Maps to load
-        window.initMap = function() {
+       window.initMap = function() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: selectedLocation,
                 zoom: 13,
                 mapTypeControl: false,
-                streetViewControl: false,
-                mapId: 'DEMO_MAP_ID'
+                streetViewControl: false
             });
 
             marker = new google.maps.Marker({
@@ -953,6 +952,9 @@
                 draggable: true,
                 animation: google.maps.Animation.DROP
             });
+
+            // Set initial location when map loads
+            setMarkerPosition(new google.maps.LatLng(selectedLocation.lat, selectedLocation.lng));
 
             map.addListener('click', (e) => {
                 setMarkerPosition(e.latLng);
@@ -1622,3 +1624,4 @@
     </script>
 </body>
 </html>
+
