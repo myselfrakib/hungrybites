@@ -109,28 +109,10 @@
             cursor: not-allowed;
         }
 
-        .toggle-auth {
-            text-align: center;
-            margin-top: 1.5rem;
-            color: #666;
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
-        .toggle-auth span {
-            color: #fc8019;
-            cursor: pointer;
-            text-decoration: underline;
-            font-weight: 600;
-            display: inline-block;
-            padding: 0.25rem 0;
-            min-height: 32px;
-        }
-
         .admin-link {
             text-align: center;
-            margin-top: 1rem;
-            padding-top: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
             border-top: 1px solid #e0e0e0;
         }
 
@@ -212,7 +194,7 @@
         <div class="logo">🍔 HungryBites</div>
         <div class="tagline">Your favorite food, delivered fast!</div>
         
-        <h2 id="authTitle">Login</h2>
+        <h2>Login</h2>
         
         <form id="authForm" onsubmit="handleAuth(event)">
             <div class="form-group">
@@ -230,10 +212,6 @@
             <div class="spinner"></div>
         </div>
 
-        <div class="toggle-auth">
-            <span id="authToggle" onclick="toggleAuth()">Don't have an account? Sign up</span>
-        </div>
-
         <div class="admin-link">
             <a href="adminlogin.html">Admin Login →</a>
         </div>
@@ -244,7 +222,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -259,15 +237,16 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        let isLogin = true;
+        // Set persistence to local (survives browser restarts)
+        setPersistence(auth, browserLocalPersistence);
 
-        window.toggleAuth = function() {
-            isLogin = !isLogin;
-            document.getElementById('authTitle').textContent = isLogin ? 'Login' : 'Sign Up';
-            document.getElementById('authBtn').textContent = isLogin ? 'Login' : 'Sign Up';
-            document.getElementById('authToggle').textContent = isLogin ? "Don't have an account? Sign up" : 'Already have an account? Login';
-            hideMessages();
-        };
+        // Check if user is already logged in
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, redirect to home
+                window.location.href = 'home.html';
+            }
+        });
 
         window.handleAuth = async function(e) {
             e.preventDefault();
@@ -278,31 +257,35 @@
             showLoading(true);
 
             try {
-                if (isLogin) {
+                // Try to sign in first
+                try {
                     await signInWithEmailAndPassword(auth, email, password);
                     showSuccess('Login successful! Redirecting...');
                     setTimeout(() => {
                         window.location.href = 'home.html';
                     }, 1000);
-                } else {
-                    await createUserWithEmailAndPassword(auth, email, password);
-                    showSuccess('Account created! Redirecting...');
-                    setTimeout(() => {
-                        window.location.href = 'home.html';
-                    }, 1000);
+                } catch (loginError) {
+                    // If user not found, create account automatically
+                    if (loginError.code === 'auth/user-not-found' || loginError.code === 'auth/invalid-credential') {
+                        await createUserWithEmailAndPassword(auth, email, password);
+                        showSuccess('Account created and logged in! Redirecting...');
+                        setTimeout(() => {
+                            window.location.href = 'home.html';
+                        }, 1000);
+                    } else {
+                        throw loginError;
+                    }
                 }
             } catch (error) {
                 showLoading(false);
                 let errorMessage = 'An error occurred. Please try again.';
                 
                 if (error.code === 'auth/email-already-in-use') {
-                    errorMessage = 'Email already in use. Please login instead.';
+                    errorMessage = 'Email already in use with different credentials.';
                 } else if (error.code === 'auth/weak-password') {
                     errorMessage = 'Password should be at least 6 characters.';
                 } else if (error.code === 'auth/invalid-email') {
                     errorMessage = 'Invalid email address.';
-                } else if (error.code === 'auth/user-not-found') {
-                    errorMessage = 'No account found. Please sign up.';
                 } else if (error.code === 'auth/wrong-password') {
                     errorMessage = 'Incorrect password.';
                 } else if (error.code === 'auth/invalid-credential') {
