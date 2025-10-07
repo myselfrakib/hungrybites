@@ -835,16 +835,22 @@
                 <form onsubmit="addFoodItem(event)">
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Category Name *</label>
-                            <input type="text" id="categoryName" required placeholder="e.g., Noodles, Sandwiches">
-                        </div>
-                        <div class="form-group">
-                            <label>Category Emoji *</label>
-                            <input type="text" id="categoryEmoji" placeholder="🍜" maxlength="2" required>
+                            <label>Category *</label>
+                            <select id="categorySelect" required onchange="updateCategoryEmoji()">
+                                <option value="">Select category...</option>
+                                <option value="Sandwiches" data-emoji="🥪">🥪 Sandwiches</option>
+                                <option value="Noodles" data-emoji="🍜">🍜 Noodles</option>
+                                <option value="Chai" data-emoji="☕">☕ Chai</option>
+                                <option value="Cigarettes" data-emoji="🚬">🚬 Cigarettes</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label>Item Name *</label>
                             <input type="text" id="itemName" required placeholder="e.g., Veg Noodles">
+                        </div>
+                        <div class="form-group">
+                            <label>Price (₹) *</label>
+                            <input type="number" id="itemPrice" min="0" step="0.01" required placeholder="0.00">
                         </div>
                     </div>
                     <div class="form-row">
@@ -888,23 +894,25 @@
             <form onsubmit="saveEdit(event)">
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Category Name *</label>
-                        <input type="text" id="editCategoryName" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Category Emoji *</label>
-                        <input type="text" id="editCategoryEmoji" maxlength="2" required>
+                        <label>Category *</label>
+                        <select id="editCategorySelect" required onchange="updateEditCategoryEmoji()">
+                            <option value="">Select category...</option>
+                            <option value="Sandwiches" data-emoji="🥪">🥪 Sandwiches</option>
+                            <option value="Noodles" data-emoji="🍜">🍜 Noodles</option>
+                            <option value="Chai" data-emoji="☕">☕ Chai</option>
+                            <option value="Cigarettes" data-emoji="🚬">🚬 Cigarettes</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Item Name *</label>
                         <input type="text" id="editName" required>
                     </div>
-                </div>
-                <div class="form-row">
                     <div class="form-group">
                         <label>Price (₹) *</label>
                         <input type="number" id="editPrice" min="0" step="0.01" required>
                     </div>
+                </div>
+                <div class="form-row">
                     <div class="form-group">
                         <label>Item Emoji</label>
                         <input type="text" id="editEmoji" maxlength="2">
@@ -949,6 +957,40 @@
 
         let currentEditId = null;
         let currentEditCategory = null;
+
+        // Predefined categories
+        const CATEGORIES = {
+            'Sandwiches': '🥪',
+            'Noodles': '🍜',
+            'Chai': '☕',
+            'Cigarettes': '🚬'
+        };
+
+        // Update category emoji when selection changes
+        window.updateCategoryEmoji = function() {
+            // This function can be used if needed for any dynamic updates
+        };
+
+        window.updateEditCategoryEmoji = function() {
+            // This function can be used if needed for any dynamic updates
+        };
+
+        // Initialize categories on load
+        async function initializeCategories() {
+            try {
+                for (const [categoryName, emoji] of Object.entries(CATEGORIES)) {
+                    const categoryRef = ref(db, `foodItems/${categoryName}`);
+                    const categorySnapshot = await get(categoryRef);
+                    
+                    // Only create if doesn't exist
+                    if (!categorySnapshot.exists()) {
+                        await set(ref(db, `foodItems/${categoryName}/emoji`), emoji);
+                    }
+                }
+            } catch (error) {
+                console.error('Error initializing categories:', error);
+            }
+        }
 
         // Load store status
         function loadStoreStatus() {
@@ -1184,28 +1226,25 @@
         window.addFoodItem = async function(e) {
             e.preventDefault();
             
-            const categoryName = document.getElementById('categoryName').value.trim();
-            const categoryEmoji = document.getElementById('categoryEmoji').value.trim();
+            const categorySelect = document.getElementById('categorySelect');
+            const categoryName = categorySelect.value;
+            const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+            const categoryEmoji = selectedOption.getAttribute('data-emoji');
+            
             const name = document.getElementById('itemName').value.trim();
             const price = parseFloat(document.getElementById('itemPrice').value);
             const emoji = document.getElementById('itemEmoji').value.trim();
             const imageurl = document.getElementById('itemImageUrl').value.trim();
             const description = document.getElementById('itemDescription').value.trim();
 
-            if (!categoryName || !categoryEmoji) {
-                showNotification('Please fill in category name and emoji', true);
+            if (!categoryName) {
+                showNotification('Please select a category', true);
                 return;
             }
 
             try {
-                // Check if category exists, if not create it with emoji
-                const categoryRef = ref(db, `foodItems/${categoryName}`);
-                const categorySnapshot = await get(categoryRef);
-                
-                if (!categorySnapshot.exists()) {
-                    // New category - set emoji
-                    await set(ref(db, `foodItems/${categoryName}/emoji`), categoryEmoji);
-                }
+                // Ensure category has emoji field
+                await set(ref(db, `foodItems/${categoryName}/emoji`), categoryEmoji);
 
                 // Add the item under the category
                 const itemRef = push(ref(db, `foodItems/${categoryName}`));
@@ -1233,16 +1272,12 @@
             currentEditCategory = categoryName;
             
             const itemRef = ref(db, `foodItems/${categoryName}/${itemId}`);
-            const categoryEmojiRef = ref(db, `foodItems/${categoryName}/emoji`);
             
             try {
                 const itemSnapshot = await get(itemRef);
-                const emojiSnapshot = await get(categoryEmojiRef);
                 const item = itemSnapshot.val();
-                const categoryEmoji = emojiSnapshot.val() || '';
                 
-                document.getElementById('editCategoryName').value = categoryName;
-                document.getElementById('editCategoryEmoji').value = categoryEmoji;
+                document.getElementById('editCategorySelect').value = categoryName;
                 document.getElementById('editName').value = item.name;
                 document.getElementById('editPrice').value = item.price;
                 document.getElementById('editEmoji').value = item.emoji || '';
@@ -1265,8 +1300,11 @@
         window.saveEdit = async function(e) {
             e.preventDefault();
             
-            const newCategoryName = document.getElementById('editCategoryName').value.trim();
-            const newCategoryEmoji = document.getElementById('editCategoryEmoji').value.trim();
+            const categorySelect = document.getElementById('editCategorySelect');
+            const newCategoryName = categorySelect.value;
+            const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+            const newCategoryEmoji = selectedOption.getAttribute('data-emoji');
+            
             const name = document.getElementById('editName').value.trim();
             const price = parseFloat(document.getElementById('editPrice').value);
             const emoji = document.getElementById('editEmoji').value.trim();
@@ -1280,13 +1318,8 @@
 
                 // If category changed, move the item
                 if (newCategoryName !== currentEditCategory) {
-                    // Check if new category exists, if not create it with emoji
-                    const newCategoryRef = ref(db, `foodItems/${newCategoryName}`);
-                    const newCategorySnapshot = await get(newCategoryRef);
-                    
-                    if (!newCategorySnapshot.exists()) {
-                        await set(ref(db, `foodItems/${newCategoryName}/emoji`), newCategoryEmoji);
-                    }
+                    // Ensure new category has emoji
+                    await set(ref(db, `foodItems/${newCategoryName}/emoji`), newCategoryEmoji);
                     
                     // Remove from old category
                     await remove(oldItemRef);
@@ -1302,11 +1335,17 @@
                         createdAt: oldItem.createdAt,
                         updatedAt: new Date().toISOString()
                     });
-                } else {
-                    // Update emoji for existing category
-                    await set(ref(db, `foodItems/${currentEditCategory}/emoji`), newCategoryEmoji);
                     
-                    // Update the item
+                    // Check if old category is empty
+                    const oldCategoryRef = ref(db, `foodItems/${currentEditCategory}`);
+                    const oldCategorySnapshot = await get(oldCategoryRef);
+                    const oldCategoryData = oldCategorySnapshot.val();
+                    
+                    if (oldCategoryData && Object.keys(oldCategoryData).length === 1 && oldCategoryData.emoji) {
+                        // Keep the category with just emoji - don't delete
+                    }
+                } else {
+                    // Update the item in same category
                     await update(oldItemRef, {
                         name: name,
                         price: price,
@@ -1352,18 +1391,7 @@
             try {
                 await remove(ref(db, `foodItems/${categoryName}/${itemId}`));
                 
-                // Check if category is empty (only has emoji left)
-                const categoryRef = ref(db, `foodItems/${categoryName}`);
-                const categorySnapshot = await get(categoryRef);
-                const categoryData = categorySnapshot.val();
-                
-                if (categoryData && Object.keys(categoryData).length === 1 && categoryData.emoji) {
-                    // Category only has emoji, remove entire category
-                    if (confirm(`Category "${categoryName}" is now empty. Delete the category too?`)) {
-                        await remove(categoryRef);
-                    }
-                }
-                
+                // Don't delete empty categories - keep them with emoji
                 showNotification('Item deleted successfully');
             } catch (error) {
                 showNotification('Error deleting item: ' + error.message, true);
@@ -1448,6 +1476,7 @@
         };
 
         // Initialize
+        initializeCategories();
         loadStoreStatus();
         loadFoodItems();
     </script>
