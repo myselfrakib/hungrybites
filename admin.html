@@ -333,75 +333,6 @@
             color: #2c3e50;
         }
 
-        .category-management {
-            background: white;
-            padding: 1.8rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-            margin-bottom: 2rem;
-        }
-
-        .category-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-bottom: 1rem;
-        }
-
-        .category-chip {
-            padding: 0.6rem 1rem;
-            background: #e9ecef;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.95rem;
-        }
-
-        .category-chip-name {
-            font-weight: 600;
-        }
-
-        .category-chip-delete {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .add-category-form {
-            display: flex;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-        }
-
-        .add-category-form input {
-            flex: 1;
-            min-width: 150px;
-            padding: 0.75rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 0.95rem;
-        }
-
-        .btn-add-category {
-            padding: 0.75rem 1.5rem;
-            background: #2c3e50;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
         .form-row {
             display: grid;
             grid-template-columns: 1fr;
@@ -718,13 +649,6 @@
             background: #4a9635;
         }
 
-        .orders-container {
-            background: white;
-            border-radius: 12px;
-            padding: 1.8rem;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-        }
-
         .notification {
             position: fixed;
             top: 80px;
@@ -750,27 +674,6 @@
 
         .notification.error {
             background: #e74c3c;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 2.5rem;
-            color: #666;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #2c3e50;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         .empty-state {
@@ -884,11 +787,8 @@
         <div class="mobile-menu-item active" onclick="switchTab('store')">
             🏪 Store Control
         </div>
-        <div class="mobile-menu-item" onclick="switchTab('categories')">
-            📁 Categories
-        </div>
         <div class="mobile-menu-item" onclick="switchTab('food')">
-            🍕 Food Items
+            🍕 Manage Menu
         </div>
         <div class="mobile-menu-item" onclick="switchTab('menu')">
             📋 Menu Status
@@ -900,8 +800,7 @@
     <div class="container">
         <div class="tabs">
             <div class="tab active" onclick="switchTab('store')">🏪 Store Control</div>
-            <div class="tab" onclick="switchTab('categories')">📁 Categories</div>
-            <div class="tab" onclick="switchTab('food')">🍕 Food Items</div>
+            <div class="tab" onclick="switchTab('food')">🍕 Manage Menu</div>
             <div class="tab" onclick="switchTab('menu')">📋 Menu Status</div>
         </div>
 
@@ -928,47 +827,34 @@
             </div>
         </div>
 
-        <div id="categoriesTab" class="tab-content">
-            <h2 class="section-title">Manage Categories</h2>
-            
-            <div class="category-management">
-                <h3 class="form-title">Food Categories</h3>
-                <div class="category-list" id="categoryList"></div>
-                
-                <div class="add-category-form">
-                    <input type="text" id="newCategoryName" placeholder="Category name (e.g., Noodles)" maxlength="30">
-                    <input type="text" id="newCategoryEmoji" placeholder="Emoji 🍜" maxlength="2">
-                    <button class="btn-add-category" onclick="addCategory()">Add Category</button>
-                </div>
-            </div>
-        </div>
-
         <div id="foodTab" class="tab-content">
-            <h2 class="section-title">Manage Food Items</h2>
+            <h2 class="section-title">Manage Food Menu</h2>
             
             <div class="add-item-form">
-                <h3 class="form-title">Add New Item</h3>
+                <h3 class="form-title">Add New Food Item</h3>
                 <form onsubmit="addFoodItem(event)">
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Category *</label>
-                            <select id="itemCategory" required>
-                                <option value="">Select category...</option>
-                            </select>
+                            <label>Category Name *</label>
+                            <input type="text" id="categoryName" required placeholder="e.g., Noodles, Sandwiches">
+                        </div>
+                        <div class="form-group">
+                            <label>Category Emoji *</label>
+                            <input type="text" id="categoryEmoji" placeholder="🍜" maxlength="2" required>
                         </div>
                         <div class="form-group">
                             <label>Item Name *</label>
                             <input type="text" id="itemName" required placeholder="e.g., Veg Noodles">
                         </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group">
                             <label>Price (₹) *</label>
                             <input type="number" id="itemPrice" min="0" step="0.01" required placeholder="0.00">
                         </div>
-                    </div>
-                    <div class="form-row">
                         <div class="form-group">
-                            <label>Emoji *</label>
-                            <input type="text" id="itemEmoji" placeholder="🍜" maxlength="2" required>
+                            <label>Item Emoji</label>
+                            <input type="text" id="itemEmoji" placeholder="🍜" maxlength="2">
                         </div>
                         <div class="form-group">
                             <label>Image URL</label>
@@ -1002,24 +888,26 @@
             <form onsubmit="saveEdit(event)">
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Category *</label>
-                        <select id="editCategory" required>
-                            <option value="">Select category...</option>
-                        </select>
+                        <label>Category Name *</label>
+                        <input type="text" id="editCategoryName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category Emoji *</label>
+                        <input type="text" id="editCategoryEmoji" maxlength="2" required>
                     </div>
                     <div class="form-group">
                         <label>Item Name *</label>
                         <input type="text" id="editName" required>
                     </div>
+                </div>
+                <div class="form-row">
                     <div class="form-group">
                         <label>Price (₹) *</label>
                         <input type="number" id="editPrice" min="0" step="0.01" required>
                     </div>
-                </div>
-                <div class="form-row">
                     <div class="form-group">
-                        <label>Emoji *</label>
-                        <input type="text" id="editEmoji" maxlength="2" required>
+                        <label>Item Emoji</label>
+                        <input type="text" id="editEmoji" maxlength="2">
                     </div>
                     <div class="form-group">
                         <label>Image URL</label>
@@ -1046,107 +934,21 @@
         import { getDatabase, ref, set, get, update, remove, onValue, push } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
 
         const firebaseConfig = {
-    apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
-    authDomain: "hungrybites-c7930.firebaseapp.com",
-    databaseURL: "https://hungrybites-c7930-default-rtdb.firebaseio.com",
-    projectId: "hungrybites-c7930",
-    storageBucket: "hungrybites-c7930.firebasestorage.app",
-    messagingSenderId: "346758544945",
-    appId: "1:346758544945:web:4bcad30016540d18e79f10",
-    measurementId: "G-B5GP5SYMRC"
-  };
+            apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
+            authDomain: "hungrybites-c7930.firebaseapp.com",
+            databaseURL: "https://hungrybites-c7930-default-rtdb.firebaseio.com",
+            projectId: "hungrybites-c7930",
+            storageBucket: "hungrybites-c7930.firebasestorage.app",
+            messagingSenderId: "346758544945",
+            appId: "1:346758544945:web:4bcad30016540d18e79f10",
+            measurementId: "G-B5GP5SYMRC"
+        };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
         let currentEditId = null;
         let currentEditCategory = null;
-        let categories = {};
-
-        // Load categories
-        function loadCategories() {
-            const categoriesRef = ref(db, 'categories');
-            onValue(categoriesRef, (snapshot) => {
-                categories = snapshot.val() || {};
-                displayCategories();
-                updateCategorySelects();
-                loadFoodItems();
-            });
-        }
-
-        // Display categories
-        function displayCategories() {
-            const categoryList = document.getElementById('categoryList');
-            categoryList.innerHTML = '';
-            
-            Object.keys(categories).forEach(categoryId => {
-                const category = categories[categoryId];
-                const chip = document.createElement('div');
-                chip.className = 'category-chip';
-                chip.innerHTML = `
-                    <span>${category.emoji}</span>
-                    <span class="category-chip-name">${category.name}</span>
-                    <button class="category-chip-delete" onclick="deleteCategory('${categoryId}')">×</button>
-                `;
-                categoryList.appendChild(chip);
-            });
-        }
-
-        // Update category dropdowns
-        function updateCategorySelects() {
-            const itemCategory = document.getElementById('itemCategory');
-            const editCategory = document.getElementById('editCategory');
-            
-            const options = '<option value="">Select category...</option>' + 
-                Object.keys(categories).map(categoryId => 
-                    `<option value="${categoryId}">${categories[categoryId].emoji} ${categories[categoryId].name}</option>`
-                ).join('');
-            
-            itemCategory.innerHTML = options;
-            editCategory.innerHTML = options;
-        }
-
-        // Add category
-        window.addCategory = async function() {
-            const name = document.getElementById('newCategoryName').value.trim();
-            const emoji = document.getElementById('newCategoryEmoji').value.trim();
-            
-            if (!name || !emoji) {
-                showNotification('Please fill in all fields', true);
-                return;
-            }
-
-            try {
-                const categoriesRef = ref(db, 'categories');
-                const newCategoryRef = push(categoriesRef);
-                await set(newCategoryRef, {
-                    name: name,
-                    emoji: emoji,
-                    createdAt: new Date().toISOString()
-                });
-                
-                document.getElementById('newCategoryName').value = '';
-                document.getElementById('newCategoryEmoji').value = '';
-                showNotification('Category added successfully');
-            } catch (error) {
-                showNotification('Error adding category: ' + error.message, true);
-            }
-        };
-
-        // Delete category
-        window.deleteCategory = async function(categoryId) {
-            if (!confirm('Delete this category? All items in this category will also be deleted.')) {
-                return;
-            }
-
-            try {
-                await remove(ref(db, `categories/${categoryId}`));
-                await remove(ref(db, `foodItems/${categoryId}`));
-                showNotification('Category deleted successfully');
-            } catch (error) {
-                showNotification('Error deleting category: ' + error.message, true);
-            }
-        };
 
         // Load store status
         function loadStoreStatus() {
@@ -1215,21 +1017,42 @@
         function loadFoodItems() {
             const foodItemsRef = ref(db, 'foodItems');
             onValue(foodItemsRef, (snapshot) => {
-                const items = snapshot.val() || {};
-                displayFoodItems(items);
-                displayMenuStatus(items);
+                const categories = snapshot.val() || {};
+                displayFoodItems(categories);
+                displayMenuStatus(categories);
             });
         }
 
         // Display food items grouped by category
-        function displayFoodItems(items) {
+        function displayFoodItems(categories) {
             const container = document.getElementById('menuContainer');
             container.innerHTML = '';
 
-            Object.keys(categories).forEach(categoryId => {
-                const category = categories[categoryId];
-                const categoryItems = items[categoryId] || {};
-                const itemCount = Object.keys(categoryItems).length;
+            const categoryNames = Object.keys(categories);
+            
+            if (categoryNames.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div class="empty-state-text">No menu items yet. Add your first item above!</div>
+                    </div>
+                `;
+                return;
+            }
+
+            categoryNames.forEach(categoryName => {
+                const categoryData = categories[categoryName];
+                const emoji = categoryData.emoji || '🍽️';
+                
+                // Get all items in this category (excluding emoji field)
+                const items = Object.keys(categoryData)
+                    .filter(key => key !== 'emoji')
+                    .reduce((obj, key) => {
+                        obj[key] = categoryData[key];
+                        return obj;
+                    }, {});
+
+                const itemCount = Object.keys(items).length;
 
                 const section = document.createElement('div');
                 section.className = 'category-section';
@@ -1237,17 +1060,17 @@
                 section.innerHTML = `
                     <div class="category-header">
                         <div class="category-title">
-                            <span>${category.emoji}</span>
-                            <span>${category.name}</span>
+                            <span>${emoji}</span>
+                            <span>${categoryName}</span>
                             <span class="category-count">${itemCount} items</span>
                         </div>
                     </div>
-                    <div class="items-grid" id="category-${categoryId}"></div>
+                    <div class="items-grid" id="category-${categoryName.replace(/\s+/g, '-')}"></div>
                 `;
                 
                 container.appendChild(section);
 
-                const grid = document.getElementById(`category-${categoryId}`);
+                const grid = document.getElementById(`category-${categoryName.replace(/\s+/g, '-')}`);
                 
                 if (itemCount === 0) {
                     grid.innerHTML = `
@@ -1257,9 +1080,9 @@
                         </div>
                     `;
                 } else {
-                    Object.keys(categoryItems).forEach(itemId => {
-                        const item = categoryItems[itemId];
-                        const card = createItemCard(item, itemId, categoryId);
+                    Object.keys(items).forEach(itemId => {
+                        const item = items[itemId];
+                        const card = createItemCard(item, itemId, categoryName);
                         grid.appendChild(card);
                     });
                 }
@@ -1267,13 +1090,15 @@
         }
 
         // Create item card
-        function createItemCard(item, itemId, categoryId) {
+        function createItemCard(item, itemId, categoryName) {
             const card = document.createElement('div');
             card.className = 'item-card';
             
             const imageHtml = item.imageurl ? 
                 `<img src="${item.imageurl}" alt="${item.name}" class="item-image">` :
-                `<div class="item-emoji">${item.emoji}</div>`;
+                item.emoji ? `<div class="item-emoji">${item.emoji}</div>` : '';
+            
+            const isActive = item.isActive !== false; // Default to true if not set
             
             card.innerHTML = `
                 ${imageHtml}
@@ -1281,12 +1106,12 @@
                 ${item.description ? `<div class="item-description">${item.description}</div>` : ''}
                 <div class="item-price">₹${parseFloat(item.price).toFixed(2)}</div>
                 <div class="item-actions">
-                    <button class="btn-edit" onclick="editItem('${categoryId}', '${itemId}')">Edit</button>
-                    <button class="btn-toggle ${item.isActive ? '' : 'inactive'}" 
-                            onclick="toggleItemStatus('${categoryId}', '${itemId}', ${item.isActive})">
-                        ${item.isActive ? 'Active' : 'Inactive'}
+                    <button class="btn-edit" onclick="editItem('${categoryName}', '${itemId}')">Edit</button>
+                    <button class="btn-toggle ${isActive ? '' : 'inactive'}" 
+                            onclick="toggleItemStatus('${categoryName}', '${itemId}', ${isActive})">
+                        ${isActive ? 'Active' : 'Inactive'}
                     </button>
-                    <button class="btn-delete" onclick="deleteItem('${categoryId}', '${itemId}')">Delete</button>
+                    <button class="btn-delete" onclick="deleteItem('${categoryName}', '${itemId}')">Delete</button>
                 </div>
             `;
             
@@ -1294,32 +1119,51 @@
         }
 
         // Display menu status
-        function displayMenuStatus(items) {
+        function displayMenuStatus(categories) {
             const container = document.getElementById('menuStatusContainer');
             container.innerHTML = '';
 
-            Object.keys(categories).forEach(categoryId => {
-                const category = categories[categoryId];
-                const categoryItems = items[categoryId] || {};
+            const categoryNames = Object.keys(categories);
+            
+            if (categoryNames.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div class="empty-state-text">No menu items yet</div>
+                    </div>
+                `;
+                return;
+            }
+
+            categoryNames.forEach(categoryName => {
+                const categoryData = categories[categoryName];
+                const emoji = categoryData.emoji || '🍽️';
                 
+                const items = Object.keys(categoryData)
+                    .filter(key => key !== 'emoji')
+                    .reduce((obj, key) => {
+                        obj[key] = categoryData[key];
+                        return obj;
+                    }, {});
+
                 const section = document.createElement('div');
                 section.className = 'category-section';
                 
                 section.innerHTML = `
                     <div class="category-header">
                         <div class="category-title">
-                            <span>${category.emoji}</span>
-                            <span>${category.name}</span>
+                            <span>${emoji}</span>
+                            <span>${categoryName}</span>
                         </div>
                     </div>
-                    <div class="items-grid" id="status-${categoryId}"></div>
+                    <div class="items-grid" id="status-${categoryName.replace(/\s+/g, '-')}"></div>
                 `;
                 
                 container.appendChild(section);
 
-                const grid = document.getElementById(`status-${categoryId}`);
+                const grid = document.getElementById(`status-${categoryName.replace(/\s+/g, '-')}`);
                 
-                if (Object.keys(categoryItems).length === 0) {
+                if (Object.keys(items).length === 0) {
                     grid.innerHTML = `
                         <div class="empty-state">
                             <div class="empty-state-icon">📭</div>
@@ -1327,9 +1171,9 @@
                         </div>
                     `;
                 } else {
-                    Object.keys(categoryItems).forEach(itemId => {
-                        const item = categoryItems[itemId];
-                        const card = createItemCard(item, itemId, categoryId);
+                    Object.keys(items).forEach(itemId => {
+                        const item = items[itemId];
+                        const card = createItemCard(item, itemId, categoryName);
                         grid.appendChild(card);
                     });
                 }
@@ -1340,20 +1184,31 @@
         window.addFoodItem = async function(e) {
             e.preventDefault();
             
-            const categoryId = document.getElementById('itemCategory').value;
+            const categoryName = document.getElementById('categoryName').value.trim();
+            const categoryEmoji = document.getElementById('categoryEmoji').value.trim();
             const name = document.getElementById('itemName').value.trim();
             const price = parseFloat(document.getElementById('itemPrice').value);
             const emoji = document.getElementById('itemEmoji').value.trim();
             const imageurl = document.getElementById('itemImageUrl').value.trim();
             const description = document.getElementById('itemDescription').value.trim();
 
-            if (!categoryId) {
-                showNotification('Please select a category', true);
+            if (!categoryName || !categoryEmoji) {
+                showNotification('Please fill in category name and emoji', true);
                 return;
             }
 
             try {
-                const itemRef = push(ref(db, `foodItems/${categoryId}`));
+                // Check if category exists, if not create it with emoji
+                const categoryRef = ref(db, `foodItems/${categoryName}`);
+                const categorySnapshot = await get(categoryRef);
+                
+                if (!categorySnapshot.exists()) {
+                    // New category - set emoji
+                    await set(ref(db, `foodItems/${categoryName}/emoji`), categoryEmoji);
+                }
+
+                // Add the item under the category
+                const itemRef = push(ref(db, `foodItems/${categoryName}`));
                 await set(itemRef, {
                     name: name,
                     price: price,
@@ -1373,18 +1228,24 @@
         };
 
         // Edit item
-        window.editItem = function(categoryId, itemId) {
+        window.editItem = async function(categoryName, itemId) {
             currentEditId = itemId;
-            currentEditCategory = categoryId;
+            currentEditCategory = categoryName;
             
-            const itemRef = ref(db, `foodItems/${categoryId}/${itemId}`);
-            get(itemRef).then((snapshot) => {
-                const item = snapshot.val();
+            const itemRef = ref(db, `foodItems/${categoryName}/${itemId}`);
+            const categoryEmojiRef = ref(db, `foodItems/${categoryName}/emoji`);
+            
+            try {
+                const itemSnapshot = await get(itemRef);
+                const emojiSnapshot = await get(categoryEmojiRef);
+                const item = itemSnapshot.val();
+                const categoryEmoji = emojiSnapshot.val() || '';
                 
-                document.getElementById('editCategory').value = categoryId;
+                document.getElementById('editCategoryName').value = categoryName;
+                document.getElementById('editCategoryEmoji').value = categoryEmoji;
                 document.getElementById('editName').value = item.name;
                 document.getElementById('editPrice').value = item.price;
-                document.getElementById('editEmoji').value = item.emoji;
+                document.getElementById('editEmoji').value = item.emoji || '';
                 document.getElementById('editImageUrl').value = item.imageurl || '';
                 document.getElementById('editDescription').value = item.description || '';
                 
@@ -1395,14 +1256,17 @@
                 }
                 
                 document.getElementById('editModal').classList.add('active');
-            });
+            } catch (error) {
+                showNotification('Error loading item: ' + error.message, true);
+            }
         };
 
         // Save edit
         window.saveEdit = async function(e) {
             e.preventDefault();
             
-            const newCategoryId = document.getElementById('editCategory').value;
+            const newCategoryName = document.getElementById('editCategoryName').value.trim();
+            const newCategoryEmoji = document.getElementById('editCategoryEmoji').value.trim();
             const name = document.getElementById('editName').value.trim();
             const price = parseFloat(document.getElementById('editPrice').value);
             const emoji = document.getElementById('editEmoji').value.trim();
@@ -1415,19 +1279,34 @@
                 const oldItem = oldItemSnapshot.val();
 
                 // If category changed, move the item
-                if (newCategoryId !== currentEditCategory) {
+                if (newCategoryName !== currentEditCategory) {
+                    // Check if new category exists, if not create it with emoji
+                    const newCategoryRef = ref(db, `foodItems/${newCategoryName}`);
+                    const newCategorySnapshot = await get(newCategoryRef);
+                    
+                    if (!newCategorySnapshot.exists()) {
+                        await set(ref(db, `foodItems/${newCategoryName}/emoji`), newCategoryEmoji);
+                    }
+                    
+                    // Remove from old category
                     await remove(oldItemRef);
-                    await set(ref(db, `foodItems/${newCategoryId}/${currentEditId}`), {
+                    
+                    // Add to new category
+                    await set(ref(db, `foodItems/${newCategoryName}/${currentEditId}`), {
                         name: name,
                         price: price,
                         emoji: emoji,
                         imageurl: imageurl,
                         description: description,
-                        isActive: oldItem.isActive,
+                        isActive: oldItem.isActive !== false,
                         createdAt: oldItem.createdAt,
                         updatedAt: new Date().toISOString()
                     });
                 } else {
+                    // Update emoji for existing category
+                    await set(ref(db, `foodItems/${currentEditCategory}/emoji`), newCategoryEmoji);
+                    
+                    // Update the item
                     await update(oldItemRef, {
                         name: name,
                         price: price,
@@ -1454,9 +1333,9 @@
         };
 
         // Toggle item status
-        window.toggleItemStatus = async function(categoryId, itemId, currentStatus) {
+        window.toggleItemStatus = async function(categoryName, itemId, currentStatus) {
             try {
-                await update(ref(db, `foodItems/${categoryId}/${itemId}`), {
+                await update(ref(db, `foodItems/${categoryName}/${itemId}`), {
                     isActive: !currentStatus,
                     updatedAt: new Date().toISOString()
                 });
@@ -1467,11 +1346,24 @@
         };
 
         // Delete item
-        window.deleteItem = async function(categoryId, itemId) {
+        window.deleteItem = async function(categoryName, itemId) {
             if (!confirm('Are you sure you want to delete this item?')) return;
             
             try {
-                await remove(ref(db, `foodItems/${categoryId}/${itemId}`));
+                await remove(ref(db, `foodItems/${categoryName}/${itemId}`));
+                
+                // Check if category is empty (only has emoji left)
+                const categoryRef = ref(db, `foodItems/${categoryName}`);
+                const categorySnapshot = await get(categoryRef);
+                const categoryData = categorySnapshot.val();
+                
+                if (categoryData && Object.keys(categoryData).length === 1 && categoryData.emoji) {
+                    // Category only has emoji, remove entire category
+                    if (confirm(`Category "${categoryName}" is now empty. Delete the category too?`)) {
+                        await remove(categoryRef);
+                    }
+                }
+                
                 showNotification('Item deleted successfully');
             } catch (error) {
                 showNotification('Error deleting item: ' + error.message, true);
@@ -1557,8 +1449,7 @@
 
         // Initialize
         loadStoreStatus();
-        loadCategories();
+        loadFoodItems();
     </script>
 </body>
 </html>
-
