@@ -148,27 +148,36 @@
             padding: 0 4px;
         }
 
-        .hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2.5rem 1rem;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: clamp(1.75rem, 5vw, 3rem);
-            margin-bottom: 0.75rem;
-        }
-
-        .hero p {
-            font-size: clamp(1rem, 3vw, 1.3rem);
-            opacity: 0.9;
-        }
-
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem 1rem;
+        }
+
+        .store-closed-banner {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(231, 76, 60, 0.3);
+        }
+
+        .store-closed-icon {
+            font-size: clamp(3rem, 10vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .store-closed-title {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .store-closed-text {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            opacity: 0.9;
         }
 
         .section-title {
@@ -403,10 +412,6 @@
         }
 
         @media (min-width: 768px) {
-            .hero {
-                padding: 3.5rem 2rem;
-            }
-
             .container {
                 padding: 3rem 2rem;
             }
@@ -496,7 +501,8 @@
     </div>
 
     <div class="container">
-        <h2 class="section-title">Our Menu</h2>
+        <div id="storeStatusBanner"></div>
+        <h2 class="section-title" id="menuTitle">Our Menu</h2>
         <div id="foodGrid" class="food-grid"></div>
     </div>
 
@@ -525,20 +531,58 @@
         const db = getDatabase(app);
 
         let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        let isStoreOpen = true;
+        
         updateCartBadge();
         updateNotificationVisibility();
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                loadFoodItems();
+                checkStoreStatus();
             } else {
                 window.location.href = 'index.html';
             }
         });
 
+        async function checkStoreStatus() {
+            try {
+                const storeRef = ref(db, 'storeopen');
+                const snapshot = await get(storeRef);
+                
+                if (snapshot.exists() && snapshot.val().inactive === true) {
+                    isStoreOpen = false;
+                    showStoreClosed();
+                } else {
+                    isStoreOpen = true;
+                    loadFoodItems();
+                }
+            } catch (error) {
+                console.error('Error checking store status:', error);
+                isStoreOpen = true;
+                loadFoodItems();
+            }
+        }
+
+        function showStoreClosed() {
+            const banner = document.getElementById('storeStatusBanner');
+            banner.innerHTML = `
+                <div class="store-closed-banner">
+                    <div class="store-closed-icon">🔒</div>
+                    <div class="store-closed-title">Store is Currently Closed</div>
+                    <div class="store-closed-text">We're not taking orders right now. Please check back later!</div>
+                </div>
+            `;
+            
+            const foodGrid = document.getElementById('foodGrid');
+            foodGrid.innerHTML = '';
+            document.getElementById('menuTitle').style.display = 'none';
+        }
+
         async function loadFoodItems() {
             const foodGrid = document.getElementById('foodGrid');
             foodGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Loading menu...</div>';
+            document.getElementById('menuTitle').style.display = 'block';
+            document.getElementById('storeStatusBanner').innerHTML = '';
 
             try {
                 const foodItemsRef = ref(db, 'foodItems');
@@ -609,6 +653,11 @@
         }
 
         window.addToCart = function(id, name, price, emoji) {
+            if (!isStoreOpen) {
+                alert('Sorry, the store is currently closed!');
+                return;
+            }
+
             const existingItem = cart.find(item => item.id === id);
             
             if (existingItem) {
@@ -630,6 +679,11 @@
         };
 
         window.increaseQuantity = function(id) {
+            if (!isStoreOpen) {
+                alert('Sorry, the store is currently closed!');
+                return;
+            }
+
             const item = cart.find(item => item.id === id);
             if (item) {
                 item.quantity += 1;
@@ -690,7 +744,7 @@
             const notification = document.getElementById('notification');
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
             
-            if (totalItems > 0) {
+            if (totalItems > 0 && isStoreOpen) {
                 notification.classList.add('show');
             } else {
                 notification.classList.remove('show');
@@ -716,7 +770,6 @@
             navMenu.classList.toggle('active');
         };
 
-        // Close menu when clicking outside
         document.addEventListener('click', function(event) {
             const hamburger = document.querySelector('.hamburger');
             const navMenu = document.getElementById('navMenu');
