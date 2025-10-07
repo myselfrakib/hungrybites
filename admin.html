@@ -836,7 +836,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Category *</label>
-                            <select id="categorySelect" required onchange="updateCategoryEmoji()">
+                            <select id="categorySelect" required>
                                 <option value="">Select category...</option>
                                 <option value="Sandwiches" data-emoji="🥪">🥪 Sandwiches</option>
                                 <option value="Noodles" data-emoji="🍜">🍜 Noodles</option>
@@ -854,10 +854,6 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>Price (₹) *</label>
-                            <input type="number" id="itemPrice" min="0" step="0.01" required placeholder="0.00">
-                        </div>
                         <div class="form-group">
                             <label>Item Emoji</label>
                             <input type="text" id="itemEmoji" placeholder="🍜" maxlength="2">
@@ -895,7 +891,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Category *</label>
-                        <select id="editCategorySelect" required onchange="updateEditCategoryEmoji()">
+                        <select id="editCategorySelect" required>
                             <option value="">Select category...</option>
                             <option value="Sandwiches" data-emoji="🥪">🥪 Sandwiches</option>
                             <option value="Noodles" data-emoji="🍜">🍜 Noodles</option>
@@ -940,6 +936,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
         import { getDatabase, ref, set, get, update, remove, onValue, push } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -954,9 +951,41 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const auth = getAuth(app);
 
         let currentEditId = null;
         let currentEditCategory = null;
+        let isAdmin = false;
+
+        // Check authentication
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Check if user is admin
+            try {
+                const adminRef = ref(db, `admins/${user.uid}`);
+                const adminSnapshot = await get(adminRef);
+                
+                if (!adminSnapshot.exists() || !adminSnapshot.val().admin) {
+                    showNotification('Unauthorized access', true);
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                    return;
+                }
+                
+                isAdmin = true;
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+                showNotification('Error verifying admin access', true);
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+            }
+        });
 
         // Predefined categories
         const CATEGORIES = {
@@ -966,38 +995,15 @@
             'Cigarettes': '🚬'
         };
 
-        // Update category emoji when selection changes
-        window.updateCategoryEmoji = function() {
-            // This function can be used if needed for any dynamic updates
-        };
-
-        window.updateEditCategoryEmoji = function() {
-            // This function can be used if needed for any dynamic updates
-        };
-
-        // Initialize categories on load
-        async function initializeCategories() {
-            try {
-                for (const [categoryName, emoji] of Object.entries(CATEGORIES)) {
-                    const categoryRef = ref(db, `foodItems/${categoryName}`);
-                    const categorySnapshot = await get(categoryRef);
-                    
-                    // Only create if doesn't exist
-                    if (!categorySnapshot.exists()) {
-                        await set(ref(db, `foodItems/${categoryName}/emoji`), emoji);
-                    }
-                }
-            } catch (error) {
-                console.error('Error initializing categories:', error);
-            }
-        }
-
         // Load store status
         function loadStoreStatus() {
             const storeRef = ref(db, 'storeStatus');
             onValue(storeRef, (snapshot) => {
                 const status = snapshot.val() || { isOpen: false };
                 updateStoreUI(status.isOpen);
+            }, (error) => {
+                console.error('Error loading store status:', error);
+                showNotification('Error loading store status', true);
             });
         }
 
@@ -1040,17 +1046,25 @@
 
         // Toggle store status
         window.toggleStoreStatus = async function() {
+            if (!isAdmin) {
+                showNotification('Unauthorized', true);
+                return;
+            }
+
             const storeRef = ref(db, 'storeStatus');
-            const snapshot = await get(storeRef);
-            const currentStatus = snapshot.val() || { isOpen: false };
             
             try {
+                const snapshot = await get(storeRef);
+                const currentStatus = snapshot.val() || { isOpen: false };
+                
                 await set(storeRef, {
                     isOpen: !currentStatus.isOpen,
                     updatedAt: new Date().toISOString()
                 });
+                
                 showNotification(`Store ${!currentStatus.isOpen ? 'opened' : 'closed'} successfully`);
             } catch (error) {
+                console.error('Error updating store status:', error);
                 showNotification('Error updating store status: ' + error.message, true);
             }
         };
@@ -1062,6 +1076,9 @@
                 const categories = snapshot.val() || {};
                 displayFoodItems(categories);
                 displayMenuStatus(categories);
+            }, (error) => {
+                console.error('Error loading food items:', error);
+                showNotification('Error loading menu items', true);
             });
         }
 
@@ -1084,9 +1101,8 @@
 
             categoryNames.forEach(categoryName => {
                 const categoryData = categories[categoryName];
-                const emoji = categoryData.emoji || '🍽️';
+                const emoji = categoryData.emoji || CATEGORIES[categoryName] || '🍽️';
                 
-                // Get all items in this category (excluding emoji field)
                 const items = Object.keys(categoryData)
                     .filter(key => key !== 'emoji')
                     .reduce((obj, key) => {
@@ -1137,10 +1153,10 @@
             card.className = 'item-card';
             
             const imageHtml = item.imageurl ? 
-                `<img src="${item.imageurl}" alt="${item.name}" class="item-image">` :
+                `<img src="${item.imageurl}" alt="${item.name}" class="item-image" onerror="this.style.display='none'">` :
                 item.emoji ? `<div class="item-emoji">${item.emoji}</div>` : '';
             
-            const isActive = item.isActive !== false; // Default to true if not set
+            const isActive = item.isActive !== false;
             
             card.innerHTML = `
                 ${imageHtml}
@@ -1179,7 +1195,7 @@
 
             categoryNames.forEach(categoryName => {
                 const categoryData = categories[categoryName];
-                const emoji = categoryData.emoji || '🍽️';
+                const emoji = categoryData.emoji || CATEGORIES[categoryName] || '🍽️';
                 
                 const items = Object.keys(categoryData)
                     .filter(key => key !== 'emoji')
@@ -1226,6 +1242,11 @@
         window.addFoodItem = async function(e) {
             e.preventDefault();
             
+            if (!isAdmin) {
+                showNotification('Unauthorized', true);
+                return;
+            }
+
             const categorySelect = document.getElementById('categorySelect');
             const categoryName = categorySelect.value;
             const selectedOption = categorySelect.options[categorySelect.selectedIndex];
@@ -1243,8 +1264,13 @@
             }
 
             try {
-                // Ensure category has emoji field
-                await set(ref(db, `foodItems/${categoryName}/emoji`), categoryEmoji);
+                // Ensure category exists with emoji
+                const categoryRef = ref(db, `foodItems/${categoryName}`);
+                const categorySnapshot = await get(categoryRef);
+                
+                if (!categorySnapshot.exists()) {
+                    await set(ref(db, `foodItems/${categoryName}/emoji`), categoryEmoji);
+                }
 
                 // Add the item under the category
                 const itemRef = push(ref(db, `foodItems/${categoryName}`));
@@ -1262,12 +1288,18 @@
                 document.getElementById('imagePreview').classList.remove('show');
                 showNotification('Food item added successfully');
             } catch (error) {
+                console.error('Error adding item:', error);
                 showNotification('Error adding item: ' + error.message, true);
             }
         };
 
         // Edit item
         window.editItem = async function(categoryName, itemId) {
+            if (!isAdmin) {
+                showNotification('Unauthorized', true);
+                return;
+            }
+
             currentEditId = itemId;
             currentEditCategory = categoryName;
             
@@ -1292,6 +1324,7 @@
                 
                 document.getElementById('editModal').classList.add('active');
             } catch (error) {
+                console.error('Error loading item:', error);
                 showNotification('Error loading item: ' + error.message, true);
             }
         };
@@ -1300,6 +1333,11 @@
         window.saveEdit = async function(e) {
             e.preventDefault();
             
+            if (!isAdmin) {
+                showNotification('Unauthorized', true);
+                return;
+            }
+
             const categorySelect = document.getElementById('editCategorySelect');
             const newCategoryName = categorySelect.value;
             const selectedOption = categorySelect.options[categorySelect.selectedIndex];
@@ -1316,10 +1354,14 @@
                 const oldItemSnapshot = await get(oldItemRef);
                 const oldItem = oldItemSnapshot.val();
 
-                // If category changed, move the item
                 if (newCategoryName !== currentEditCategory) {
-                    // Ensure new category has emoji
-                    await set(ref(db, `foodItems/${newCategoryName}/emoji`), newCategoryEmoji);
+                    // Ensure new category exists
+                    const newCategoryRef = ref(db, `foodItems/${newCategoryName}`);
+                    const newCategorySnapshot = await get(newCategoryRef);
+                    
+                    if (!newCategorySnapshot.exists()) {
+                        await set(ref(db, `foodItems/${newCategoryName}/emoji`), newCategoryEmoji);
+                    }
                     
                     // Remove from old category
                     await remove(oldItemRef);
@@ -1335,17 +1377,8 @@
                         createdAt: oldItem.createdAt,
                         updatedAt: new Date().toISOString()
                     });
-                    
-                    // Check if old category is empty
-                    const oldCategoryRef = ref(db, `foodItems/${currentEditCategory}`);
-                    const oldCategorySnapshot = await get(oldCategoryRef);
-                    const oldCategoryData = oldCategorySnapshot.val();
-                    
-                    if (oldCategoryData && Object.keys(oldCategoryData).length === 1 && oldCategoryData.emoji) {
-                        // Keep the category with just emoji - don't delete
-                    }
                 } else {
-                    // Update the item in same category
+                    // Update in same category
                     await update(oldItemRef, {
                         name: name,
                         price: price,
@@ -1359,6 +1392,7 @@
                 closeEditModal();
                 showNotification('Item updated successfully');
             } catch (error) {
+                console.error('Error updating item:', error);
                 showNotification('Error updating item: ' + error.message, true);
             }
         };
@@ -1373,6 +1407,11 @@
 
         // Toggle item status
         window.toggleItemStatus = async function(categoryName, itemId, currentStatus) {
+            if (!isAdmin) {
+                showNotification('Unauthorized', true);
+                return;
+            }
+
             try {
                 await update(ref(db, `foodItems/${categoryName}/${itemId}`), {
                     isActive: !currentStatus,
@@ -1380,20 +1419,25 @@
                 });
                 showNotification(`Item ${!currentStatus ? 'activated' : 'deactivated'}`);
             } catch (error) {
+                console.error('Error updating status:', error);
                 showNotification('Error updating status: ' + error.message, true);
             }
         };
 
         // Delete item
         window.deleteItem = async function(categoryName, itemId) {
+            if (!isAdmin) {
+                showNotification('Unauthorized', true);
+                return;
+            }
+
             if (!confirm('Are you sure you want to delete this item?')) return;
             
             try {
                 await remove(ref(db, `foodItems/${categoryName}/${itemId}`));
-                
-                // Don't delete empty categories - keep them with emoji
                 showNotification('Item deleted successfully');
             } catch (error) {
+                console.error('Error deleting item:', error);
                 showNotification('Error deleting item: ' + error.message, true);
             }
         };
@@ -1471,12 +1515,16 @@
         // Logout
         window.logout = function() {
             if (confirm('Are you sure you want to logout?')) {
-                window.location.href = 'login.html';
+                auth.signOut().then(() => {
+                    window.location.href = 'login.html';
+                }).catch((error) => {
+                    console.error('Error signing out:', error);
+                    showNotification('Error logging out', true);
+                });
             }
         };
 
         // Initialize
-        initializeCategories();
         loadStoreStatus();
         loadFoodItems();
     </script>
