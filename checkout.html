@@ -6,6 +6,14 @@
     <title>HungryBites - Checkout</title>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
+        :root {
+            --sunglow: #fdc921;
+            --mustard: #fdd85d;
+            --baby-powder: #fffdf7;
+            --non-photo-blue: #99d6ea;
+            --blue-gray: #6798c0;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,7 +23,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f8f9fa;
+            background: var(--baby-powder);
             color: #333;
             padding-bottom: 2rem;
         }
@@ -50,7 +58,7 @@
         .hamburger span {
             width: 22px;
             height: 2.5px;
-            background: #333;
+            background: var(--blue-gray);
             border-radius: 3px;
             transition: all 0.3s;
         }
@@ -70,7 +78,7 @@
         .logo {
             font-size: clamp(1.2rem, 4vw, 1.5rem);
             font-weight: bold;
-            color: #fc8019;
+            color: var(--sunglow);
             cursor: pointer;
         }
 
@@ -108,7 +116,7 @@
         }
 
         .nav-item:hover {
-            background: #f8f9fa;
+            background: var(--baby-powder);
         }
 
         .container {
@@ -127,7 +135,7 @@
 
         h2 {
             margin-bottom: 1rem;
-            color: #fc8019;
+            color: var(--sunglow);
             font-size: clamp(1.3rem, 4vw, 1.6rem);
         }
 
@@ -163,7 +171,7 @@
         }
 
         .cart-item-price {
-            color: #60b246;
+            color: var(--blue-gray);
             font-weight: 600;
             font-size: clamp(0.85rem, 2.5vw, 0.95rem);
         }
@@ -182,7 +190,7 @@
         }
 
         .quantity-btn {
-            background: #fc8019;
+            background: var(--sunglow);
             color: white;
             border: none;
             width: 32px;
@@ -254,7 +262,7 @@
             justify-content: space-between;
             font-size: clamp(1.3rem, 4vw, 1.5rem);
             font-weight: bold;
-            color: #60b246;
+            color: var(--blue-gray);
             margin-top: 1rem;
             padding-top: 1rem;
             border-top: 2px solid #eee;
@@ -279,10 +287,10 @@
         }
 
         .address-display-card {
-            border: 2px solid #60b246;
+            border: 2px solid var(--non-photo-blue);
             border-radius: 10px;
             padding: 0.9rem;
-            background: #f0f9f0;
+            background: #f0f9ff;
             position: relative;
         }
 
@@ -300,7 +308,7 @@
         }
 
         .change-address-btn {
-            background: #fc8019;
+            background: var(--sunglow);
             color: white;
             border: none;
             padding: 0.4rem 0.8rem;
@@ -331,7 +339,7 @@
         .coordinates-display {
             margin-top: 0.5rem;
             padding-top: 0.5rem;
-            border-top: 1px solid #d0e8d0;
+            border-top: 1px solid var(--non-photo-blue);
             font-size: 0.8rem;
             color: #666;
         }
@@ -362,7 +370,7 @@
         .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #fc8019;
+            border-color: var(--sunglow);
         }
 
         .form-group textarea {
@@ -391,8 +399,8 @@
         }
 
         .map-instruction {
-            background: #fff8f3;
-            border-left: 4px solid #fc8019;
+            background: #fffbf0;
+            border-left: 4px solid var(--sunglow);
             padding: 0.75rem;
             margin-bottom: 1rem;
             border-radius: 4px;
@@ -401,7 +409,7 @@
         }
 
         .location-btn {
-            background: #60b246;
+            background: var(--non-photo-blue);
             color: white;
             border: none;
             padding: 0.6rem 1rem;
@@ -421,6 +429,11 @@
             transform: scale(0.95);
         }
 
+        .location-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
         .address-card {
             border: 2px solid #e0e0e0;
             border-radius: 10px;
@@ -432,13 +445,13 @@
         }
 
         .address-card:hover {
-            border-color: #fc8019;
-            background: #fff8f3;
+            border-color: var(--sunglow);
+            background: #fffbf0;
         }
 
         .address-card.selected {
-            border-color: #fc8019;
-            background: #fff8f3;
+            border-color: var(--sunglow);
+            background: #fffbf0;
         }
 
         .address-card-header {
@@ -493,7 +506,7 @@
         }
 
         .default-badge {
-            background: #60b246;
+            background: var(--non-photo-blue);
             color: white;
             padding: 0.2rem 0.6rem;
             border-radius: 5px;
@@ -513,13 +526,13 @@
         }
 
         .payment-option:hover {
-            border-color: #fc8019;
-            background: #fff8f3;
+            border-color: var(--sunglow);
+            background: #fffbf0;
         }
 
         .payment-option.selected {
-            border-color: #fc8019;
-            background: #fff8f3;
+            border-color: var(--sunglow);
+            background: #fffbf0;
         }
 
         .payment-option input[type="radio"] {
@@ -527,7 +540,7 @@
             height: 18px;
             margin-right: 0.9rem;
             cursor: pointer;
-            accent-color: #fc8019;
+            accent-color: var(--sunglow);
         }
 
         .payment-details {
@@ -551,7 +564,7 @@
         .btn {
             width: 100%;
             padding: 1rem;
-            background: #60b246;
+            background: var(--blue-gray);
             color: white;
             border: none;
             border-radius: 10px;
@@ -576,8 +589,8 @@
             width: 100%;
             padding: 0.9rem;
             background: white;
-            color: #fc8019;
-            border: 2px solid #fc8019;
+            color: var(--sunglow);
+            border: 2px solid var(--sunglow);
             border-radius: 10px;
             font-size: clamp(0.95rem, 3vw, 1.05rem);
             font-weight: 600;
@@ -610,7 +623,7 @@
             display: inline-block;
             margin-top: 0.75rem;
             padding: 0.7rem 1.5rem;
-            background: #fc8019;
+            background: var(--sunglow);
             color: white;
             text-decoration: none;
             border-radius: 8px;
@@ -653,7 +666,7 @@
 
         .spinner {
             border: 3px solid #f3f3f3;
-            border-top: 3px solid #fc8019;
+            border-top: 3px solid var(--sunglow);
             border-radius: 50%;
             width: 28px;
             height: 28px;
@@ -664,6 +677,78 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            z-index: 10000;
+            display: none;
+            text-align: center;
+            min-width: 280px;
+            max-width: 90%;
+            animation: toastSlideIn 0.3s ease-out;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .toast-success {
+            border-left: 5px solid var(--non-photo-blue);
+        }
+
+        .toast-error {
+            border-left: 5px solid #dc3545;
+        }
+
+        .toast-icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .toast-message {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .toast-submessage {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                transform: translate(-50%, -60%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            }
+        }
+
+        .toast-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 9999;
+            display: none;
+        }
+
+        .toast-overlay.show {
+            display: block;
         }
 
         .modal-overlay {
@@ -747,7 +832,7 @@
             }
 
             .quantity-btn:hover {
-                background: #e67316;
+                background: var(--mustard);
                 transform: scale(1.1);
             }
 
@@ -756,9 +841,9 @@
             }
 
             .btn:hover {
-                background: #54a03d;
+                background: #5989b3;
                 transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(96, 178, 70, 0.4);
+                box-shadow: 0 5px 15px rgba(103, 152, 192, 0.4);
             }
 
             .hamburger {
@@ -803,6 +888,13 @@
     <div class="container">
         <div class="success-message" id="successMessage"></div>
         <div class="error-message" id="errorMessage"></div>
+
+        <div class="toast-overlay" id="toastOverlay"></div>
+        <div class="toast" id="toast">
+            <div class="toast-icon" id="toastIcon"></div>
+            <div class="toast-message" id="toastMessage"></div>
+            <div class="toast-submessage" id="toastSubMessage"></div>
+        </div>
 
         <div class="cart-container">
             <h2>Your Cart</h2>
@@ -854,11 +946,11 @@
 
             <div id="addressFormContainer">
                 <div class="map-instruction">
-                    📍 Click on the map or use "Use My Location" to set your exact delivery location
+                    📍 Your current location will be automatically detected. You can adjust the marker on the map if needed.
                 </div>
                 
-                <button type="button" class="location-btn" onclick="getCurrentLocation()">
-                    📍 Use My Location
+                <button type="button" class="location-btn" id="locationBtn" onclick="getCurrentLocation()">
+                    📍 Detecting Location...
                 </button>
 
                 <div id="map"></div>
@@ -934,11 +1026,12 @@
         let map;
         let marker;
         let selectedLocation = { lat: 22.9734, lng: 78.6569 };
+        let locationDetected = false;
+        let storeStatus = { isOpen: false };
 
         const RAZORPAY_KEY = 'rzp_test_your_key_here';
 
-        // Wait for Google Maps to load
-       window.initMap = function() {
+        window.initMap = function() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: selectedLocation,
                 zoom: 13,
@@ -953,9 +1046,6 @@
                 animation: google.maps.Animation.DROP
             });
 
-            // Set initial location when map loads
-            setMarkerPosition(new google.maps.LatLng(selectedLocation.lat, selectedLocation.lng));
-
             map.addListener('click', (e) => {
                 setMarkerPosition(e.latLng);
             });
@@ -963,6 +1053,9 @@
             marker.addListener('dragend', (e) => {
                 setMarkerPosition(e.latLng);
             });
+
+            // Automatically get current location when map loads
+            getCurrentLocation();
         };
 
         function setMarkerPosition(latLng) {
@@ -984,41 +1077,34 @@
                     addressComponents.forEach(component => {
                         const types = component.types;
                         
-                        // City
                         if (types.includes('locality')) {
                             city = component.long_name;
                         } else if (types.includes('administrative_area_level_2') && !city) {
                             city = component.long_name;
                         }
                         
-                        // Pincode
                         if (types.includes('postal_code')) {
                             pincode = component.long_name;
                         }
                         
-                        // Area/Neighborhood
                         if (types.includes('sublocality_level_1') || types.includes('sublocality_level_2') || 
                             types.includes('sublocality') || types.includes('neighborhood')) {
                             area = component.long_name;
                         }
                         
-                        // Street
                         if (types.includes('route') && !street) {
                             street = component.long_name;
                         }
                         
-                        // State
                         if (types.includes('administrative_area_level_1')) {
                             state = component.long_name;
                         }
                         
-                        // Country
                         if (types.includes('country')) {
                             country = component.long_name;
                         }
                     });
                     
-                    // Auto-fill the form
                     if (city) {
                         document.getElementById('city').value = city;
                     }
@@ -1027,7 +1113,6 @@
                         document.getElementById('pincode').value = pincode;
                     }
                     
-                    // Build address string
                     let addressParts = [];
                     if (street) addressParts.push(street);
                     if (area) addressParts.push(area);
@@ -1036,12 +1121,11 @@
                         document.getElementById('address').value = addressParts.join(', ');
                     }
                     
-                    // Update landmark with state info if available
                     if (state && !document.getElementById('landmark').value) {
                         document.getElementById('landmark').value = `Near ${area || city}, ${state}`;
                     }
                     
-                    showSuccess('Address auto-filled from map location');
+                    showSuccess('Address auto-filled from location');
                 } else {
                     console.error('Geocoding failed:', status);
                     showError('Could not auto-fill address. Please enter manually.');
@@ -1050,6 +1134,10 @@
         }
 
         window.getCurrentLocation = function() {
+            const locationBtn = document.getElementById('locationBtn');
+            locationBtn.disabled = true;
+            locationBtn.innerHTML = '📍 Detecting Location...';
+            
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
@@ -1060,13 +1148,20 @@
                         map.setCenter(pos);
                         map.setZoom(15);
                         setMarkerPosition(new google.maps.LatLng(pos.lat, pos.lng));
+                        locationDetected = true;
+                        locationBtn.innerHTML = '✅ Location Detected';
+                        locationBtn.disabled = false;
                         showSuccess('Location detected successfully');
                     },
                     () => {
+                        locationBtn.innerHTML = '📍 Use My Location';
+                        locationBtn.disabled = false;
                         showError('Unable to get your location. Please select manually on map.');
                     }
                 );
             } else {
+                locationBtn.innerHTML = '📍 Use My Location';
+                locationBtn.disabled = false;
                 showError('Geolocation is not supported by your browser');
             }
         };
@@ -1077,10 +1172,28 @@
                 loadGoogleMaps();
                 loadCart();
                 loadSavedAddresses();
+                checkStoreStatus();
             } else {
                 window.location.href = 'index.html';
             }
         });
+
+        async function checkStoreStatus() {
+            try {
+                const storeStatusRef = ref(db, 'storeStatus');
+                const snapshot = await get(storeStatusRef);
+                
+                if (snapshot.exists()) {
+                    storeStatus = snapshot.val();
+                    console.log('Store Status:', storeStatus);
+                } else {
+                    storeStatus = { isOpen: false };
+                }
+            } catch (error) {
+                console.error('Error checking store status:', error);
+                storeStatus = { isOpen: false };
+            }
+        }
 
         function loadGoogleMaps() {
             if (window.google && window.google.maps) {
@@ -1349,6 +1462,10 @@
                 if (map) {
                     google.maps.event.trigger(map, 'resize');
                     map.setCenter(selectedLocation);
+                    // Auto-detect location when showing new address form
+                    if (!locationDetected && document.getElementById('addressFormContainer').style.display !== 'none') {
+                        getCurrentLocation();
+                    }
                 }
             }, 300);
         };
@@ -1364,11 +1481,14 @@
             
             document.getElementById('addressForm').reset();
             document.getElementById('saveAddress').checked = true;
+            locationDetected = false;
             
             setTimeout(() => {
                 if (map) {
                     google.maps.event.trigger(map, 'resize');
                     map.setCenter(selectedLocation);
+                    // Auto-detect location when form is shown
+                    getCurrentLocation();
                 }
             }, 100);
         };
@@ -1464,6 +1584,14 @@
                 return;
             }
 
+            // Check store status before placing order
+            await checkStoreStatus();
+            
+            if (!storeStatus.isOpen) {
+                showToast('error', '🔒 Store Closed', 'Sorry, we are not taking orders now. Please try again later.');
+                return;
+            }
+
             if (selectedPayment === 'cod') {
                 await placeOrder('cod', null);
             } else {
@@ -1492,7 +1620,7 @@
                     contact: deliveryAddress.phone || ''
                 },
                 theme: {
-                    color: '#fc8019'
+                    color: '#fdc921'
                 },
                 modal: {
                     ondismiss: function() {
@@ -1551,19 +1679,46 @@
                 const ordersRef = ref(db, 'orders');
                 await push(ordersRef, orderData);
 
-                showSuccess('Order placed successfully! Redirecting...');
+                showToast('success', '✅ Order Successful!', 'Redirecting to My Orders...');
 
                 localStorage.removeItem('cart');
                 cart = [];
 
                 setTimeout(() => {
                     window.location.href = 'orders.html';
-                }, 2000);
+                }, 2500);
             } catch (error) {
                 console.error('Error placing order:', error);
                 showError('Failed to place order. Please try again.');
                 loader.style.display = 'none';
                 placeOrderBtn.disabled = false;
+            }
+        }
+
+        function showToast(type, message, submessage) {
+            const toast = document.getElementById('toast');
+            const toastOverlay = document.getElementById('toastOverlay');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastSubMessage = document.getElementById('toastSubMessage');
+
+            toast.className = 'toast show toast-' + type;
+            toastOverlay.classList.add('show');
+            
+            if (type === 'success') {
+                toastIcon.textContent = '✅';
+            } else {
+                toastIcon.textContent = '❌';
+            }
+            
+            toastMessage.textContent = message;
+            toastSubMessage.textContent = submessage;
+
+            if (type === 'error') {
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    toastOverlay.classList.remove('show');
+                }, 3000);
             }
         }
 
@@ -1624,4 +1779,3 @@
     </script>
 </body>
 </html>
-
