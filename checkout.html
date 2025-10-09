@@ -1138,7 +1138,19 @@
             locationBtn.disabled = true;
             locationBtn.innerHTML = '📍 Detecting Location...';
             
+            window.getCurrentLocation = function() {
+            const locationBtn = document.getElementById('locationBtn');
+            locationBtn.disabled = true;
+            locationBtn.innerHTML = '📍 Detecting Location...';
+            
             if (navigator.geolocation) {
+                // Enhanced options for WebView compatibility
+                const options = {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                };
+                
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const pos = {
@@ -1153,11 +1165,28 @@
                         locationBtn.disabled = false;
                         showSuccess('Location detected successfully');
                     },
-                    () => {
+                    (error) => {
+                        console.error('Geolocation error:', error);
                         locationBtn.innerHTML = '📍 Use My Location';
                         locationBtn.disabled = false;
-                        showError('Unable to get your location. Please select manually on map.');
-                    }
+                        
+                        let errorMessage = 'Unable to get your location. ';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage += 'Please enable location permission in app settings.';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage += 'Location information unavailable.';
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage += 'Location request timed out.';
+                                break;
+                            default:
+                                errorMessage += 'Please select manually on map.';
+                        }
+                        showError(errorMessage);
+                    },
+                    options
                 );
             } else {
                 locationBtn.innerHTML = '📍 Use My Location';
@@ -1779,4 +1808,5 @@
     </script>
 </body>
 </html>
+
 
