@@ -386,8 +386,7 @@
             if (user) {
                 isAuthenticatedUser = true;
                 // Check if user already has an account
-                const phone = user.phoneNumber.replace('+91', '');
-                const userRef = ref(database, `users/${phone}/allDetails`);
+                const userRef = ref(database, `users/${user.uid}/allDetails`);
                 const snapshot = await get(userRef);
                 
                 if (snapshot.exists()) {
@@ -445,27 +444,12 @@
             showLoading(true);
 
             try {
-                // Check if user already exists
-                const userId = phone;
-                const userRef = ref(database, `users/${userId}/allDetails`);
-                const snapshot = await get(userRef);
-
-                if (snapshot.exists()) {
-                    showToast('Account already exists. Please login.', 'error');
-                    showLoading(false);
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 2000);
-                    return;
-                }
-
-                // Store user details temporarily
+                // Store user details temporarily (we'll get UID after authentication)
                 userDetails = {
                     name: name,
                     email: email,
                     phoneNumber: fullPhoneNumber,
-                    userId: userId,
-                    createdAt: new Date().toISOString()
+                    createdAt: Date.now()
                 };
 
                 // Send OTP
@@ -508,9 +492,21 @@
             try {
                 // Verify OTP
                 const result = await confirmationResult.confirm(otp);
+                const user = result.user;
                 
-                // Save user details to database
-                const userRef = ref(database, `users/${userDetails.userId}/allDetails`);
+                // Check if user already exists
+                const userRef = ref(database, `users/${user.uid}/allDetails`);
+                const snapshot = await get(userRef);
+
+                if (snapshot.exists()) {
+                    showToast('Account already exists! Redirecting to home...', 'info');
+                    setTimeout(() => {
+                        window.location.href = 'home.html';
+                    }, 1500);
+                    return;
+                }
+                
+                // Save user details to database using UID
                 await set(userRef, {
                     name: userDetails.name,
                     email: userDetails.email,
