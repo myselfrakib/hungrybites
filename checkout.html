@@ -207,9 +207,14 @@
             </div>
 
             <div id="addressFormContainer">
-                <div class="map-instruction">📍 Your location will be detected. Adjust the marker if needed.</div>
+                <div class="map-instruction">
+                    📍 Your location will be auto-detected. If it doesn't work, drag the red marker to your location or tap on the map.
+                </div>
                 <button type="button" class="location-btn" id="locationBtn" onclick="getLocation()">📍 Detecting Location...</button>
                 <div id="map"></div>
+                <div style="text-align: center; margin-top: 0.5rem; color: #666; font-size: 0.85rem;">
+                    💡 Can't detect? <span style="color: var(--sunglow); font-weight: 600; cursor: pointer;" onclick="showLocationHelp()">Click here for help</span>
+                </div>
                 <form id="addressForm" onsubmit="event.preventDefault();">
                     <div class="form-group">
                         <label for="fullName">Full Name *</label>
@@ -274,72 +279,130 @@
         let selectedLocation = { lat: 22.9734, lng: 78.6569 }, locationDetected = false;
         const RAZORPAY_KEY = 'rzp_test_your_key_here';
 
-        // Enhanced geolocation with WebView support
+        // Enhanced geolocation with aggressive WebView support
         window.getLocation = function() {
             const btn = document.getElementById('locationBtn');
             btn.disabled = true;
             btn.innerHTML = '📍 Detecting...';
 
-            const opts = {
-                enableHighAccuracy: true,
-                timeout: 15000,
-                maximumAge: 0
+            let locationFound = false;
+
+            // Success handler
+            const onSuccess = (lat, lng, source) => {
+                if (locationFound) return;
+                locationFound = true;
+                console.log(`Location from ${source}:`, lat, lng);
+                const latLng = new google.maps.LatLng(lat, lng);
+                map.setCenter(latLng);
+                map.setZoom(15);
+                setMarkerPosition(latLng);
+                locationDetected = true;
+                btn.innerHTML = '✅ Located';
+                btn.disabled = false;
+                showSuccess('Location detected');
             };
 
-            // Try multiple geolocation methods for WebView compatibility
-            const tryGeolocation = () => {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        pos => {
-                            const latLng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-                            map.setCenter(latLng);
-                            map.setZoom(15);
-                            setMarkerPosition(latLng);
-                            locationDetected = true;
-                            btn.innerHTML = '✅ Located';
-                            btn.disabled = false;
-                            showSuccess('Location detected');
-                        },
-                        err => {
-                            console.error('Geolocation error:', err);
-                            btn.innerHTML = '📍 Use My Location';
-                            btn.disabled = false;
-                            
-                            // Provide specific error messages
-                            const msgs = {
-                                1: 'Enable location permission in settings',
-                                2: 'Location unavailable - select on map',
-                                3: 'Location timeout - select on map'
-                            };
-                            showError(msgs[err.code] || 'Select location on map');
-                        },
-                        opts
-                    );
-                } else {
-                    btn.innerHTML = '📍 Use My Location';
-                    btn.disabled = false;
-                    showError('Geolocation not supported - select on map');
-                }
+            // Error handler
+            const onError = (msg) => {
+                if (locationFound) return;
+                console.error('Location error:', msg);
+                btn.innerHTML = '📍 Use My Location';
+                btn.disabled = false;
+                showError(msg);
             };
 
-            // For WebView: check if Android interface exists
-            if (window.Android && window.Android.getCurrentLocation) {
+            // Method 1: Android WebView Interface
+            if (window.Android && typeof window.Android.getCurrentLocation === 'function') {
                 try {
-                    const loc = JSON.parse(window.Android.getCurrentLocation());
-                    const latLng = new google.maps.LatLng(loc.lat, loc.lng);
-                    map.setCenter(latLng);
-                    map.setZoom(15);
-                    setMarkerPosition(latLng);
-                    locationDetected = true;
-                    btn.innerHTML = '✅ Located';
-                    btn.disabled = false;
-                    showSuccess('Location detected');
+                    const loc = window.Android.getCurrentLocation();
+                    if (loc) {
+                        const parsed = typeof loc === 'string' ? JSON.parse(loc) : loc;
+                        if (parsed && parsed.lat && parsed.lng) {
+                            return onSuccess(parsed.lat, parsed.lng, 'Android Interface');
+                        }
+                    }
                 } catch(e) {
-                    tryGeolocation();
+                    console.log('Android interface failed:', e);
                 }
-            } else {
-                tryGeolocation();
             }
+
+            // Method 2: iOS WebKit MessageHandler
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.getCurrentLocation) {
+                try {
+                    window.webkit.messageHandlers.getCurrentLocation.postMessage({});
+                    // iOS will call window.setLocation(lat, lng) callback
+                    window.setLocation = (lat, lng) => onSuccess(lat, lng, 'iOS WebKit');
+                    setTimeout(() => {
+                        if (!locationFound) tryStandardGeo();
+                    }, 2000);
+                    return;
+                } catch(e) {
+                    console.log('iOS WebKit failed:', e);
+                }
+            }
+
+            // Method 3: Standard HTML5 Geolocation with aggressive settings
+            const tryStandardGeo = () => {
+                if (!navigator.geolocation) {
+                    return onError('Geolocation not supported - tap marker to set location');
+                }
+
+                // Try with high accuracy first
+                const optsHigh = {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                };
+
+                navigator.geolocation.getCurrentPosition(
+                    pos => onSuccess(pos.coords.latitude, pos.coords.longitude, 'HTML5 High Accuracy'),
+                    err1 => {
+                        console.log('High accuracy failed, trying low accuracy:', err1);
+                        
+                        // Fallback to low accuracy (faster, works better in WebView)
+                        const optsLow = {
+                            enableHighAccuracy: false,
+                            timeout: 8000,
+                            maximumAge: 5000
+                        };
+
+                        navigator.geolocation.getCurrentPosition(
+                            pos => onSuccess(pos.coords.latitude, pos.coords.longitude, 'HTML5 Low Accuracy'),
+                            err2 => {
+                                const msgs = {
+                                    1: 'Location permission denied - enable in app settings',
+                                    2: 'Location unavailable - drag marker to your location',
+                                    3: 'Location timeout - drag marker to your location'
+                                };
+                                onError(msgs[err2.code] || 'Drag marker to set your location');
+                            },
+                            optsLow
+                        );
+                    },
+                    optsHigh
+                );
+            };
+
+            // Method 4: Try IP-based geolocation as last resort
+            const tryIPLocation = () => {
+                setTimeout(() => {
+                    if (!locationFound) {
+                        fetch('https://ipapi.co/json/')
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data.latitude && data.longitude) {
+                                    onSuccess(data.latitude, data.longitude, 'IP Location (approximate)');
+                                }
+                            })
+                            .catch(() => {
+                                onError('Drag marker to set your location');
+                            });
+                    }
+                }, 12000);
+            };
+
+            tryStandardGeo();
+            tryIPLocation();
         };
 
         window.initMap = function() {
