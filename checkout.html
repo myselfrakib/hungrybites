@@ -13,856 +13,120 @@
             --non-photo-blue: #99d6ea;
             --blue-gray: #6798c0;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--baby-powder);
-            color: #333;
-            padding-bottom: 2rem;
-        }
-
-        .navbar {
-            background: white;
-            padding: 0.75rem 1rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .hamburger {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            cursor: pointer;
-            padding: 0.5rem;
-            touch-action: manipulation;
-        }
-
-        .hamburger span {
-            width: 22px;
-            height: 2.5px;
-            background: var(--blue-gray);
-            border-radius: 3px;
-            transition: all 0.3s;
-        }
-
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(7px, 7px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(6px, -6px);
-        }
-
-        .logo {
-            font-size: clamp(1.2rem, 4vw, 1.5rem);
-            font-weight: bold;
-            color: var(--sunglow);
-            cursor: pointer;
-        }
-
-        .nav-items {
-            display: none;
-            position: fixed;
-            top: 60px;
-            left: 0;
-            right: 0;
-            background: white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            padding: 0.5rem;
-            flex-direction: column;
-            gap: 0;
-            z-index: 999;
-        }
-
-        .nav-items.active {
-            display: flex;
-        }
-
-        .nav-item {
-            cursor: pointer;
-            padding: 0.9rem;
-            border-radius: 8px;
-            transition: background 0.3s;
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            touch-action: manipulation;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .nav-item:hover {
-            background: var(--baby-powder);
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 1rem auto;
-            padding: 0 0.75rem;
-        }
-
-        .cart-container {
-            background: white;
-            padding: 1rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            margin-bottom: 1rem;
-        }
-
-        h2 {
-            margin-bottom: 1rem;
-            color: var(--sunglow);
-            font-size: clamp(1.3rem, 4vw, 1.6rem);
-        }
-
-        .cart-item {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            padding: 0.9rem;
-            border-bottom: 1px solid #eee;
-        }
-
-        .cart-item:last-child {
-            border-bottom: none;
-        }
-
-        .cart-item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 0.75rem;
-        }
-
-        .cart-item-details {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .cart-item-name {
-            font-size: clamp(0.95rem, 3vw, 1.05rem);
-            font-weight: 600;
-            margin-bottom: 0.2rem;
-            word-wrap: break-word;
-        }
-
-        .cart-item-price {
-            color: var(--blue-gray);
-            font-weight: 600;
-            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
-        }
-
-        .cart-item-actions {
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .cart-item-quantity {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .quantity-btn {
-            background: var(--sunglow);
-            color: white;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: bold;
-            transition: all 0.3s;
-            touch-action: manipulation;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .quantity-btn:active {
-            transform: scale(0.9);
-        }
-
-        .quantity-display {
-            font-size: 1rem;
-            font-weight: 600;
-            min-width: 25px;
-            text-align: center;
-        }
-
-        .cart-item-total {
-            font-size: clamp(1rem, 3vw, 1.15rem);
-            font-weight: bold;
-            color: #333;
-        }
-
-        .remove-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 0.5rem 0.85rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: all 0.3s;
-            touch-action: manipulation;
-        }
-
-        .remove-btn:active {
-            transform: scale(0.95);
-        }
-
-        .cart-summary {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 2px solid #eee;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.75rem;
-            font-size: clamp(0.9rem, 2.5vw, 1rem);
-        }
-
-        .summary-row.subtotal, .summary-row.delivery {
-            color: #666;
-        }
-
-        .cart-total {
-            display: flex;
-            justify-content: space-between;
-            font-size: clamp(1.3rem, 4vw, 1.5rem);
-            font-weight: bold;
-            color: var(--blue-gray);
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 2px solid #eee;
-        }
-
-        .section-container {
-            background: white;
-            padding: 1rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            margin-bottom: 1rem;
-        }
-
-        .section-title {
-            font-size: clamp(1.1rem, 3vw, 1.3rem);
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .address-display-card {
-            border: 2px solid var(--non-photo-blue);
-            border-radius: 10px;
-            padding: 0.9rem;
-            background: #f0f9ff;
-            position: relative;
-        }
-
-        .address-display-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 0.5rem;
-        }
-
-        .address-display-name {
-            font-weight: 600;
-            font-size: 1rem;
-            color: #333;
-        }
-
-        .change-address-btn {
-            background: var(--sunglow);
-            color: white;
-            border: none;
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 600;
-            transition: all 0.3s;
-            touch-action: manipulation;
-        }
-
-        .change-address-btn:active {
-            transform: scale(0.95);
-        }
-
-        .address-display-phone {
-            color: #666;
-            font-size: 0.85rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .address-display-text {
-            color: #555;
-            line-height: 1.5;
-            font-size: 0.9rem;
-        }
-
-        .coordinates-display {
-            margin-top: 0.5rem;
-            padding-top: 0.5rem;
-            border-top: 1px solid var(--non-photo-blue);
-            font-size: 0.8rem;
-            color: #666;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.4rem;
-            font-weight: 600;
-            color: #333;
-            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
-            font-family: inherit;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--sunglow);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 70px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
-        }
-
-        @media (max-width: 480px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        #map {
-            width: 100%;
-            height: 350px;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            border: 2px solid #e0e0e0;
-        }
-
-        .map-instruction {
-            background: #fffbf0;
-            border-left: 4px solid var(--sunglow);
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            color: #666;
-        }
-
-        .location-btn {
-            background: var(--non-photo-blue);
-            color: white;
-            border: none;
-            padding: 0.6rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            transition: all 0.3s;
-            touch-action: manipulation;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .location-btn:active {
-            transform: scale(0.95);
-        }
-
-        .location-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        .address-card {
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .address-card:hover {
-            border-color: var(--sunglow);
-            background: #fffbf0;
-        }
-
-        .address-card.selected {
-            border-color: var(--sunglow);
-            background: #fffbf0;
-        }
-
-        .address-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 0.6rem;
-        }
-
-        .address-name {
-            font-weight: 600;
-            font-size: 1rem;
-            color: #333;
-        }
-
-        .address-phone {
-            color: #666;
-            font-size: 0.85rem;
-            margin-top: 0.2rem;
-        }
-
-        .address-details {
-            color: #666;
-            line-height: 1.5;
-            font-size: 0.85rem;
-        }
-
-        .address-actions {
-            display: flex;
-            gap: 0.6rem;
-            margin-top: 0.75rem;
-        }
-
-        .btn-small {
-            padding: 0.4rem 0.8rem;
-            font-size: 0.8rem;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            touch-action: manipulation;
-        }
-
-        .btn-delete {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-delete:active {
-            transform: scale(0.95);
-        }
-
-        .default-badge {
-            background: var(--non-photo-blue);
-            color: white;
-            padding: 0.2rem 0.6rem;
-            border-radius: 5px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .payment-option {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            border: 2px solid #eee;
-            border-radius: 10px;
-            margin-bottom: 0.75rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .payment-option:hover {
-            border-color: var(--sunglow);
-            background: #fffbf0;
-        }
-
-        .payment-option.selected {
-            border-color: var(--sunglow);
-            background: #fffbf0;
-        }
-
-        .payment-option input[type="radio"] {
-            width: 18px;
-            height: 18px;
-            margin-right: 0.9rem;
-            cursor: pointer;
-            accent-color: var(--sunglow);
-        }
-
-        .payment-details {
-            flex: 1;
-        }
-
-        .payment-title {
-            font-size: clamp(0.95rem, 3vw, 1.05rem);
-            font-weight: 600;
-            margin-bottom: 0.2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .payment-description {
-            color: #666;
-            font-size: clamp(0.8rem, 2vw, 0.85rem);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 1rem;
-            background: var(--blue-gray);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: clamp(1rem, 3vw, 1.1rem);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            touch-action: manipulation;
-        }
-
-        .btn:active {
-            transform: scale(0.98);
-        }
-
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-secondary {
-            width: 100%;
-            padding: 0.9rem;
-            background: white;
-            color: var(--sunglow);
-            border: 2px solid var(--sunglow);
-            border-radius: 10px;
-            font-size: clamp(0.95rem, 3vw, 1.05rem);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            touch-action: manipulation;
-        }
-
-        .btn-secondary:active {
-            transform: scale(0.98);
-        }
-
-        .empty-cart {
-            text-align: center;
-            padding: 2.5rem 1rem;
-        }
-
-        .empty-cart-icon {
-            font-size: clamp(3rem, 10vw, 4rem);
-            margin-bottom: 0.75rem;
-        }
-
-        .empty-cart h3 {
-            color: #666;
-            margin-bottom: 0.75rem;
-            font-size: clamp(1.1rem, 3vw, 1.3rem);
-        }
-
-        .continue-shopping {
-            display: inline-block;
-            margin-top: 0.75rem;
-            padding: 0.7rem 1.5rem;
-            background: var(--sunglow);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s;
-            touch-action: manipulation;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .continue-shopping:active {
-            transform: scale(0.95);
-        }
-
-        .success-message, .error-message {
-            padding: 0.9rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            text-align: center;
-            font-weight: 600;
-            display: none;
-            font-size: 0.9rem;
-        }
-
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .loader {
-            display: none;
-            text-align: center;
-            padding: 0.75rem;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--sunglow);
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .toast {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 1.5rem 2rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            z-index: 10000;
-            display: none;
-            text-align: center;
-            min-width: 280px;
-            max-width: 90%;
-            animation: toastSlideIn 0.3s ease-out;
-        }
-
-        .toast.show {
-            display: block;
-        }
-
-        .toast-success {
-            border-left: 5px solid var(--non-photo-blue);
-        }
-
-        .toast-error {
-            border-left: 5px solid #dc3545;
-        }
-
-        .toast-icon {
-            font-size: 3rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .toast-message {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 0.5rem;
-        }
-
-        .toast-submessage {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        @keyframes toastSlideIn {
-            from {
-                transform: translate(-50%, -60%);
-                opacity: 0;
-            }
-            to {
-                transform: translate(-50%, -50%);
-                opacity: 1;
-            }
-        }
-
-        .toast-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.4);
-            z-index: 9999;
-            display: none;
-        }
-
-        .toast-overlay.show {
-            display: block;
-        }
-
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
-            animation: fadeIn 0.3s;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 1.25rem;
-            max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: slideUp 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.25rem;
-        }
-
-        .modal-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            cursor: pointer;
-            color: #666;
-            line-height: 1;
-            padding: 0;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--baby-powder); color: #333; padding-bottom: 2rem; }
+        .navbar { background: white; padding: 0.75rem 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; }
+        .nav-left { display: flex; align-items: center; gap: 1rem; }
+        .hamburger { display: flex; flex-direction: column; gap: 4px; cursor: pointer; padding: 0.5rem; }
+        .hamburger span { width: 22px; height: 2.5px; background: var(--blue-gray); border-radius: 3px; transition: all 0.3s; }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(7px, 7px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .logo { font-size: clamp(1.2rem, 4vw, 1.5rem); font-weight: bold; color: var(--sunglow); cursor: pointer; }
+        .nav-items { display: none; position: fixed; top: 60px; left: 0; right: 0; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1); padding: 0.5rem; flex-direction: column; gap: 0; z-index: 999; }
+        .nav-items.active { display: flex; }
+        .nav-item { cursor: pointer; padding: 0.9rem; border-radius: 8px; transition: background 0.3s; text-decoration: none; color: #333; font-weight: 500; font-size: 0.95rem; border-bottom: 1px solid #f0f0f0; }
+        .nav-item:hover { background: var(--baby-powder); }
+        .container { max-width: 900px; margin: 1rem auto; padding: 0 0.75rem; }
+        .cart-container, .section-container { background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 1rem; }
+        h2 { margin-bottom: 1rem; color: var(--sunglow); font-size: clamp(1.3rem, 4vw, 1.6rem); }
+        .cart-item { display: flex; flex-direction: column; gap: 0.75rem; padding: 0.9rem; border-bottom: 1px solid #eee; }
+        .cart-item:last-child { border-bottom: none; }
+        .cart-item-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; }
+        .cart-item-details { flex: 1; min-width: 0; }
+        .cart-item-name { font-size: clamp(0.95rem, 3vw, 1.05rem); font-weight: 600; margin-bottom: 0.2rem; word-wrap: break-word; }
+        .cart-item-price { color: var(--blue-gray); font-weight: 600; font-size: clamp(0.85rem, 2.5vw, 0.95rem); }
+        .cart-item-actions { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+        .cart-item-quantity { display: flex; align-items: center; gap: 0.6rem; }
+        .quantity-btn { background: var(--sunglow); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+        .quantity-btn:active { transform: scale(0.9); }
+        .quantity-display { font-size: 1rem; font-weight: 600; min-width: 25px; text-align: center; }
+        .cart-item-total { font-size: clamp(1rem, 3vw, 1.15rem); font-weight: bold; color: #333; }
+        .remove-btn { background: #dc3545; color: white; border: none; padding: 0.5rem 0.85rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.3s; }
+        .remove-btn:active { transform: scale(0.95); }
+        .cart-summary { margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #eee; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: clamp(0.9rem, 2.5vw, 1rem); }
+        .summary-row.subtotal, .summary-row.delivery { color: #666; }
+        .cart-total { display: flex; justify-content: space-between; font-size: clamp(1.3rem, 4vw, 1.5rem); font-weight: bold; color: var(--blue-gray); margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #eee; }
+        .section-title { font-size: clamp(1.1rem, 3vw, 1.3rem); font-weight: 600; color: #333; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .address-display-card { border: 2px solid var(--non-photo-blue); border-radius: 10px; padding: 0.9rem; background: #f0f9ff; }
+        .address-display-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+        .address-display-name { font-weight: 600; font-size: 1rem; color: #333; }
+        .change-address-btn { background: var(--sunglow); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.3s; }
+        .change-address-btn:active { transform: scale(0.95); }
+        .address-display-phone { color: #666; font-size: 0.85rem; margin-bottom: 0.5rem; }
+        .address-display-text { color: #555; line-height: 1.5; font-size: 0.9rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; color: #333; font-size: clamp(0.85rem, 2.5vw, 0.95rem); }
+        .form-group input, .form-group textarea { width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: clamp(0.85rem, 2.5vw, 0.95rem); font-family: inherit; transition: border-color 0.3s; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--sunglow); }
+        .form-group textarea { resize: vertical; min-height: 70px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+        #map { width: 100%; height: 350px; border-radius: 8px; margin-bottom: 1rem; border: 2px solid #e0e0e0; }
+        .map-instruction { background: #fffbf0; border-left: 4px solid var(--sunglow); padding: 0.75rem; margin-bottom: 1rem; border-radius: 4px; font-size: 0.85rem; color: #666; }
+        .location-btn { background: var(--non-photo-blue); color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; }
+        .location-btn:active { transform: scale(0.95); }
+        .location-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .address-card { border: 2px solid #e0e0e0; border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; cursor: pointer; transition: all 0.3s; }
+        .address-card:hover, .address-card.selected { border-color: var(--sunglow); background: #fffbf0; }
+        .address-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.6rem; }
+        .address-name { font-weight: 600; font-size: 1rem; color: #333; }
+        .address-phone { color: #666; font-size: 0.85rem; margin-top: 0.2rem; }
+        .address-details { color: #666; line-height: 1.5; font-size: 0.85rem; }
+        .address-actions { display: flex; gap: 0.6rem; margin-top: 0.75rem; }
+        .btn-small { padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-delete { background: #dc3545; color: white; }
+        .btn-delete:active { transform: scale(0.95); }
+        .default-badge { background: var(--non-photo-blue); color: white; padding: 0.2rem 0.6rem; border-radius: 5px; font-size: 0.75rem; font-weight: 600; }
+        .payment-option { display: flex; align-items: center; padding: 1rem; border: 2px solid #eee; border-radius: 10px; margin-bottom: 0.75rem; cursor: pointer; transition: all 0.3s; }
+        .payment-option:hover, .payment-option.selected { border-color: var(--sunglow); background: #fffbf0; }
+        .payment-option input[type="radio"] { width: 18px; height: 18px; margin-right: 0.9rem; cursor: pointer; accent-color: var(--sunglow); }
+        .payment-details { flex: 1; }
+        .payment-title { font-size: clamp(0.95rem, 3vw, 1.05rem); font-weight: 600; margin-bottom: 0.2rem; }
+        .payment-description { color: #666; font-size: clamp(0.8rem, 2vw, 0.85rem); }
+        .btn { width: 100%; padding: 1rem; background: var(--blue-gray); color: white; border: none; border-radius: 10px; font-size: clamp(1rem, 3vw, 1.1rem); font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        .btn-secondary { width: 100%; padding: 0.9rem; background: white; color: var(--sunglow); border: 2px solid var(--sunglow); border-radius: 10px; font-size: clamp(0.95rem, 3vw, 1.05rem); font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn-secondary:active { transform: scale(0.98); }
+        .empty-cart { text-align: center; padding: 2.5rem 1rem; }
+        .empty-cart-icon { font-size: clamp(3rem, 10vw, 4rem); margin-bottom: 0.75rem; }
+        .empty-cart h3 { color: #666; margin-bottom: 0.75rem; font-size: clamp(1.1rem, 3vw, 1.3rem); }
+        .continue-shopping { display: inline-flex; margin-top: 0.75rem; padding: 0.7rem 1.5rem; background: var(--sunglow); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s; align-items: center; }
+        .continue-shopping:active { transform: scale(0.95); }
+        .success-message, .error-message { padding: 0.9rem; border-radius: 8px; margin-bottom: 1rem; text-align: center; font-weight: 600; display: none; font-size: 0.9rem; }
+        .success-message { background: #d4edda; color: #155724; }
+        .error-message { background: #f8d7da; color: #721c24; }
+        .loader { display: none; text-align: center; padding: 0.75rem; }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid var(--sunglow); border-radius: 50%; width: 28px; height: 28px; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 1.5rem 2rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 10000; display: none; text-align: center; min-width: 280px; max-width: 90%; animation: toastSlideIn 0.3s ease-out; }
+        .toast.show { display: block; }
+        .toast-success { border-left: 5px solid var(--non-photo-blue); }
+        .toast-error { border-left: 5px solid #dc3545; }
+        .toast-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+        .toast-message { font-size: 1.1rem; font-weight: 600; color: #333; margin-bottom: 0.5rem; }
+        .toast-submessage { font-size: 0.9rem; color: #666; }
+        @keyframes toastSlideIn { from { transform: translate(-50%, -60%); opacity: 0; } to { transform: translate(-50%, -50%); opacity: 1; } }
+        .toast-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 9999; display: none; }
+        .toast-overlay.show { display: block; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; animation: fadeIn 0.3s; }
+        .modal-overlay.active { display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-content { background: white; border-radius: 12px; padding: 1.25rem; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+        .modal-title { font-size: 1.3rem; font-weight: 600; color: #333; }
+        .close-modal { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #666; line-height: 1; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
         @media (min-width: 768px) {
-            .cart-item {
-                flex-direction: row;
-                align-items: center;
-            }
-
-            .quantity-btn:hover {
-                background: var(--mustard);
-                transform: scale(1.1);
-            }
-
-            .remove-btn:hover {
-                background: #c82333;
-            }
-
-            .btn:hover {
-                background: #5989b3;
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(103, 152, 192, 0.4);
-            }
-
-            .hamburger {
-                display: none;
-            }
-
-            .nav-items {
-                display: flex !important;
-                position: static;
-                flex-direction: row;
-                padding: 0;
-                box-shadow: none;
-                gap: 0.75rem;
-            }
-
-            .nav-item {
-                border-bottom: none;
-                padding: 0.4rem 0.6rem;
-            }
+            .cart-item { flex-direction: row; align-items: center; }
+            .quantity-btn:hover { background: var(--mustard); transform: scale(1.1); }
+            .remove-btn:hover { background: #c82333; }
+            .btn:hover { background: #5989b3; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(103, 152, 192, 0.4); }
+            .hamburger { display: none; }
+            .nav-items { display: flex !important; position: static; flex-direction: row; padding: 0; box-shadow: none; gap: 0.75rem; }
+            .nav-item { border-bottom: none; padding: 0.4rem 0.6rem; }
         }
     </style>
 </head>
@@ -870,9 +134,7 @@
     <div class="navbar">
         <div class="nav-left">
             <div class="hamburger" onclick="toggleMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span>
             </div>
             <div class="logo" onclick="window.location.href='home.html'">🍔 Midnight Plaza</div>
         </div>
@@ -945,16 +207,9 @@
             </div>
 
             <div id="addressFormContainer">
-                <div class="map-instruction">
-                    📍 Your current location will be automatically detected. You can adjust the marker on the map if needed.
-                </div>
-                
-                <button type="button" class="location-btn" id="locationBtn" onclick="getCurrentLocation()">
-                    📍 Detecting Location...
-                </button>
-
+                <div class="map-instruction">📍 Your location will be detected. Adjust the marker if needed.</div>
+                <button type="button" class="location-btn" id="locationBtn" onclick="getLocation()">📍 Detecting Location...</button>
                 <div id="map"></div>
-
                 <form id="addressForm" onsubmit="event.preventDefault();">
                     <div class="form-group">
                         <label for="fullName">Full Name *</label>
@@ -1002,7 +257,7 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
         import { getDatabase, ref, push, set, get, remove } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
-        const firebaseConfig = {
+        const app = initializeApp({
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
             authDomain: "hungrybites-c7930.firebaseapp.com",
             projectId: "hungrybites-c7930",
@@ -1011,32 +266,89 @@
             appId: "1:346758544945:web:4bcad30016540d18e79f10",
             measurementId: "G-B5GP5SYMRC",
             databaseURL: "https://hungrybites-c7930-default-rtdb.firebaseio.com"
-        };
+        });
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
-
-        let cart = [];
-        let currentUser = null;
-        let selectedPayment = null;
-        let deliveryAddress = null;
-        let savedAddresses = [];
-        let selectedAddressId = null;
-        let map;
-        let marker;
-        let selectedLocation = { lat: 22.9734, lng: 78.6569 };
-        let locationDetected = false;
-        let storeStatus = { isOpen: false };
-
+        const auth = getAuth(app), db = getDatabase(app);
+        let cart = [], currentUser = null, selectedPayment = null, deliveryAddress = null;
+        let savedAddresses = [], selectedAddressId = null, map, marker;
+        let selectedLocation = { lat: 22.9734, lng: 78.6569 }, locationDetected = false;
         const RAZORPAY_KEY = 'rzp_test_your_key_here';
+
+        // Enhanced geolocation with WebView support
+        window.getLocation = function() {
+            const btn = document.getElementById('locationBtn');
+            btn.disabled = true;
+            btn.innerHTML = '📍 Detecting...';
+
+            const opts = {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 0
+            };
+
+            // Try multiple geolocation methods for WebView compatibility
+            const tryGeolocation = () => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        pos => {
+                            const latLng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+                            map.setCenter(latLng);
+                            map.setZoom(15);
+                            setMarkerPosition(latLng);
+                            locationDetected = true;
+                            btn.innerHTML = '✅ Located';
+                            btn.disabled = false;
+                            showSuccess('Location detected');
+                        },
+                        err => {
+                            console.error('Geolocation error:', err);
+                            btn.innerHTML = '📍 Use My Location';
+                            btn.disabled = false;
+                            
+                            // Provide specific error messages
+                            const msgs = {
+                                1: 'Enable location permission in settings',
+                                2: 'Location unavailable - select on map',
+                                3: 'Location timeout - select on map'
+                            };
+                            showError(msgs[err.code] || 'Select location on map');
+                        },
+                        opts
+                    );
+                } else {
+                    btn.innerHTML = '📍 Use My Location';
+                    btn.disabled = false;
+                    showError('Geolocation not supported - select on map');
+                }
+            };
+
+            // For WebView: check if Android interface exists
+            if (window.Android && window.Android.getCurrentLocation) {
+                try {
+                    const loc = JSON.parse(window.Android.getCurrentLocation());
+                    const latLng = new google.maps.LatLng(loc.lat, loc.lng);
+                    map.setCenter(latLng);
+                    map.setZoom(15);
+                    setMarkerPosition(latLng);
+                    locationDetected = true;
+                    btn.innerHTML = '✅ Located';
+                    btn.disabled = false;
+                    showSuccess('Location detected');
+                } catch(e) {
+                    tryGeolocation();
+                }
+            } else {
+                tryGeolocation();
+            }
+        };
 
         window.initMap = function() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: selectedLocation,
                 zoom: 13,
                 mapTypeControl: false,
-                streetViewControl: false
+                streetViewControl: false,
+                fullscreenControl: false
             });
 
             marker = new google.maps.Marker({
@@ -1046,284 +358,122 @@
                 animation: google.maps.Animation.DROP
             });
 
-            map.addListener('click', (e) => {
-                setMarkerPosition(e.latLng);
-            });
-
-            marker.addListener('dragend', (e) => {
-                setMarkerPosition(e.latLng);
-            });
-
-            // Automatically get current location when map loads
-            getCurrentLocation();
+            map.addListener('click', e => setMarkerPosition(e.latLng));
+            marker.addListener('dragend', e => setMarkerPosition(e.latLng));
+            
+            // Auto-detect location on load
+            setTimeout(() => window.getLocation(), 500);
         };
 
         function setMarkerPosition(latLng) {
-            selectedLocation = {
-                lat: latLng.lat(),
-                lng: latLng.lng()
-            };
+            selectedLocation = { lat: latLng.lat(), lng: latLng.lng() };
             marker.setPosition(latLng);
             map.panTo(latLng);
             
-            const geocoder = new google.maps.Geocoder();
-            geocoder.geocode({ location: latLng }, (results, status) => {
+            new google.maps.Geocoder().geocode({ location: latLng }, (results, status) => {
                 if (status === 'OK' && results[0]) {
-                    console.log('Geocoding result:', results[0]);
+                    const c = results[0].address_components;
+                    let city = '', pin = '', addr = '', area = '', state = '';
                     
-                    const addressComponents = results[0].address_components;
-                    let city = '', pincode = '', area = '', street = '', state = '', country = '';
-                    
-                    addressComponents.forEach(component => {
-                        const types = component.types;
-                        
-                        if (types.includes('locality')) {
-                            city = component.long_name;
-                        } else if (types.includes('administrative_area_level_2') && !city) {
-                            city = component.long_name;
-                        }
-                        
-                        if (types.includes('postal_code')) {
-                            pincode = component.long_name;
-                        }
-                        
-                        if (types.includes('sublocality_level_1') || types.includes('sublocality_level_2') || 
-                            types.includes('sublocality') || types.includes('neighborhood')) {
-                            area = component.long_name;
-                        }
-                        
-                        if (types.includes('route') && !street) {
-                            street = component.long_name;
-                        }
-                        
-                        if (types.includes('administrative_area_level_1')) {
-                            state = component.long_name;
-                        }
-                        
-                        if (types.includes('country')) {
-                            country = component.long_name;
-                        }
+                    c.forEach(comp => {
+                        const t = comp.types;
+                        if (t.includes('locality') || t.includes('administrative_area_level_2')) city = comp.long_name;
+                        if (t.includes('postal_code')) pin = comp.long_name;
+                        if (t.includes('sublocality') || t.includes('neighborhood')) area = comp.long_name;
+                        if (t.includes('route')) addr = comp.long_name;
+                        if (t.includes('administrative_area_level_1')) state = comp.long_name;
                     });
                     
-                    if (city) {
-                        document.getElementById('city').value = city;
-                    }
-                    
-                    if (pincode) {
-                        document.getElementById('pincode').value = pincode;
-                    }
-                    
-                    let addressParts = [];
-                    if (street) addressParts.push(street);
-                    if (area) addressParts.push(area);
-                    
-                    if (addressParts.length > 0) {
-                        document.getElementById('address').value = addressParts.join(', ');
-                    }
-                    
-                    if (state && !document.getElementById('landmark').value) {
-                        document.getElementById('landmark').value = `Near ${area || city}, ${state}`;
-                    }
-                    
-                    showSuccess('Address auto-filled from location');
-                } else {
-                    console.error('Geocoding failed:', status);
-                    showError('Could not auto-fill address. Please enter manually.');
+                    if (city) document.getElementById('city').value = city;
+                    if (pin) document.getElementById('pincode').value = pin;
+                    if (addr || area) document.getElementById('address').value = [addr, area].filter(Boolean).join(', ');
+                    if (state) document.getElementById('landmark').value = `Near ${area || city}, ${state}`;
+                    showSuccess('Address auto-filled');
                 }
             });
         }
 
-        window.getCurrentLocation = function() {
-            const locationBtn = document.getElementById('locationBtn');
-            locationBtn.disabled = true;
-            locationBtn.innerHTML = '📍 Detecting Location...';
-            
-            window.getCurrentLocation = function() {
-            const locationBtn = document.getElementById('locationBtn');
-            locationBtn.disabled = true;
-            locationBtn.innerHTML = '📍 Detecting Location...';
-            
-            if (navigator.geolocation) {
-                // Enhanced options for WebView compatibility
-                const options = {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0
-                };
-                
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const pos = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        };
-                        map.setCenter(pos);
-                        map.setZoom(15);
-                        setMarkerPosition(new google.maps.LatLng(pos.lat, pos.lng));
-                        locationDetected = true;
-                        locationBtn.innerHTML = '✅ Location Detected';
-                        locationBtn.disabled = false;
-                        showSuccess('Location detected successfully');
-                    },
-                    (error) => {
-                        console.error('Geolocation error:', error);
-                        locationBtn.innerHTML = '📍 Use My Location';
-                        locationBtn.disabled = false;
-                        
-                        let errorMessage = 'Unable to get your location. ';
-                        switch(error.code) {
-                            case error.PERMISSION_DENIED:
-                                errorMessage += 'Please enable location permission in app settings.';
-                                break;
-                            case error.POSITION_UNAVAILABLE:
-                                errorMessage += 'Location information unavailable.';
-                                break;
-                            case error.TIMEOUT:
-                                errorMessage += 'Location request timed out.';
-                                break;
-                            default:
-                                errorMessage += 'Please select manually on map.';
-                        }
-                        showError(errorMessage);
-                    },
-                    options
-                );
-            } else {
-                locationBtn.innerHTML = '📍 Use My Location';
-                locationBtn.disabled = false;
-                showError('Geolocation is not supported by your browser');
-            }
-        };
-
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, user => {
             if (user) {
                 currentUser = user;
                 loadGoogleMaps();
                 loadCart();
                 loadSavedAddresses();
-                checkStoreStatus();
             } else {
                 window.location.href = 'index.html';
             }
         });
 
-        async function checkStoreStatus() {
-            try {
-                const storeStatusRef = ref(db, 'storeStatus');
-                const snapshot = await get(storeStatusRef);
-                
-                if (snapshot.exists()) {
-                    storeStatus = snapshot.val();
-                    console.log('Store Status:', storeStatus);
-                } else {
-                    storeStatus = { isOpen: false };
-                }
-            } catch (error) {
-                console.error('Error checking store status:', error);
-                storeStatus = { isOpen: false };
-            }
-        }
-
         function loadGoogleMaps() {
-            if (window.google && window.google.maps) {
-                window.initMap();
-                return;
-            }
-
-            const script = document.createElement('script');
-            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDsn16p7w8b-x8pEA_WTO5F2oUk4MHwcUc&libraries=places&callback=initMap';
-            script.async = true;
-            script.defer = true;
-            script.onerror = () => {
-                showError('Failed to load Google Maps. Please check your API key.');
-            };
-            document.head.appendChild(script);
+            if (window.google?.maps) { window.initMap(); return; }
+            const s = document.createElement('script');
+            s.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDsn16p7w8b-x8pEA_WTO5F2oUk4MHwcUc&callback=initMap';
+            s.async = true;
+            s.defer = true;
+            document.head.appendChild(s);
         }
 
         function loadCart() {
-            const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
-            cart = savedCart;
+            cart = JSON.parse(localStorage.getItem('cart') || '[]');
             renderCart();
         }
 
         function renderCart() {
-            const cartContent = document.getElementById('cartContent');
-            const checkoutSections = document.getElementById('checkoutSections');
+            const content = document.getElementById('cartContent');
+            const sections = document.getElementById('checkoutSections');
             
-            if (cart.length === 0) {
-                cartContent.innerHTML = `
+            if (!cart.length) {
+                content.innerHTML = `
                     <div class="empty-cart">
                         <div class="empty-cart-icon">🛒</div>
                         <h3>Your cart is empty</h3>
                         <p>Add delicious items to get started!</p>
                         <a href="home.html" class="continue-shopping">Browse Menu</a>
-                    </div>
-                `;
-                checkoutSections.style.display = 'none';
+                    </div>`;
+                sections.style.display = 'none';
                 return;
             }
 
-            checkoutSections.style.display = 'block';
+            sections.style.display = 'block';
+            const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+            const delivery = 40, total = subtotal + delivery;
 
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const deliveryFee = 40;
-            const total = subtotal + deliveryFee;
-
-            let cartHTML = '';
-            cart.forEach((item, index) => {
-                cartHTML += `
-                    <div class="cart-item">
-                        <div class="cart-item-header">
-                            <div class="cart-item-details">
-                                <div class="cart-item-name">${item.emoji || '🍔'} ${item.name}</div>
-                                <div class="cart-item-price">₹${item.price}</div>
-                            </div>
-                            <div class="cart-item-total">₹${item.price * item.quantity}</div>
+            content.innerHTML = cart.map((item, i) => `
+                <div class="cart-item">
+                    <div class="cart-item-header">
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">${item.emoji || '🍔'} ${item.name}</div>
+                            <div class="cart-item-price">₹${item.price}</div>
                         </div>
-                        <div class="cart-item-actions">
-                            <div class="cart-item-quantity">
-                                <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">-</button>
-                                <div class="quantity-display">${item.quantity}</div>
-                                <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
-                            </div>
-                            <button class="remove-btn" onclick="removeItem(${index})">Remove</button>
+                        <div class="cart-item-total">₹${item.price * item.quantity}</div>
+                    </div>
+                    <div class="cart-item-actions">
+                        <div class="cart-item-quantity">
+                            <button class="quantity-btn" onclick="updateQuantity(${i}, -1)">-</button>
+                            <div class="quantity-display">${item.quantity}</div>
+                            <button class="quantity-btn" onclick="updateQuantity(${i}, 1)">+</button>
                         </div>
-                    </div>
-                `;
-            });
-
-            cartHTML += `
-                <div class="cart-summary">
-                    <div class="summary-row subtotal">
-                        <span>Subtotal</span>
-                        <span>₹${subtotal}</span>
-                    </div>
-                    <div class="summary-row delivery">
-                        <span>Delivery Fee</span>
-                        <span>₹${deliveryFee}</span>
-                    </div>
-                    <div class="cart-total">
-                        <span>Total</span>
-                        <span>₹${total}</span>
+                        <button class="remove-btn" onclick="removeItem(${i})">Remove</button>
                     </div>
                 </div>
-            `;
-
-            cartContent.innerHTML = cartHTML;
+            `).join('') + `
+                <div class="cart-summary">
+                    <div class="summary-row subtotal"><span>Subtotal</span><span>₹${subtotal}</span></div>
+                    <div class="summary-row delivery"><span>Delivery Fee</span><span>₹${delivery}</span></div>
+                    <div class="cart-total"><span>Total</span><span>₹${total}</span></div>
+                </div>`;
         }
 
-        window.updateQuantity = function(index, change) {
-            cart[index].quantity += change;
-            if (cart[index].quantity <= 0) {
-                cart.splice(index, 1);
-            }
+        window.updateQuantity = (i, change) => {
+            cart[i].quantity += change;
+            if (cart[i].quantity <= 0) cart.splice(i, 1);
             localStorage.setItem('cart', JSON.stringify(cart));
             renderCart();
         };
 
-        window.removeItem = function(index) {
-            if (confirm('Remove this item from cart?')) {
-                cart.splice(index, 1);
+        window.removeItem = i => {
+            if (confirm('Remove this item?')) {
+                cart.splice(i, 1);
                 localStorage.setItem('cart', JSON.stringify(cart));
                 renderCart();
             }
@@ -1331,48 +481,29 @@
 
         async function loadSavedAddresses() {
             if (!currentUser) return;
-
             try {
-                const addressesRef = ref(db, `users/${currentUser.uid}/addresses`);
-                const snapshot = await get(addressesRef);
-                
-                if (snapshot.exists()) {
+                const snap = await get(ref(db, `users/${currentUser.uid}/addresses`));
+                if (snap.exists()) {
                     savedAddresses = [];
-                    snapshot.forEach((childSnapshot) => {
-                        savedAddresses.push({
-                            id: childSnapshot.key,
-                            ...childSnapshot.val()
-                        });
-                    });
-                    
-                    if (savedAddresses.length > 0) {
-                        selectSavedAddress(savedAddresses[0].id, true);
-                    } else {
-                        showAddressModal();
-                    }
-                } else {
-                    showAddressModal();
-                }
-            } catch (error) {
-                console.error('Error loading addresses:', error);
+                    snap.forEach(child => savedAddresses.push({ id: child.key, ...child.val() }));
+                    if (savedAddresses.length) selectSavedAddress(savedAddresses[0].id, true);
+                    else showAddressModal();
+                } else showAddressModal();
+            } catch (e) {
+                console.error('Load addresses error:', e);
                 showAddressModal();
             }
         }
 
         function renderAddressDisplay() {
-            const addressDisplayArea = document.getElementById('addressDisplayArea');
-            
+            const area = document.getElementById('addressDisplayArea');
             if (!deliveryAddress) {
-                addressDisplayArea.innerHTML = `
-                    <button class="btn-secondary" onclick="showAddressModal()">+ Add Delivery Address</button>
-                `;
+                area.innerHTML = '<button class="btn-secondary" onclick="showAddressModal()">+ Add Delivery Address</button>';
                 return;
             }
-
-            const coordsDisplay = deliveryAddress.coordinates ? 
-                `<div class="coordinates-display">📍 Coordinates: ${deliveryAddress.coordinates.lat.toFixed(6)}, ${deliveryAddress.coordinates.lng.toFixed(6)}</div>` : '';
-
-            addressDisplayArea.innerHTML = `
+            const coords = deliveryAddress.coordinates ? 
+                `<div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--non-photo-blue);font-size:0.8rem;color:#666;">📍 ${deliveryAddress.coordinates.lat.toFixed(6)}, ${deliveryAddress.coordinates.lng.toFixed(6)}</div>` : '';
+            area.innerHTML = `
                 <div class="address-display-card">
                     <div class="address-display-header">
                         <div>
@@ -1385,202 +516,140 @@
                         ${deliveryAddress.streetAddress || deliveryAddress.address}<br>
                         ${deliveryAddress.city}, ${deliveryAddress.pincode}
                         ${deliveryAddress.landmark ? `<br>Landmark: ${deliveryAddress.landmark}` : ''}
-                    </div>
-                    ${coordsDisplay}
-                </div>
-            `;
+                    </div>${coords}
+                </div>`;
         }
 
         function renderSavedAddresses() {
-            const savedList = document.getElementById('savedAddressesList');
-            const formContainer = document.getElementById('addressFormContainer');
-            const addressCards = document.getElementById('addressCards');
-            const backBtn = document.getElementById('backToSavedBtn');
+            const list = document.getElementById('savedAddressesList');
+            const form = document.getElementById('addressFormContainer');
+            const cards = document.getElementById('addressCards');
 
-            if (savedAddresses.length === 0) {
-                savedList.style.display = 'none';
-                formContainer.style.display = 'block';
-                backBtn.style.display = 'none';
+            if (!savedAddresses.length) {
+                list.style.display = 'none';
+                form.style.display = 'block';
+                document.getElementById('backToSavedBtn').style.display = 'none';
                 return;
             }
 
-            savedList.style.display = 'block';
-            formContainer.style.display = 'none';
-
-            let html = '';
-            savedAddresses.forEach((addr, index) => {
-                const isDefault = index === 0;
-                const coordsDisplay = addr.coordinates ? 
-                    `<br><small style="color: #999;">📍 ${addr.coordinates.lat.toFixed(4)}, ${addr.coordinates.lng.toFixed(4)}</small>` : '';
-                
-                html += `
-                    <div class="address-card ${selectedAddressId === addr.id ? 'selected' : ''}" onclick="selectSavedAddress('${addr.id}')">
+            list.style.display = 'block';
+            form.style.display = 'none';
+            cards.innerHTML = savedAddresses.map((a, i) => {
+                const coords = a.coordinates ? `<br><small style="color:#999;">📍 ${a.coordinates.lat.toFixed(4)}, ${a.coordinates.lng.toFixed(4)}</small>` : '';
+                return `
+                    <div class="address-card ${selectedAddressId === a.id ? 'selected' : ''}" onclick="selectSavedAddress('${a.id}')">
                         <div class="address-card-header">
                             <div>
-                                <div class="address-name">${addr.fullName}</div>
-                                <div class="address-phone">${addr.phone}</div>
+                                <div class="address-name">${a.fullName}</div>
+                                <div class="address-phone">${a.phone}</div>
                             </div>
-                            ${isDefault ? '<span class="default-badge">Default</span>' : ''}
+                            ${i === 0 ? '<span class="default-badge">Default</span>' : ''}
                         </div>
                         <div class="address-details">
-                            ${addr.streetAddress || addr.address}<br>
-                            ${addr.city}, ${addr.pincode}
-                            ${addr.landmark ? `<br>Landmark: ${addr.landmark}` : ''}
-                            ${coordsDisplay}
+                            ${a.streetAddress || a.address}<br>
+                            ${a.city}, ${a.pincode}
+                            ${a.landmark ? `<br>Landmark: ${a.landmark}` : ''}${coords}
                         </div>
                         <div class="address-actions">
-                            <button class="btn-small btn-delete" onclick="event.stopPropagation(); deleteAddress('${addr.id}')">Delete</button>
+                            <button class="btn-small btn-delete" onclick="event.stopPropagation(); deleteAddress('${a.id}')">Delete</button>
                         </div>
-                    </div>
-                `;
-            });
-
-            addressCards.innerHTML = html;
+                    </div>`;
+            }).join('');
         }
 
-        window.selectSavedAddress = function(addressId, autoSelect = false) {
-            selectedAddressId = addressId;
-            deliveryAddress = savedAddresses.find(addr => addr.id === addressId);
-            
+        window.selectSavedAddress = (id, auto = false) => {
+            selectedAddressId = id;
+            deliveryAddress = savedAddresses.find(a => a.id === id);
             renderAddressDisplay();
-            
-            if (!autoSelect) {
-                document.querySelectorAll('.address-card').forEach(card => {
-                    card.classList.remove('selected');
-                });
+            if (!auto) {
+                document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
                 event.currentTarget.classList.add('selected');
-                
-                setTimeout(() => {
-                    closeAddressModal();
-                }, 300);
+                setTimeout(closeAddressModal, 300);
             }
         };
 
-        window.deleteAddress = async function(addressId) {
+        window.deleteAddress = async id => {
             if (!confirm('Delete this address?')) return;
-
             try {
-                const addressRef = ref(db, `users/${currentUser.uid}/addresses/${addressId}`);
-                await remove(addressRef);
-                
-                savedAddresses = savedAddresses.filter(addr => addr.id !== addressId);
-                
-                if (selectedAddressId === addressId) {
+                await remove(ref(db, `users/${currentUser.uid}/addresses/${id}`));
+                savedAddresses = savedAddresses.filter(a => a.id !== id);
+                if (selectedAddressId === id) {
                     selectedAddressId = null;
                     deliveryAddress = null;
-                    if (savedAddresses.length > 0) {
-                        selectSavedAddress(savedAddresses[0].id, true);
-                    } else {
-                        renderAddressDisplay();
-                    }
+                    if (savedAddresses.length) selectSavedAddress(savedAddresses[0].id, true);
+                    else renderAddressDisplay();
                 }
-                
                 renderSavedAddresses();
-                showSuccess('Address deleted successfully');
-            } catch (error) {
-                console.error('Error deleting address:', error);
-                showError('Failed to delete address');
+                showSuccess('Address deleted');
+            } catch (e) {
+                console.error('Delete error:', e);
+                showError('Failed to delete');
             }
         };
 
-        window.showAddressModal = function() {
+        window.showAddressModal = () => {
             document.getElementById('addressModal').classList.add('active');
             renderSavedAddresses();
-            
             setTimeout(() => {
                 if (map) {
                     google.maps.event.trigger(map, 'resize');
                     map.setCenter(selectedLocation);
-                    // Auto-detect location when showing new address form
                     if (!locationDetected && document.getElementById('addressFormContainer').style.display !== 'none') {
-                        getCurrentLocation();
+                        window.getLocation();
                     }
                 }
             }, 300);
         };
 
-        window.closeAddressModal = function() {
-            document.getElementById('addressModal').classList.remove('active');
-        };
+        window.closeAddressModal = () => document.getElementById('addressModal').classList.remove('active');
 
-        window.showAddressForm = function() {
+        window.showAddressForm = () => {
             document.getElementById('savedAddressesList').style.display = 'none';
             document.getElementById('addressFormContainer').style.display = 'block';
-            document.getElementById('backToSavedBtn').style.display = savedAddresses.length > 0 ? 'block' : 'none';
-            
+            document.getElementById('backToSavedBtn').style.display = savedAddresses.length ? 'block' : 'none';
             document.getElementById('addressForm').reset();
             document.getElementById('saveAddress').checked = true;
             locationDetected = false;
-            
             setTimeout(() => {
                 if (map) {
                     google.maps.event.trigger(map, 'resize');
                     map.setCenter(selectedLocation);
-                    // Auto-detect location when form is shown
-                    getCurrentLocation();
+                    window.getLocation();
                 }
             }, 100);
         };
 
-        window.showSavedAddresses = function() {
-            if (savedAddresses.length > 0) {
+        window.showSavedAddresses = () => {
+            if (savedAddresses.length) {
                 document.getElementById('savedAddressesList').style.display = 'block';
                 document.getElementById('addressFormContainer').style.display = 'none';
             }
         };
 
-        window.saveAndSelectAddress = async function() {
-            const fullName = document.getElementById('fullName').value.trim();
+        window.saveAndSelectAddress = async () => {
+            const name = document.getElementById('fullName').value.trim();
             const phone = document.getElementById('phone').value.trim();
-            const address = document.getElementById('address').value.trim();
+            const addr = document.getElementById('address').value.trim();
             const city = document.getElementById('city').value.trim();
-            const pincode = document.getElementById('pincode').value.trim();
+            const pin = document.getElementById('pincode').value.trim();
             const landmark = document.getElementById('landmark').value.trim();
-            const saveAddress = document.getElementById('saveAddress').checked;
+            const save = document.getElementById('saveAddress').checked;
 
-            if (!fullName || !phone || !address || !city || !pincode) {
-                showError('Please fill all required fields');
-                return;
-            }
+            if (!name || !phone || !addr || !city || !pin) return showError('Fill all required fields');
+            if (!/^[0-9]{10}$/.test(phone)) return showError('Enter valid 10-digit phone');
+            if (!/^[0-9]{6}$/.test(pin)) return showError('Enter valid 6-digit pincode');
 
-            if (!/^[0-9]{10}$/.test(phone)) {
-                showError('Enter valid 10-digit phone number');
-                return;
-            }
+            deliveryAddress = { fullName: name, phone, streetAddress: addr, city, pincode: pin, landmark, coordinates: selectedLocation };
 
-            if (!/^[0-9]{6}$/.test(pincode)) {
-                showError('Enter valid 6-digit pincode');
-                return;
-            }
-
-            deliveryAddress = {
-                fullName,
-                phone,
-                streetAddress: address,
-                city,
-                pincode,
-                landmark,
-                coordinates: selectedLocation
-            };
-
-            if (saveAddress && currentUser) {
+            if (save && currentUser) {
                 try {
-                    const addressesRef = ref(db, `users/${currentUser.uid}/addresses`);
-                    const newAddressRef = push(addressesRef);
-                    await set(newAddressRef, {
-                        ...deliveryAddress,
-                        createdAt: Date.now()
-                    });
-                    
-                    savedAddresses.push({
-                        id: newAddressRef.key,
-                        ...deliveryAddress
-                    });
-                    selectedAddressId = newAddressRef.key;
-                    
-                    showSuccess('Address saved successfully');
-                } catch (error) {
-                    console.error('Error saving address:', error);
+                    const newRef = push(ref(db, `users/${currentUser.uid}/addresses`));
+                    await set(newRef, { ...deliveryAddress, createdAt: Date.now() });
+                    savedAddresses.push({ id: newRef.key, ...deliveryAddress });
+                    selectedAddressId = newRef.key;
+                    showSuccess('Address saved');
+                } catch (e) {
+                    console.error('Save error:', e);
                 }
             }
 
@@ -1588,104 +657,62 @@
             closeAddressModal();
         };
 
-        window.selectPayment = function(method) {
+        window.selectPayment = method => {
             selectedPayment = method;
-            document.querySelectorAll('.payment-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
+            document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
             document.getElementById(method).checked = true;
             document.getElementById(method).closest('.payment-option').classList.add('selected');
-            
             const btn = document.getElementById('placeOrderBtn');
             btn.disabled = false;
             btn.textContent = method === 'cod' ? 'Place Order (COD)' : 'Pay Now';
         };
 
-        window.handlePlaceOrder = async function() {
-            if (!deliveryAddress) {
-                showError('Please add delivery address');
-                showAddressModal();
-                return;
+        window.handlePlaceOrder = async () => {
+            if (!deliveryAddress) { showError('Add delivery address'); showAddressModal(); return; }
+            if (!selectedPayment) return showError('Select payment method');
+
+            const snap = await get(ref(db, 'storeStatus'));
+            if (!snap.exists() || !snap.val().isOpen) {
+                return showToast('error', '🔒 Store Closed', 'Not taking orders now. Try again later.');
             }
 
-            if (!selectedPayment) {
-                showError('Please select payment method');
-                return;
-            }
-
-            // Check store status before placing order
-            await checkStoreStatus();
-            
-            if (!storeStatus.isOpen) {
-                showToast('error', '🔒 Store Closed', 'Sorry, we are not taking orders now. Please try again later.');
-                return;
-            }
-
-            if (selectedPayment === 'cod') {
-                await placeOrder('cod', null);
-            } else {
-                await initiateRazorpay();
-            }
+            selectedPayment === 'cod' ? await placeOrder('cod', null) : await initiateRazorpay();
         };
 
         async function initiateRazorpay() {
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const deliveryFee = 40;
-            const total = subtotal + deliveryFee;
+            const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+            const total = subtotal + 40;
 
-            const options = {
+            new Razorpay({
                 key: RAZORPAY_KEY,
                 amount: total * 100,
                 currency: 'INR',
-                name: 'HungryBites',
-                description: 'Food Order Payment',
-                image: 'https://cdn-icons-png.flaticon.com/512/3480/3480822.png',
-                handler: async function (response) {
-                    await placeOrder('online', response.razorpay_payment_id);
-                },
-                prefill: {
-                    name: deliveryAddress.fullName || '',
-                    email: currentUser.email || '',
-                    contact: deliveryAddress.phone || ''
-                },
-                theme: {
-                    color: '#fdc921'
-                },
-                modal: {
-                    ondismiss: function() {
-                        showError('Payment cancelled');
-                    }
-                }
-            };
-
-            const rzp = new Razorpay(options);
-            rzp.open();
+                name: 'Midnight Plaza',
+                description: 'Food Order',
+                handler: async res => await placeOrder('online', res.razorpay_payment_id),
+                prefill: { name: deliveryAddress.fullName, email: currentUser.email, contact: deliveryAddress.phone },
+                theme: { color: '#fdc921' },
+                modal: { ondismiss: () => showError('Payment cancelled') }
+            }).open();
         }
 
-        async function placeOrder(paymentMethod, paymentId) {
-            if (!currentUser || cart.length === 0) {
-                showError('Unable to place order');
-                return;
-            }
+        async function placeOrder(method, paymentId) {
+            if (!currentUser || !cart.length) return showError('Unable to place order');
 
             const loader = document.getElementById('loader');
-            const placeOrderBtn = document.getElementById('placeOrderBtn');
-            
+            const btn = document.getElementById('placeOrderBtn');
             loader.style.display = 'block';
-            placeOrderBtn.disabled = true;
+            btn.disabled = true;
 
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const deliveryFee = 40;
-            const total = subtotal + deliveryFee;
+            const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+            const total = subtotal + 40;
 
             try {
-                const orderData = {
+                await push(ref(db, 'orders'), {
                     userId: currentUser.uid,
                     userEmail: currentUser.email,
                     items: cart,
-                    subtotal: subtotal,
-                    deliveryFee: deliveryFee,
-                    total: total,
+                    subtotal, deliveryFee: 40, total,
                     deliveryAddress: {
                         address: deliveryAddress.streetAddress || deliveryAddress.address,
                         fullName: deliveryAddress.fullName,
@@ -1695,118 +722,77 @@
                         landmark: deliveryAddress.landmark || '',
                         coordinates: deliveryAddress.coordinates
                     },
-                    paymentMethod: paymentMethod,
-                    paymentStatus: paymentMethod === 'online' ? 'paid' : 'pending',
+                    paymentMethod: method,
+                    paymentStatus: method === 'online' ? 'paid' : 'pending',
+                    ...(paymentId && { paymentId }),
                     status: 'pending',
                     createdAt: Date.now()
-                };
-
-                if (paymentId) {
-                    orderData.paymentId = paymentId;
-                }
-
-                const ordersRef = ref(db, 'orders');
-                await push(ordersRef, orderData);
+                });
 
                 showToast('success', '✅ Order Successful!', 'Redirecting to My Orders...');
-
                 localStorage.removeItem('cart');
                 cart = [];
-
-                setTimeout(() => {
-                    window.location.href = 'orders.html';
-                }, 2500);
-            } catch (error) {
-                console.error('Error placing order:', error);
-                showError('Failed to place order. Please try again.');
+                setTimeout(() => window.location.href = 'orders.html', 2500);
+            } catch (e) {
+                console.error('Order error:', e);
+                showError('Failed to place order');
                 loader.style.display = 'none';
-                placeOrderBtn.disabled = false;
+                btn.disabled = false;
             }
         }
 
-        function showToast(type, message, submessage) {
+        function showToast(type, msg, sub) {
             const toast = document.getElementById('toast');
-            const toastOverlay = document.getElementById('toastOverlay');
-            const toastIcon = document.getElementById('toastIcon');
-            const toastMessage = document.getElementById('toastMessage');
-            const toastSubMessage = document.getElementById('toastSubMessage');
-
-            toast.className = 'toast show toast-' + type;
-            toastOverlay.classList.add('show');
-            
-            if (type === 'success') {
-                toastIcon.textContent = '✅';
-            } else {
-                toastIcon.textContent = '❌';
-            }
-            
-            toastMessage.textContent = message;
-            toastSubMessage.textContent = submessage;
-
-            if (type === 'error') {
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    toastOverlay.classList.remove('show');
-                }, 3000);
-            }
+            const overlay = document.getElementById('toastOverlay');
+            toast.className = `toast show toast-${type}`;
+            overlay.classList.add('show');
+            document.getElementById('toastIcon').textContent = type === 'success' ? '✅' : '❌';
+            document.getElementById('toastMessage').textContent = msg;
+            document.getElementById('toastSubMessage').textContent = sub;
+            if (type === 'error') setTimeout(() => { toast.classList.remove('show'); overlay.classList.remove('show'); }, 3000);
         }
 
-        function showSuccess(message) {
-            const successMsg = document.getElementById('successMessage');
-            successMsg.textContent = message;
-            successMsg.style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            setTimeout(() => {
-                successMsg.style.display = 'none';
-            }, 3000);
+        function showSuccess(msg) {
+            const el = document.getElementById('successMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 3000);
         }
 
-        function showError(message) {
-            const errorMsg = document.getElementById('errorMessage');
-            errorMsg.textContent = message;
-            errorMsg.style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            setTimeout(() => {
-                errorMsg.style.display = 'none';
-            }, 3000);
+        function showError(msg) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 3000);
         }
 
-        window.toggleMenu = function() {
-            const hamburger = document.querySelector('.hamburger');
-            const navMenu = document.getElementById('navMenu');
-            hamburger.classList.toggle('active');
-            navMenu.classList.toggle('active');
+        window.toggleMenu = () => {
+            document.querySelector('.hamburger').classList.toggle('active');
+            document.getElementById('navMenu').classList.toggle('active');
         };
 
-        document.addEventListener('click', function(event) {
-            const hamburger = document.querySelector('.hamburger');
-            const navMenu = document.getElementById('navMenu');
+        document.addEventListener('click', e => {
             const navLeft = document.querySelector('.nav-left');
+            const navMenu = document.getElementById('navMenu');
             const modal = document.getElementById('addressModal');
-            
-            if (!navLeft.contains(event.target) && !navMenu.contains(event.target)) {
-                hamburger.classList.remove('active');
+            if (!navLeft.contains(e.target) && !navMenu.contains(e.target)) {
+                document.querySelector('.hamburger').classList.remove('active');
                 navMenu.classList.remove('active');
             }
-
-            if (event.target === modal) {
-                closeAddressModal();
-            }
+            if (e.target === modal) closeAddressModal();
         });
 
-        window.logout = async function() {
-            if (confirm('Are you sure you want to logout?')) {
+        window.logout = async () => {
+            if (confirm('Logout?')) {
                 try {
                     await signOut(auth);
                     localStorage.removeItem('cart');
                     window.location.href = 'index.html';
-                } catch (error) {
-                    console.error('Error logging out:', error);
+                } catch (e) {
+                    console.error('Logout error:', e);
                 }
             }
         };
     </script>
 </body>
 </html>
-
-
