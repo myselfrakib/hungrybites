@@ -279,11 +279,6 @@
         let selectedLocation = { lat: 22.9734, lng: 78.6569 }, locationDetected = false;
         const RAZORPAY_KEY = 'rzp_test_your_key_here';
 
-        // Initialize cart from global variable
-        if (!window.cartData) {
-            window.cartData = [];
-        }
-
         // Enhanced geolocation with aggressive WebView support
         window.getLocation = function() {
             const btn = document.getElementById('locationBtn');
@@ -480,8 +475,15 @@
         }
 
         function loadCart() {
-            // Load from global variable
-            cart = window.cartData || [];
+            try {
+                const savedCart = localStorage.getItem('midnightPlazaCart');
+                if (savedCart) {
+                    cart = JSON.parse(savedCart);
+                }
+            } catch (error) {
+                console.error('Error loading cart from localStorage:', error);
+                cart = [];
+            }
             renderCart();
         }
 
@@ -534,17 +536,25 @@
         window.updateQuantity = (i, change) => {
             cart[i].quantity += change;
             if (cart[i].quantity <= 0) cart.splice(i, 1);
-            window.cartData = cart;
+            saveCart();
             renderCart();
         };
 
         window.removeItem = i => {
             if (confirm('Remove this item?')) {
                 cart.splice(i, 1);
-                window.cartData = cart;
+                saveCart();
                 renderCart();
             }
         };
+
+        function saveCart() {
+            try {
+                localStorage.setItem('midnightPlazaCart', JSON.stringify(cart));
+            } catch (error) {
+                console.error('Error saving cart to localStorage:', error);
+            }
+        }
 
         async function loadSavedAddresses() {
             if (!currentUser) return;
@@ -797,7 +807,7 @@
                 });
 
                 showToast('success', '✅ Order Successful!', 'Redirecting to My Orders...');
-                window.cartData = [];
+                localStorage.removeItem('midnightPlazaCart');
                 cart = [];
                 setTimeout(() => window.location.href = 'orders.html', 2500);
             } catch (e) {
@@ -853,7 +863,7 @@
             if (confirm('Logout?')) {
                 try {
                     await signOut(auth);
-                    window.cartData = [];
+                    localStorage.removeItem('midnightPlazaCart');
                     window.location.href = 'index.html';
                 } catch (e) {
                     console.error('Logout error:', e);
