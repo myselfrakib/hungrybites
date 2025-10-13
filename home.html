@@ -616,12 +616,7 @@
         let allFoodItems = {};
         let currentCategory = 'all';
         
-        // Initialize global cart data for cross-page access
-        if (!window.cartData) {
-            window.cartData = [];
-        }
-        
-        // Load cart from global variable
+        // Load cart from localStorage
         loadCart();
         updateCartBadge();
         updateNotificationVisibility();
@@ -909,21 +904,20 @@
 
         function saveCart() {
             try {
-                // Save to global window variable for cross-page access
-                window.cartData = cart;
+                localStorage.setItem('midnightPlazaCart', JSON.stringify(cart));
             } catch (error) {
-                console.error('Error saving cart:', error);
+                console.error('Error saving cart to localStorage:', error);
             }
         }
 
         function loadCart() {
             try {
-                // Load from global window variable
-                if (window.cartData && Array.isArray(window.cartData)) {
-                    cart = window.cartData;
+                const savedCart = localStorage.getItem('midnightPlazaCart');
+                if (savedCart) {
+                    cart = JSON.parse(savedCart);
                 }
             } catch (error) {
-                console.error('Error loading cart:', error);
+                console.error('Error loading cart from localStorage:', error);
                 cart = [];
             }
         }
@@ -963,7 +957,7 @@
             if (confirm('Are you sure you want to logout?')) {
                 signOut(auth).then(() => {
                     // Clear cart on logout
-                    window.cartData = [];
+                    localStorage.removeItem('midnightPlazaCart');
                     cart = [];
                     window.location.href = 'index.html';
                 }).catch((error) => {
