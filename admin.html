@@ -1292,6 +1292,7 @@
                 <table class="users-table">
                     <thead>
                         <tr>
+                            <th style="width: 60px;">Sl No.</th>
                             <th>User</th>
                             <th>Phone</th>
                             <th>Joined</th>
@@ -1301,7 +1302,7 @@
                     </thead>
                     <tbody id="usersTableBody">
                         <tr>
-                            <td colspan="5" style="text-align: center; padding: 2rem;">
+                            <td colspan="6" style="text-align: center; padding: 2rem;">
                                 <div class="empty-state-icon">⏳</div>
                                 <div class="empty-state-text">Loading users...</div>
                             </td>
@@ -1551,7 +1552,7 @@
             if (userKeys.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 2rem;">
+                        <td colspan="6" style="text-align: center; padding: 2rem;">
                             <div class="empty-state-icon">📭</div>
                             <div class="empty-state-text">No users registered yet</div>
                         </td>
@@ -1561,21 +1562,22 @@
             }
 
             tbody.innerHTML = '';
-            userKeys.forEach(uid => {
+            userKeys.forEach((uid, index) => {
                 const user = allUsers[uid];
-                const row = createUserRow(user, uid);
+                const row = createUserRow(user, uid, index + 1);
                 tbody.appendChild(row);
             });
         }
 
         // Create user row
-        function createUserRow(user, uid) {
+        function createUserRow(user, uid, slNo) {
             const row = document.createElement('tr');
             const joinedDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A';
             const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?';
             const isVerified = user.verified !== false;
             
             row.innerHTML = `
+                <td style="text-align: center; font-weight: 600; color: #666;">${slNo}</td>
                 <td>
                     <div class="user-info">
                         <div class="user-avatar">${initials}</div>
