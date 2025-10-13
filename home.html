@@ -28,7 +28,7 @@
 
         .navbar {
             background: white;
-            padding: 1rem;
+            padding: 0.75rem 1rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
@@ -38,32 +38,38 @@
             align-items: center;
         }
 
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
         .logo {
-            font-size: clamp(1.3rem, 4vw, 1.8rem);
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
             font-weight: bold;
-            color: #fc8019;
+            color: var(--sunglow);
             cursor: pointer;
         }
 
         .hamburger {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
             cursor: pointer;
             padding: 0.5rem;
             touch-action: manipulation;
         }
 
         .hamburger span {
-            width: 25px;
-            height: 3px;
-            background: #333;
+            width: 22px;
+            height: 2.5px;
+            background: var(--blue-gray);
             border-radius: 3px;
             transition: all 0.3s;
         }
 
         .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(8px, 8px);
+            transform: rotate(45deg) translate(7px, 7px);
         }
 
         .hamburger.active span:nth-child(2) {
@@ -71,18 +77,18 @@
         }
 
         .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
+            transform: rotate(-45deg) translate(6px, -6px);
         }
 
         .nav-items {
             display: none;
             position: fixed;
-            top: 70px;
+            top: 60px;
             left: 0;
             right: 0;
             background: white;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            padding: 1rem;
+            padding: 0.5rem;
             flex-direction: column;
             gap: 0;
             z-index: 999;
@@ -100,13 +106,13 @@
 
         .nav-item {
             cursor: pointer;
-            padding: 1rem;
+            padding: 0.9rem;
             border-radius: 8px;
             transition: background 0.3s;
             text-decoration: none;
             color: #333;
             font-weight: 500;
-            font-size: 1rem;
+            font-size: 0.95rem;
             position: relative;
             min-height: 50px;
             display: flex;
@@ -116,7 +122,7 @@
         }
 
         .nav-item:hover {
-            background: #f8f9fa;
+            background: var(--baby-powder);
         }
 
         .cart-item {
@@ -127,7 +133,7 @@
             text-decoration: none;
             color: #333;
             font-weight: 500;
-            font-size: clamp(0.85rem, 2vw, 1rem);
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
             position: relative;
             min-height: 40px;
             display: flex;
@@ -136,14 +142,14 @@
         }
 
         .cart-item:hover {
-            background: #f8f9fa;
+            background: var(--baby-powder);
         }
 
         .cart-badge {
             position: absolute;
             top: -2px;
             right: -2px;
-            background: #fc8019;
+            background: var(--sunglow);
             color: white;
             border-radius: 50%;
             min-width: 20px;
@@ -159,7 +165,7 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 1.5rem 1rem;
+            padding: 1.5rem 0.75rem;
         }
 
         .category-tabs {
@@ -199,10 +205,10 @@
         }
 
         .category-tab.active {
-            background: linear-gradient(135deg, #fc8019 0%, #ff6b00 100%);
-            color: white;
-            border-color: #fc8019;
-            box-shadow: 0 4px 15px rgba(252, 128, 25, 0.3);
+            background: linear-gradient(135deg, var(--sunglow) 0%, var(--mustard) 100%);
+            color: #333;
+            border-color: var(--sunglow);
+            box-shadow: 0 4px 15px rgba(253, 201, 33, 0.3);
         }
 
         .category-emoji {
@@ -218,7 +224,7 @@
         }
 
         .category-tab.active .category-count {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.5);
         }
 
         .section-header {
@@ -229,11 +235,12 @@
         }
 
         .section-title {
-            font-size: clamp(1.5rem, 4vw, 2rem);
-            color: #333;
+            font-size: clamp(1.3rem, 4vw, 1.6rem);
+            color: var(--sunglow);
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            font-weight: 600;
         }
 
         .item-count {
@@ -250,9 +257,9 @@
 
         .food-card {
             background: white;
-            border-radius: 16px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
             transition: transform 0.3s, box-shadow 0.3s;
             animation: fadeIn 0.4s ease;
         }
@@ -291,11 +298,11 @@
         }
 
         .food-details {
-            padding: 1.25rem;
+            padding: 1rem;
         }
 
         .food-name {
-            font-size: clamp(1.1rem, 3vw, 1.3rem);
+            font-size: clamp(0.95rem, 3vw, 1.05rem);
             font-weight: 600;
             margin-bottom: 0.5rem;
             color: #333;
@@ -303,7 +310,7 @@
 
         .food-description {
             color: #666;
-            font-size: clamp(0.85rem, 2vw, 0.9rem);
+            font-size: clamp(0.8rem, 2vw, 0.85rem);
             margin-bottom: 1rem;
             line-height: 1.5;
         }
@@ -316,21 +323,21 @@
         }
 
         .food-price {
-            font-size: clamp(1.3rem, 4vw, 1.5rem);
+            font-size: clamp(1rem, 4vw, 1.15rem);
             font-weight: bold;
-            color: #60b246;
+            color: var(--blue-gray);
         }
 
         .add-btn {
-            background: #fc8019;
+            background: var(--sunglow);
             color: white;
             border: none;
-            padding: 0.7rem 1.25rem;
-            border-radius: 10px;
+            padding: 0.5rem 0.85rem;
+            border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
             min-height: 44px;
             touch-action: manipulation;
             white-space: nowrap;
@@ -343,22 +350,22 @@
         .quantity-control {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            background: #fc8019;
-            border-radius: 10px;
-            padding: 0.5rem 0.75rem;
+            gap: 0.6rem;
+            background: var(--sunglow);
+            border-radius: 6px;
+            padding: 0.4rem 0.6rem;
             min-height: 44px;
         }
 
         .quantity-btn {
             background: white;
-            color: #fc8019;
+            color: var(--sunglow);
             border: none;
             width: 32px;
             height: 32px;
-            border-radius: 6px;
+            border-radius: 50%;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
             transition: all 0.2s;
             touch-action: manipulation;
@@ -374,7 +381,7 @@
         .quantity-display {
             color: white;
             font-weight: 600;
-            min-width: 24px;
+            min-width: 25px;
             text-align: center;
             font-size: 1rem;
         }
@@ -388,7 +395,7 @@
 
         .spinner {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #fc8019;
+            border-top: 4px solid var(--sunglow);
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -418,7 +425,7 @@
             bottom: 2rem;
             left: 50%;
             transform: translateX(-50%) translateY(150px);
-            background: #60b246;
+            background: var(--blue-gray);
             color: white;
             padding: 0.75rem 1rem;
             border-radius: 12px;
@@ -446,7 +453,7 @@
 
         .view-cart-btn {
             background: white;
-            color: #60b246;
+            color: var(--blue-gray);
             border: none;
             padding: 0.5rem 1rem;
             border-radius: 8px;
@@ -468,7 +475,7 @@
 
         @media (min-width: 480px) {
             .navbar {
-                padding: 1rem 2rem;
+                padding: 0.75rem 1.5rem;
             }
 
             .nav-items {
@@ -476,7 +483,7 @@
             }
 
             .container {
-                padding: 2rem 1.5rem;
+                padding: 2rem 1rem;
             }
 
             .category-tabs {
@@ -486,7 +493,7 @@
 
         @media (min-width: 768px) {
             .container {
-                padding: 2.5rem 2rem;
+                padding: 2.5rem 1.5rem;
             }
 
             .food-grid {
@@ -499,13 +506,13 @@
             }
 
             .add-btn:hover {
-                background: #e67316;
+                background: var(--mustard);
                 transform: scale(1.05);
             }
 
             .category-tab:hover {
-                border-color: #fc8019;
-                box-shadow: 0 4px 15px rgba(252, 128, 25, 0.2);
+                border-color: var(--sunglow);
+                box-shadow: 0 4px 15px rgba(253, 201, 33, 0.2);
             }
 
             .notification {
@@ -535,23 +542,28 @@
                 flex-direction: row;
                 padding: 0;
                 box-shadow: none;
-                gap: 1rem;
+                gap: 0.75rem;
             }
 
             .nav-item {
                 border-bottom: none;
-                padding: 0.5rem 0.75rem;
+                padding: 0.4rem 0.6rem;
                 min-height: 40px;
             }
 
             .nav-right {
                 gap: 1rem;
             }
+
+            .quantity-btn:hover {
+                background: var(--mustard);
+                transform: scale(1.1);
+            }
         }
 
         @media (min-width: 1024px) {
             .nav-items {
-                gap: 2rem;
+                gap: 1.5rem;
             }
 
             .category-tabs {
@@ -562,7 +574,7 @@
 </head>
 <body>
     <div class="navbar">
-        <div class="nav-right">
+        <div class="nav-left">
             <div class="hamburger" onclick="toggleMenu()">
                 <span></span>
                 <span></span>
@@ -624,7 +636,6 @@
         let allFoodItems = {};
         let currentCategory = 'all';
         
-        // Load cart from localStorage
         loadCart();
         updateCartBadge();
         updateNotificationVisibility();
@@ -731,6 +742,14 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        function escapeJs(text) {
+            return text.replace(/\\/g, '\\\\')
+                      .replace(/'/g, "\\'")
+                      .replace(/"/g, '\\"')
+                      .replace(/\n/g, '\\n')
+                      .replace(/\r/g, '\\r');
         }
 
         window.filterCategory = function(category) {
@@ -964,7 +983,6 @@
         window.logout = function() {
             if (confirm('Are you sure you want to logout?')) {
                 signOut(auth).then(() => {
-                    // Clear cart on logout
                     localStorage.removeItem('midnightPlazaCart');
                     cart = [];
                     window.location.href = 'index.html';
