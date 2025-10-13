@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>HungryBites - Home</title>
+    <title>MidnightPlaza - Home</title>
     <style>
         * {
             margin: 0;
@@ -593,9 +593,9 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -616,7 +616,12 @@
         let allFoodItems = {};
         let currentCategory = 'all';
         
-        // Initialize cart from memory
+        // Initialize global cart data for cross-page access
+        if (!window.cartData) {
+            window.cartData = [];
+        }
+        
+        // Load cart from global variable
         loadCart();
         updateCartBadge();
         updateNotificationVisibility();
@@ -904,6 +909,7 @@
 
         function saveCart() {
             try {
+                // Save to global window variable for cross-page access
                 window.cartData = cart;
             } catch (error) {
                 console.error('Error saving cart:', error);
@@ -912,7 +918,8 @@
 
         function loadCart() {
             try {
-                if (window.cartData) {
+                // Load from global window variable
+                if (window.cartData && Array.isArray(window.cartData)) {
                     cart = window.cartData;
                 }
             } catch (error) {
@@ -955,6 +962,9 @@
         window.logout = function() {
             if (confirm('Are you sure you want to logout?')) {
                 signOut(auth).then(() => {
+                    // Clear cart on logout
+                    window.cartData = [];
+                    cart = [];
                     window.location.href = 'index.html';
                 }).catch((error) => {
                     console.error('Logout error:', error);
