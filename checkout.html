@@ -122,6 +122,7 @@
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
         .modal-title { font-size: 1.3rem; font-weight: 600; color: #333; }
         .close-modal { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #666; line-height: 1; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+        .coord-display { background: #f0f9ff; border: 2px solid var(--non-photo-blue); border-radius: 8px; padding: 0.75rem; margin-top: 0.75rem; font-size: 0.85rem; color: #666; text-align: center; }
         @media (min-width: 768px) {
             .cart-item { flex-direction: row; align-items: center; }
             .quantity-btn:hover { background: var(--mustard); transform: scale(1.1); }
@@ -214,10 +215,13 @@
 
             <div id="addressFormContainer">
                 <div class="map-instruction">
-                    📍 Your location will be auto-detected. If it doesn't work, drag the red marker to your location or tap on the map.
+                    📍 Drag the red marker to your exact delivery location. Your location will be auto-detected first.
                 </div>
                 <button type="button" class="location-btn" id="locationBtn" onclick="getLocation()">📍 Detecting Location...</button>
                 <div id="map"></div>
+                <div class="coord-display" id="coordDisplay">
+                    📌 Selected Location: <strong id="currentCoords">Detecting...</strong>
+                </div>
                 <div style="text-align: center; margin-top: 0.5rem; color: #666; font-size: 0.85rem;">
                     💡 Can't detect? <span style="color: var(--sunglow); font-weight: 600; cursor: pointer;" onclick="showLocationHelp()">Click here for help</span>
                 </div>
@@ -284,8 +288,20 @@
         const auth = getAuth(app), db = getDatabase(app);
         let cart = [], currentUser = null, selectedPayment = null, deliveryAddress = null;
         let savedAddresses = [], selectedAddressId = null, map, marker;
-        let selectedLocation = { lat: 22.9734, lng: 78.6569 }, locationDetected = false;
+        
+        // CHANGED: finalPinLocation will store the actual pin position
+        let finalPinLocation = null;
+        let initialLocationDetected = false;
+        
         const RAZORPAY_KEY = 'rzp_test_your_key_here';
+
+        // CHANGED: Update coordinates display when marker moves
+        function updateCoordinatesDisplay() {
+            if (finalPinLocation) {
+                document.getElementById('currentCoords').textContent = 
+                    `${finalPinLocation.lat.toFixed(6)}, ${finalPinLocation.lng.toFixed(6)}`;
+            }
+        }
 
         // Enhanced geolocation with aggressive WebView support
         window.getLocation = function() {
@@ -302,11 +318,11 @@
                 const latLng = new google.maps.LatLng(lat, lng);
                 map.setCenter(latLng);
                 map.setZoom(15);
-                setMarkerPosition(latLng);
-                locationDetected = true;
+                setMarkerPosition(latLng, true); // CHANGED: Pass true for initial detection
+                initialLocationDetected = true;
                 btn.innerHTML = '✅ Located';
                 btn.disabled = false;
-                showSuccess('Location detected');
+                showSuccess('Location detected - drag pin if needed');
             };
 
             const onError = (msg) => {
@@ -315,6 +331,11 @@
                 btn.innerHTML = '📍 Use My Location';
                 btn.disabled = false;
                 showError(msg);
+                
+                // CHANGED: Set default location to India center but make it clear it's not accurate
+                const defaultLatLng = new google.maps.LatLng(22.9734, 78.6569);
+                setMarkerPosition(defaultLatLng, false);
+                document.getElementById('currentCoords').textContent = 'Default location - please drag pin';
             };
 
             // Method 1: Android WebView Interface
@@ -349,7 +370,7 @@
             // Method 3: Standard HTML5 Geolocation
             const tryStandardGeo = () => {
                 if (!navigator.geolocation) {
-                    return onError('Geolocation not supported - tap marker to set location');
+                    return onError('Geolocation not supported - drag marker to set location');
                 }
 
                 const optsHigh = {
@@ -409,32 +430,60 @@
         };
 
         window.initMap = function() {
+            // CHANGED: Start with default India location
+            const defaultLocation = { lat: 22.9734, lng: 78.6569 };
+            
             map = new google.maps.Map(document.getElementById('map'), {
-                center: selectedLocation,
-                zoom: 13,
+                center: defaultLocation,
+                zoom: 5, // CHANGED: Wider zoom initially
                 mapTypeControl: false,
                 streetViewControl: false,
                 fullscreenControl: false
             });
 
             marker = new google.maps.Marker({
-                position: selectedLocation,
+                position: defaultLocation,
                 map: map,
                 draggable: true,
                 animation: google.maps.Animation.DROP
             });
 
-            map.addListener('click', e => setMarkerPosition(e.latLng));
-            marker.addListener('dragend', e => setMarkerPosition(e.latLng));
+            // CHANGED: Set initial pin location
+            finalPinLocation = defaultLocation;
+            updateCoordinatesDisplay();
+
+            // CHANGED: Update finalPinLocation when user clicks map
+            map.addListener('click', e => {
+                setMarkerPosition(e.latLng, false);
+            });
+            
+            // CHANGED: Update finalPinLocation when user drags marker
+            marker.addListener('dragend', e => {
+                setMarkerPosition(e.latLng, false);
+                showSuccess('Pin location updated');
+            });
+            
+            // CHANGED: Also update during drag for live feedback
+            marker.addListener('drag', e => {
+                finalPinLocation = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+                updateCoordinatesDisplay();
+            });
             
             setTimeout(() => window.getLocation(), 500);
         };
 
-        function setMarkerPosition(latLng) {
-            selectedLocation = { lat: latLng.lat(), lng: latLng.lng() };
+        // CHANGED: Accept isInitialDetection parameter
+        function setMarkerPosition(latLng, isInitialDetection = false) {
+            // CHANGED: Always update finalPinLocation to current marker position
+            finalPinLocation = { lat: latLng.lat(), lng: latLng.lng() };
+            
             marker.setPosition(latLng);
             map.panTo(latLng);
             
+            // CHANGED: Update coordinates display
+            updateCoordinatesDisplay();
+            
+            // Only auto-fill address on initial detection or user interaction
             new google.maps.Geocoder().geocode({ location: latLng }, (results, status) => {
                 if (status === 'OK' && results[0]) {
                     const c = results[0].address_components;
@@ -453,13 +502,16 @@
                     if (pin) document.getElementById('pincode').value = pin;
                     if (addr || area) document.getElementById('address').value = [addr, area].filter(Boolean).join(', ');
                     if (state) document.getElementById('landmark').value = `Near ${area || city}, ${state}`;
-                    showSuccess('Address auto-filled');
+                    
+                    if (!isInitialDetection) {
+                        showSuccess('Address updated from pin location');
+                    }
                 }
             });
         }
 
         window.showLocationHelp = function() {
-            alert('Location Detection Help:\n\n1. Allow location permission when prompted\n2. If not working, drag the red marker to your exact location\n3. You can also tap anywhere on the map\n4. Make sure location services are enabled on your device');
+            alert('Location Detection Help:\n\n1. Allow location permission when prompted\n2. DRAG the red marker to your EXACT delivery location\n3. You can also tap anywhere on the map\n4. The coordinates shown below the map are what will be saved\n5. Make sure to position the pin at your exact address');
         };
 
         onAuthStateChanged(auth, user => {
@@ -685,8 +737,16 @@
             setTimeout(() => {
                 if (map) {
                     google.maps.event.trigger(map, 'resize');
-                    map.setCenter(selectedLocation);
-                    if (!locationDetected && document.getElementById('addressFormContainer').style.display !== 'none') {
+                    
+                    // CHANGED: Reset to default location when opening form
+                    if (document.getElementById('addressFormContainer').style.display !== 'none') {
+                        const defaultLocation = { lat: 22.9734, lng: 78.6569 };
+                        finalPinLocation = defaultLocation;
+                        map.setCenter(defaultLocation);
+                        map.setZoom(5);
+                        marker.setPosition(defaultLocation);
+                        updateCoordinatesDisplay();
+                        initialLocationDetected = false;
                         window.getLocation();
                     }
                 }
@@ -701,11 +761,19 @@
             document.getElementById('backToSavedBtn').style.display = savedAddresses.length ? 'block' : 'none';
             document.getElementById('addressForm').reset();
             document.getElementById('saveAddress').checked = true;
-            locationDetected = false;
+            initialLocationDetected = false;
+            
+            // CHANGED: Reset pin to default location
+            const defaultLocation = { lat: 22.9734, lng: 78.6569 };
+            finalPinLocation = defaultLocation;
+            
             setTimeout(() => {
                 if (map) {
                     google.maps.event.trigger(map, 'resize');
-                    map.setCenter(selectedLocation);
+                    map.setCenter(defaultLocation);
+                    map.setZoom(5);
+                    marker.setPosition(defaultLocation);
+                    updateCoordinatesDisplay();
                     window.getLocation();
                 }
             }, 100);
@@ -731,6 +799,11 @@
             if (!/^[0-9]{10}$/.test(phone)) return showError('Enter valid 10-digit phone');
             if (!/^[0-9]{6}$/.test(pin)) return showError('Enter valid 6-digit pincode');
 
+            // CHANGED: Validate that user has set a proper location
+            if (!finalPinLocation) {
+                return showError('Please set your location on the map');
+            }
+
             // Show button feedback
             const btn = document.getElementById('deliverHereBtn');
             const btnText = document.getElementById('deliverHereBtnText');
@@ -744,8 +817,18 @@
                 const pincodeSnap = await get(pincodeRef);
                 
                 if (!pincodeSnap.exists() || pincodeSnap.val() !== true) {
-                    // Pincode not serviceable
-                    deliveryAddress = { fullName: name, phone, streetAddress: addr, city, pincode: pin, landmark, coordinates: selectedLocation };
+                    // CHANGED: Use finalPinLocation (the actual pin position)
+                    deliveryAddress = { 
+                        fullName: name, 
+                        phone, 
+                        streetAddress: addr, 
+                        city, 
+                        pincode: pin, 
+                        landmark, 
+                        coordinates: finalPinLocation  // CHANGED: Use final pin location
+                    };
+                    
+                    console.log('Saving coordinates:', finalPinLocation); // Debug log
                     
                     // Save address anyway if user wants to
                     if (save && currentUser) {
@@ -764,7 +847,7 @@
                     btnText.textContent = '📍 Deliver Here';
                     
                     // Show error toast for 5 seconds
-                    showToast('error', '⚠️ Out of Service Area', 'Address is out of service area. Please try again with another address.');
+                    showToast('error', '⚠️ Out of Service Area', 'Pincode is out of service area. Please try another address.');
                     
                     setTimeout(() => {
                         const toast = document.getElementById('toast');
@@ -778,7 +861,20 @@
 
                 // Pincode is serviceable - proceed normally
                 btnText.textContent = '⏳ Saving...';
-                deliveryAddress = { fullName: name, phone, streetAddress: addr, city, pincode: pin, landmark, coordinates: selectedLocation, serviceable: true };
+                
+                // CHANGED: Use finalPinLocation (the actual pin position)
+                deliveryAddress = { 
+                    fullName: name, 
+                    phone, 
+                    streetAddress: addr, 
+                    city, 
+                    pincode: pin, 
+                    landmark, 
+                    coordinates: finalPinLocation,  // CHANGED: Use final pin location
+                    serviceable: true 
+                };
+
+                console.log('Saving serviceable address coordinates:', finalPinLocation); // Debug log
 
                 if (save && currentUser) {
                     try {
@@ -894,6 +990,9 @@
             const total = subtotal + 40;
 
             try {
+                // CHANGED: Log the coordinates being saved
+                console.log('Order coordinates being saved:', deliveryAddress.coordinates);
+                
                 await push(ref(db, 'orders'), {
                     userId: currentUser.uid,
                     userEmail: currentUser.email,
@@ -906,7 +1005,7 @@
                         city: deliveryAddress.city,
                         pincode: deliveryAddress.pincode,
                         landmark: deliveryAddress.landmark || '',
-                        coordinates: deliveryAddress.coordinates
+                        coordinates: deliveryAddress.coordinates  // CHANGED: This now contains finalPinLocation
                     },
                     paymentMethod: method,
                     paymentStatus: method === 'online' ? 'paid' : 'pending',
@@ -967,18 +1066,3 @@
             }
             if (e.target === modal) closeAddressModal();
         });
-
-        window.logout = async () => {
-            if (confirm('Logout?')) {
-                try {
-                    await signOut(auth);
-                    localStorage.removeItem('midnightPlazaCart');
-                    window.location.href = 'index.html';
-                } catch (e) {
-                    console.error('Logout error:', e);
-                }
-            }
-        };
-    </script>
-</body>
-</html>
