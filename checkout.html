@@ -123,6 +123,7 @@
         .modal-title { font-size: 1.3rem; font-weight: 600; color: #333; }
         .close-modal { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #666; line-height: 1; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
         .coord-display { background: #f0f9ff; border: 2px solid var(--non-photo-blue); border-radius: 8px; padding: 0.75rem; margin-top: 0.75rem; font-size: 0.85rem; color: #666; text-align: center; }
+        .inline-addresses { margin-top: 0.75rem; }
         @media (min-width: 768px) {
             .cart-item { flex-direction: row; align-items: center; }
             .quantity-btn:hover { background: var(--mustard); transform: scale(1.1); }
@@ -174,18 +175,21 @@
             <div class="section-container">
                 <div class="section-title">📍 Delivery Address</div>
                 <div id="addressDisplayArea"></div>
+
+                <!-- Inline list of saved addresses so user can select without opening modal -->
+                <div class="inline-addresses" id="inlineAddressesList"></div>
             </div>
 
             <div class="section-container">
                 <div class="section-title">💳 Payment Method</div>
-                <div class="payment-option" onclick="selectPayment('cod')">
+                <div class="payment-option" onclick="selectPayment('cod')" id="paymentCodOption">
                     <input type="radio" name="payment" id="cod" value="cod">
                     <div class="payment-details">
                         <div class="payment-title">💵 Cash on Delivery</div>
                         <div class="payment-description">Pay when order arrives</div>
                     </div>
                 </div>
-                <div class="payment-option" onclick="selectPayment('online')">
+                <div class="payment-option" onclick="selectPayment('online')" id="paymentOnlineOption">
                     <input type="radio" name="payment" id="online" value="online">
                     <div class="payment-details">
                         <div class="payment-title">💳 Online Payment</div>
@@ -292,15 +296,18 @@
         let initialLocationDetected = false;
         const RAZORPAY_KEY = 'rzp_test_your_key_here';
 
+        /********** Utility: update coords display **********/
         function updateCoordinatesDisplay() {
             if (finalPinLocation) {
-                document.getElementById('currentCoords').textContent = 
-                    `${finalPinLocation.lat.toFixed(6)}, ${finalPinLocation.lng.toFixed(6)}`;
+                const el = document.getElementById('currentCoords');
+                if (el) el.textContent = `${finalPinLocation.lat.toFixed(6)}, ${finalPinLocation.lng.toFixed(6)}`;
             }
         }
 
+        /********** Location detection & Google Maps init (unchanged) **********/
         window.getLocation = function() {
             const btn = document.getElementById('locationBtn');
+            if (!btn) return;
             btn.disabled = true;
             btn.innerHTML = '📍 Detecting...';
             let locationFound = false;
@@ -308,7 +315,6 @@
             const onSuccess = (lat, lng, source) => {
                 if (locationFound) return;
                 locationFound = true;
-                console.log(`Location from ${source}:`, lat, lng);
                 const latLng = new google.maps.LatLng(lat, lng);
                 map.setCenter(latLng);
                 map.setZoom(15);
@@ -321,13 +327,13 @@
 
             const onError = (msg) => {
                 if (locationFound) return;
-                console.error('Location error:', msg);
                 btn.innerHTML = '📍 Use My Location';
                 btn.disabled = false;
                 showError(msg);
                 const defaultLatLng = new google.maps.LatLng(22.9734, 78.6569);
                 setMarkerPosition(defaultLatLng, false);
-                document.getElementById('currentCoords').textContent = 'Default location - please drag pin';
+                const el = document.getElementById('currentCoords');
+                if (el) el.textContent = 'Default location - please drag pin';
             };
 
             if (window.Android && typeof window.Android.getCurrentLocation === 'function') {
@@ -339,53 +345,31 @@
                             return onSuccess(parsed.lat, parsed.lng, 'Android Interface');
                         }
                     }
-                } catch(e) {
-                    console.log('Android interface failed:', e);
-                }
+                } catch(e) { console.log('Android interface failed:', e); }
             }
 
             if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.getCurrentLocation) {
                 try {
                     window.webkit.messageHandlers.getCurrentLocation.postMessage({});
                     window.setLocation = (lat, lng) => onSuccess(lat, lng, 'iOS WebKit');
-                    setTimeout(() => {
-                        if (!locationFound) tryStandardGeo();
-                    }, 2000);
+                    setTimeout(() => { if (!locationFound) tryStandardGeo(); }, 2000);
                     return;
-                } catch(e) {
-                    console.log('iOS WebKit failed:', e);
-                }
+                } catch(e) { console.log('iOS WebKit failed:', e); }
             }
 
             const tryStandardGeo = () => {
-                if (!navigator.geolocation) {
-                    return onError('Geolocation not supported - drag marker to set location');
-                }
+                if (!navigator.geolocation) { return onError('Geolocation not supported - drag marker to set location'); }
 
-                const optsHigh = {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0
-                };
+                const optsHigh = { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 };
 
                 navigator.geolocation.getCurrentPosition(
                     pos => onSuccess(pos.coords.latitude, pos.coords.longitude, 'HTML5 High Accuracy'),
                     err1 => {
-                        console.log('High accuracy failed, trying low accuracy:', err1);
-                        const optsLow = {
-                            enableHighAccuracy: false,
-                            timeout: 8000,
-                            maximumAge: 5000
-                        };
-
+                        const optsLow = { enableHighAccuracy: false, timeout: 8000, maximumAge: 5000 };
                         navigator.geolocation.getCurrentPosition(
                             pos => onSuccess(pos.coords.latitude, pos.coords.longitude, 'HTML5 Low Accuracy'),
                             err2 => {
-                                const msgs = {
-                                    1: 'Location permission denied - enable in app settings',
-                                    2: 'Location unavailable - drag marker to your location',
-                                    3: 'Location timeout - drag marker to your location'
-                                };
+                                const msgs = { 1: 'Location permission denied - enable in app settings', 2: 'Location unavailable - drag marker to your location', 3: 'Location timeout - drag marker to your location' };
                                 onError(msgs[err2.code] || 'Drag marker to set your location');
                             },
                             optsLow
@@ -398,16 +382,9 @@
             const tryIPLocation = () => {
                 setTimeout(() => {
                     if (!locationFound) {
-                        fetch('https://ipapi.co/json/')
-                            .then(r => r.json())
-                            .then(data => {
-                                if (data.latitude && data.longitude) {
-                                    onSuccess(data.latitude, data.longitude, 'IP Location (approximate)');
-                                }
-                            })
-                            .catch(() => {
-                                onError('Drag marker to set your location');
-                            });
+                        fetch('https://ipapi.co/json/').then(r => r.json()).then(data => {
+                            if (data.latitude && data.longitude) onSuccess(data.latitude, data.longitude, 'IP Location (approximate)');
+                        }).catch(() => onError('Drag marker to set your location'));
                     }
                 }, 12000);
             };
@@ -418,7 +395,6 @@
 
         window.initMap = function() {
             const defaultLocation = { lat: 22.9734, lng: 78.6569 };
-            
             map = new google.maps.Map(document.getElementById('map'), {
                 center: defaultLocation,
                 zoom: 5,
@@ -437,34 +413,23 @@
             finalPinLocation = defaultLocation;
             updateCoordinatesDisplay();
 
-            map.addListener('click', e => {
-                setMarkerPosition(e.latLng, false);
-            });
-            
-            marker.addListener('dragend', e => {
-                setMarkerPosition(e.latLng, false);
-                showSuccess('Pin location updated');
-            });
-            
-            marker.addListener('drag', e => {
-                finalPinLocation = { lat: e.latLng.lat(), lng: e.latLng.lng() };
-                updateCoordinatesDisplay();
-            });
-            
+            map.addListener('click', e => setMarkerPosition(e.latLng, false));
+            marker.addListener('dragend', e => { setMarkerPosition(e.latLng, false); showSuccess('Pin location updated'); });
+            marker.addListener('drag', e => { finalPinLocation = { lat: e.latLng.lat(), lng: e.latLng.lng() }; updateCoordinatesDisplay(); });
+
             setTimeout(() => window.getLocation(), 500);
         };
 
         function setMarkerPosition(latLng, isInitialDetection = false) {
             finalPinLocation = { lat: latLng.lat(), lng: latLng.lng() };
-            marker.setPosition(latLng);
-            map.panTo(latLng);
+            if (marker) marker.setPosition(latLng);
+            if (map) map.panTo(latLng);
             updateCoordinatesDisplay();
-            
+
             new google.maps.Geocoder().geocode({ location: latLng }, (results, status) => {
                 if (status === 'OK' && results[0]) {
                     const c = results[0].address_components;
                     let city = '', pin = '', addr = '', area = '', state = '';
-                    
                     c.forEach(comp => {
                         const t = comp.types;
                         if (t.includes('locality') || t.includes('administrative_area_level_2')) city = comp.long_name;
@@ -473,15 +438,11 @@
                         if (t.includes('route')) addr = comp.long_name;
                         if (t.includes('administrative_area_level_1')) state = comp.long_name;
                     });
-                    
                     if (city) document.getElementById('city').value = city;
                     if (pin) document.getElementById('pincode').value = pin;
                     if (addr || area) document.getElementById('address').value = [addr, area].filter(Boolean).join(', ');
                     if (state) document.getElementById('landmark').value = `Near ${area || city}, ${state}`;
-                    
-                    if (!isInitialDetection) {
-                        showSuccess('Address updated from pin location');
-                    }
+                    if (!isInitialDetection) showSuccess('Address updated from pin location');
                 }
             });
         }
@@ -490,12 +451,15 @@
             alert('Location Detection Help:\n\n1. Allow location permission when prompted\n2. DRAG the red marker to your EXACT delivery location\n3. You can also tap anywhere on the map\n4. The coordinates shown below the map are what will be saved\n5. Make sure to position the pin at your exact address');
         };
 
+        /********** Auth & initial load **********/
         onAuthStateChanged(auth, user => {
             if (user) {
                 currentUser = user;
                 loadGoogleMaps();
                 loadCart();
                 loadSavedAddresses();
+                // pre-select COD as requested
+                selectPayment('cod');
             } else {
                 window.location.href = 'index.html';
             }
@@ -513,20 +477,14 @@
         function loadCart() {
             try {
                 const savedCart = localStorage.getItem('midnightPlazaCart');
-                if (savedCart) {
-                    cart = JSON.parse(savedCart);
-                }
-            } catch (error) {
-                console.error('Error loading cart from localStorage:', error);
-                cart = [];
-            }
+                if (savedCart) cart = JSON.parse(savedCart);
+            } catch (error) { console.error('Error loading cart from localStorage:', error); cart = []; }
             renderCart();
         }
 
         function renderCart() {
             const content = document.getElementById('cartContent');
             const sections = document.getElementById('checkoutSections');
-            
             if (!cart.length) {
                 content.innerHTML = `
                     <div class="empty-cart">
@@ -538,7 +496,6 @@
                 sections.style.display = 'none';
                 return;
             }
-
             sections.style.display = 'block';
             const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
             const delivery = 40, total = subtotal + delivery;
@@ -585,26 +542,40 @@
         };
 
         function saveCart() {
-            try {
-                localStorage.setItem('midnightPlazaCart', JSON.stringify(cart));
-            } catch (error) {
-                console.error('Error saving cart to localStorage:', error);
-            }
+            try { localStorage.setItem('midnightPlazaCart', JSON.stringify(cart)); } catch (error) { console.error('Error saving cart to localStorage:', error); }
         }
 
+        /********** Saved addresses loading and rendering **********/
         async function loadSavedAddresses() {
             if (!currentUser) return;
             try {
                 const snap = await get(ref(db, `users/${currentUser.uid}/addresses`));
+                savedAddresses = [];
                 if (snap.exists()) {
-                    savedAddresses = [];
                     snap.forEach(child => savedAddresses.push({ id: child.key, ...child.val() }));
-                    if (savedAddresses.length) selectSavedAddress(savedAddresses[0].id, true);
-                    else showAddressModal();
-                } else showAddressModal();
+                }
+                // ensure consistent ordering (by createdAt if present)
+                savedAddresses.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                // Set selected address (prefer previously selected, else first in list)
+                if (savedAddresses.length) {
+                    if (!selectedAddressId) {
+                        selectedAddressId = savedAddresses[0].id;
+                    }
+                    deliveryAddress = savedAddresses.find(a => a.id === selectedAddressId) || savedAddresses[0];
+                } else {
+                    deliveryAddress = null;
+                    selectedAddressId = null;
+                }
+
+                renderAddressDisplay();
+                renderInlineAddresses(); // show inline list on checkout page
             } catch (e) {
                 console.error('Load addresses error:', e);
-                showAddressModal();
+                // fallback: show modal to add address
+                deliveryAddress = null;
+                selectedAddressId = null;
+                renderAddressDisplay();
             }
         }
 
@@ -614,13 +585,13 @@
                 area.innerHTML = '<button class="btn-secondary" onclick="showAddressModal()">+ Add Delivery Address</button>';
                 return;
             }
-            
-            const serviceableIndicator = deliveryAddress.serviceable === false ? 
+
+            const serviceableIndicator = deliveryAddress.serviceable === false ?
                 '<div style="margin-top:0.5rem;padding:0.5rem;background:#fff3cd;border-left:4px solid #ffc107;border-radius:4px;font-size:0.8rem;color:#856404;">⚠️ This address is out of service area</div>' : '';
-            
-            const coords = deliveryAddress.coordinates ? 
+
+            const coords = deliveryAddress.coordinates ?
                 `<div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--non-photo-blue);font-size:0.8rem;color:#666;">📍 ${deliveryAddress.coordinates.lat.toFixed(6)}, ${deliveryAddress.coordinates.lng.toFixed(6)}</div>` : '';
-            
+
             area.innerHTML = `
                 <div class="address-display-card">
                     <div class="address-display-header">
@@ -638,6 +609,48 @@
                 </div>`;
         }
 
+        // Render inline list of saved addresses on checkout page (so user can pick without opening modal)
+        function renderInlineAddresses() {
+            const container = document.getElementById('inlineAddressesList');
+            if (!container) return;
+            if (!savedAddresses.length) {
+                container.innerHTML = `<div style="margin-top:0.5rem;"><small style="color:#666;">No saved addresses. <button class="btn-secondary" onclick="showAddressModal()" style="display:inline-block;margin-top:6px;">Add Address</button></small></div>`;
+                return;
+            }
+
+            container.innerHTML = savedAddresses.map((a, i) => {
+                const coords = a.coordinates ? `<br><small style="color:#999;">📍 ${a.coordinates.lat.toFixed(4)}, ${a.coordinates.lng.toFixed(4)}</small>` : '';
+                const serviceableWarning = a.serviceable === false ? '<br><small style="color:#dc3545;">⚠️ Out of service area</small>' : '';
+                const selectedClass = selectedAddressId === a.id ? 'selected' : '';
+                const defaultBadge = i === 0 ? '<span class="default-badge">Default</span>' : '';
+                return `
+                    <div class="address-card ${selectedClass}" data-addr-id="${a.id}">
+                        <div class="address-card-header">
+                            <div>
+                                <div class="address-name">${a.fullName}</div>
+                                <div class="address-phone">${a.phone}</div>
+                            </div>
+                            ${defaultBadge}
+                        </div>
+                        <div class="address-details">
+                            ${a.streetAddress || a.address}<br>
+                            ${a.city}, ${a.pincode}
+                            ${a.landmark ? `<br>Landmark: ${a.landmark}` : ''}${coords}${serviceableWarning}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Attach click listeners (avoid inline event hassles)
+            container.querySelectorAll('.address-card').forEach(card => {
+                card.onclick = () => {
+                    const id = card.getAttribute('data-addr-id');
+                    selectSavedAddress(id, false, false); // don't close modal (we're inline)
+                };
+            });
+        }
+
+        // Render addresses inside modal (existing UX)
         function renderSavedAddresses() {
             const list = document.getElementById('savedAddressesList');
             const form = document.getElementById('addressFormContainer');
@@ -655,9 +668,8 @@
             cards.innerHTML = savedAddresses.map((a, i) => {
                 const coords = a.coordinates ? `<br><small style="color:#999;">📍 ${a.coordinates.lat.toFixed(4)}, ${a.coordinates.lng.toFixed(4)}</small>` : '';
                 const serviceableWarning = a.serviceable === false ? '<br><small style="color:#dc3545;">⚠️ Out of service area</small>' : '';
-                
                 return `
-                    <div class="address-card ${selectedAddressId === a.id ? 'selected' : ''} ${a.serviceable === false ? 'out-of-service' : ''}" onclick="selectSavedAddress('${a.id}')" style="${a.serviceable === false ? 'opacity: 0.7; border-color: #ffc107;' : ''}">
+                    <div class="address-card ${selectedAddressId === a.id ? 'selected' : ''}" onclick="selectSavedAddress('${a.id}', false, true)" style="${a.serviceable === false ? 'opacity: 0.85; border-color: #ffc107;' : ''}">
                         <div class="address-card-header">
                             <div>
                                 <div class="address-name">${a.fullName}</div>
@@ -677,14 +689,23 @@
             }).join('');
         }
 
-        window.selectSavedAddress = (id, auto = false) => {
+        /**
+         * Select an address by id.
+         * @param {string} id
+         * @param {boolean} auto - was it automatic on load? if true we avoid closing modal
+         * @param {boolean} closeModal - whether to close modal after selection (for modal use)
+         */
+        window.selectSavedAddress = (id, auto = false, closeModal = false) => {
             selectedAddressId = id;
-            deliveryAddress = savedAddresses.find(a => a.id === id);
+            deliveryAddress = savedAddresses.find(a => a.id === id) || null;
+            // update displays
             renderAddressDisplay();
-            if (!auto) {
-                document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
-                event.currentTarget.classList.add('selected');
-                setTimeout(closeAddressModal, 300);
+            renderInlineAddresses();
+            renderSavedAddresses(); // update modal selection visuals if open
+
+            // close modal if requested (modal selection)
+            if (!auto && closeModal) {
+                setTimeout(() => closeAddressModal(), 250);
             }
         };
 
@@ -696,10 +717,14 @@
                 if (selectedAddressId === id) {
                     selectedAddressId = null;
                     deliveryAddress = null;
-                    if (savedAddresses.length) selectSavedAddress(savedAddresses[0].id, true);
-                    else renderAddressDisplay();
+                    if (savedAddresses.length) {
+                        selectedAddressId = savedAddresses[0].id;
+                        deliveryAddress = savedAddresses[0];
+                    }
                 }
                 renderSavedAddresses();
+                renderInlineAddresses();
+                renderAddressDisplay();
                 showSuccess('Address deleted');
             } catch (e) {
                 console.error('Delete error:', e);
@@ -738,7 +763,7 @@
             initialLocationDetected = false;
             const defaultLocation = { lat: 22.9734, lng: 78.6569 };
             finalPinLocation = defaultLocation;
-            
+
             setTimeout(() => {
                 if (map) {
                     google.maps.event.trigger(map, 'resize');
@@ -758,6 +783,7 @@
             }
         };
 
+        /********** save new address logic (unchanged) **********/
         window.saveAndSelectAddress = async () => {
             const name = document.getElementById('fullName').value.trim();
             const phone = document.getElementById('phone').value.trim();
@@ -770,10 +796,7 @@
             if (!name || !phone || !addr || !city || !pin) return showError('Fill all required fields');
             if (!/^[0-9]{10}$/.test(phone)) return showError('Enter valid 10-digit phone');
             if (!/^[0-9]{6}$/.test(pin)) return showError('Enter valid 6-digit pincode');
-
-            if (!finalPinLocation) {
-                return showError('Please set your location on the map');
-            }
+            if (!finalPinLocation) return showError('Please set your location on the map');
 
             const btn = document.getElementById('deliverHereBtn');
             const btnText = document.getElementById('deliverHereBtnText');
@@ -784,72 +807,54 @@
             try {
                 const pincodeRef = ref(db, `servicepincodes/${pin}`);
                 const pincodeSnap = await get(pincodeRef);
-                
+
                 if (!pincodeSnap.exists() || pincodeSnap.val() !== true) {
-                    deliveryAddress = { 
-                        fullName: name, 
-                        phone, 
-                        streetAddress: addr, 
-                        city, 
-                        pincode: pin, 
-                        landmark, 
-                        coordinates: finalPinLocation
-                    };
-                    
-                    console.log('Saving coordinates:', finalPinLocation);
-                    
+                    deliveryAddress = { fullName: name, phone, streetAddress: addr, city, pincode: pin, landmark, coordinates: finalPinLocation };
+
                     if (save && currentUser) {
                         try {
                             const newRef = push(ref(db, `users/${currentUser.uid}/addresses`));
                             await set(newRef, { ...deliveryAddress, createdAt: Date.now(), serviceable: false });
-                            savedAddresses.push({ id: newRef.key, ...deliveryAddress, serviceable: false });
-                        } catch (e) {
-                            console.error('Save error:', e);
-                        }
+                            savedAddresses.unshift({ id: newRef.key, ...deliveryAddress, serviceable: false });
+                        } catch (e) { console.error('Save error:', e); }
                     }
-                    
+
                     btn.disabled = false;
                     btn.classList.remove('processing');
                     btnText.textContent = '📍 Deliver Here';
                     showToast('error', '⚠️ Out of Service Area', 'Pincode is out of service area. Please try another address.');
-                    
+
                     setTimeout(() => {
                         const toast = document.getElementById('toast');
                         const overlay = document.getElementById('toastOverlay');
                         toast.classList.remove('show');
                         overlay.classList.remove('show');
                     }, 5000);
-                    
+
+                    renderInlineAddresses();
+                    renderSavedAddresses();
+                    renderAddressDisplay();
                     return;
                 }
 
                 btnText.textContent = '⏳ Saving...';
-                deliveryAddress = { 
-                    fullName: name, 
-                    phone, 
-                    streetAddress: addr, 
-                    city, 
-                    pincode: pin, 
-                    landmark, 
-                    coordinates: finalPinLocation,
-                    serviceable: true 
-                };
-
-                console.log('Saving serviceable address coordinates:', finalPinLocation);
+                deliveryAddress = { fullName: name, phone, streetAddress: addr, city, pincode: pin, landmark, coordinates: finalPinLocation, serviceable: true };
 
                 if (save && currentUser) {
                     try {
                         const newRef = push(ref(db, `users/${currentUser.uid}/addresses`));
                         await set(newRef, { ...deliveryAddress, createdAt: Date.now() });
-                        savedAddresses.push({ id: newRef.key, ...deliveryAddress });
+                        savedAddresses.unshift({ id: newRef.key, ...deliveryAddress });
                         selectedAddressId = newRef.key;
-                        
+
                         btnText.textContent = '✅ Saved!';
                         btn.style.background = '#60b246';
-                        
+
                         setTimeout(() => {
                             showSuccess('Address saved successfully');
                             renderAddressDisplay();
+                            renderInlineAddresses();
+                            renderSavedAddresses();
                             closeAddressModal();
                             btn.disabled = false;
                             btn.classList.remove('processing');
@@ -866,9 +871,10 @@
                 } else {
                     btnText.textContent = '✅ Selected!';
                     btn.style.background = '#60b246';
-                    
+
                     setTimeout(() => {
                         renderAddressDisplay();
+                        renderInlineAddresses();
                         closeAddressModal();
                         btn.disabled = false;
                         btn.classList.remove('processing');
@@ -885,11 +891,14 @@
             }
         };
 
+        /********** Payment selection and order placement **********/
         window.selectPayment = method => {
             selectedPayment = method;
             document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
-            document.getElementById(method).checked = true;
-            document.getElementById(method).closest('.payment-option').classList.add('selected');
+            const radio = document.getElementById(method);
+            if (radio) radio.checked = true;
+            const optionEl = method === 'cod' ? document.getElementById('paymentCodOption') : document.getElementById('paymentOnlineOption');
+            if (optionEl) optionEl.classList.add('selected');
             const btn = document.getElementById('placeOrderBtn');
             btn.disabled = false;
             btn.textContent = method === 'cod' ? 'Place Order (COD)' : 'Pay Now';
@@ -922,7 +931,7 @@
                 name: 'Midnight Plaza',
                 description: 'Food Order',
                 handler: async res => await placeOrder('online', res.razorpay_payment_id),
-                prefill: { name: deliveryAddress.fullName, email: currentUser.email, contact: deliveryAddress.phone },
+                prefill: { name: deliveryAddress.fullName, email: currentUser?.email || '', contact: deliveryAddress.phone },
                 theme: { color: '#fdc921' },
                 modal: { ondismiss: () => showError('Payment cancelled') }
             }).open();
@@ -940,11 +949,9 @@
             const total = subtotal + 40;
 
             try {
-                console.log('Order coordinates being saved:', deliveryAddress.coordinates);
-                
                 await push(ref(db, 'orders'), {
                     userId: currentUser.uid,
-                    userEmail: currentUser.email,
+                    userEmail: currentUser.email || '',
                     items: cart,
                     subtotal, deliveryFee: 40, total,
                     deliveryAddress: {
@@ -975,6 +982,7 @@
             }
         }
 
+        /********** UI helpers **********/
         function showToast(type, msg, sub) {
             const toast = document.getElementById('toast');
             const overlay = document.getElementById('toastOverlay');
@@ -982,7 +990,7 @@
             overlay.classList.add('show');
             document.getElementById('toastIcon').textContent = type === 'success' ? '✅' : '❌';
             document.getElementById('toastMessage').textContent = msg;
-            document.getElementById('toastSubMessage').textContent = sub;
+            document.getElementById('toastSubMessage').textContent = sub || '';
             if (type === 'error') setTimeout(() => { toast.classList.remove('show'); overlay.classList.remove('show'); }, 3000);
         }
 
@@ -1027,6 +1035,13 @@
                 }
             }
         };
+
+        // ensure COD is selected on load (default)
+        window.addEventListener('load', () => {
+            // if auth already set will re-invoke selectPayment in onAuthStateChanged,
+            // but this sets UI early for clarity.
+            selectPayment('cod');
+        });
     </script>
 </body>
 </html>
