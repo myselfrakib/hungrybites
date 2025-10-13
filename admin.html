@@ -228,6 +228,182 @@
             font-weight: 700;
         }
 
+        /* Users Tab Styles */
+        .users-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            text-align: center;
+            border-left: 4px solid #3498db;
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .users-search {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.9rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #2c3e50;
+            box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+        }
+
+        .users-table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table thead {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+        }
+
+        .users-table th {
+            padding: 1.2rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .users-table td {
+            padding: 1.2rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .users-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.2rem;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .user-phone {
+            color: #555;
+        }
+
+        .user-date {
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .verified-badge.verified {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .verified-badge.not-verified {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-view {
+            padding: 0.5rem 1rem;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .btn-view:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+
         /* Orders Styles */
         .orders-filter {
             display: flex;
@@ -277,33 +453,13 @@
             transform: translateY(-2px);
         }
 
-        .order-card.pending {
-            border-left-color: #f39c12;
-        }
-
-        .order-card.confirmed {
-            border-left-color: #3498db;
-        }
-
-        .order-card.cooking {
-            border-left-color: #e67e22;
-        }
-
-        .order-card.packing {
-            border-left-color: #9b59b6;
-        }
-
-        .order-card.out-for-delivery {
-            border-left-color: #1abc9c;
-        }
-
-        .order-card.delivered {
-            border-left-color: #27ae60;
-        }
-
-        .order-card.rejected {
-            border-left-color: #e74c3c;
-        }
+        .order-card.pending { border-left-color: #f39c12; }
+        .order-card.confirmed { border-left-color: #3498db; }
+        .order-card.cooking { border-left-color: #e67e22; }
+        .order-card.packing { border-left-color: #9b59b6; }
+        .order-card.out-for-delivery { border-left-color: #1abc9c; }
+        .order-card.delivered { border-left-color: #27ae60; }
+        .order-card.rejected { border-left-color: #e74c3c; }
 
         .order-header {
             display: flex;
@@ -328,40 +484,13 @@
             text-transform: uppercase;
         }
 
-        .order-status.pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .order-status.confirmed {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .order-status.cooking {
-            background: #ffe5d0;
-            color: #8a4f2d;
-        }
-
-        .order-status.packing {
-            background: #e8daef;
-            color: #5b2c6f;
-        }
-
-        .order-status.out-for-delivery {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .order-status.delivered {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .order-status.rejected {
-            background: #f8d7da;
-            color: #721c24;
-        }
+        .order-status.pending { background: #fff3cd; color: #856404; }
+        .order-status.confirmed { background: #d1ecf1; color: #0c5460; }
+        .order-status.cooking { background: #ffe5d0; color: #8a4f2d; }
+        .order-status.packing { background: #e8daef; color: #5b2c6f; }
+        .order-status.out-for-delivery { background: #d4edda; color: #155724; }
+        .order-status.delivered { background: #d4edda; color: #155724; }
+        .order-status.rejected { background: #f8d7da; color: #721c24; }
 
         .order-time {
             font-size: 0.9rem;
@@ -477,45 +606,14 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        .btn-accept {
-            background: #27ae60;
-            color: white;
-        }
-
-        .btn-reject {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .btn-cooking {
-            background: #e67e22;
-            color: white;
-        }
-
-        .btn-packing {
-            background: #9b59b6;
-            color: white;
-        }
-
-        .btn-delivery {
-            background: #1abc9c;
-            color: white;
-        }
-
-        .btn-delivered {
-            background: #27ae60;
-            color: white;
-        }
-
-        .btn-directions {
-            background: #3498db;
-            color: white;
-        }
-
-        .btn-call {
-            background: #16a085;
-            color: white;
-        }
+        .btn-accept { background: #27ae60; color: white; }
+        .btn-reject { background: #e74c3c; color: white; }
+        .btn-cooking { background: #e67e22; color: white; }
+        .btn-packing { background: #9b59b6; color: white; }
+        .btn-delivery { background: #1abc9c; color: white; }
+        .btn-delivered { background: #27ae60; color: white; }
+        .btn-directions { background: #3498db; color: white; }
+        .btn-call { background: #16a085; color: white; }
 
         .store-control-panel {
             background: white;
@@ -980,6 +1078,33 @@
             font-size: 1.1rem;
         }
 
+        /* User Details Modal */
+        .user-detail-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .user-detail-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .user-detail-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+        }
+
+        .user-detail-value {
+            color: #2c3e50;
+            font-size: 1rem;
+        }
+
+        /* Responsive Design */
         @media (min-width: 640px) {
             .form-row {
                 grid-template-columns: repeat(2, 1fr);
@@ -1058,6 +1183,14 @@
             .orders-grid {
                 grid-template-columns: 1fr;
             }
+
+            .users-table-container {
+                overflow-x: auto;
+            }
+
+            .users-table {
+                min-width: 800px;
+            }
         }
     </style>
 </head>
@@ -1084,6 +1217,9 @@
         <div class="mobile-menu-item active" onclick="switchTab('orders')">
             📦 Orders
         </div>
+        <div class="mobile-menu-item" onclick="switchTab('users')">
+            👥 Users
+        </div>
         <div class="mobile-menu-item" onclick="switchTab('store')">
             🏪 Store Control
         </div>
@@ -1100,6 +1236,7 @@
     <div class="container">
         <div class="tabs">
             <div class="tab active" onclick="switchTab('orders')">📦 Orders</div>
+            <div class="tab" onclick="switchTab('users')">👥 Users</div>
             <div class="tab" onclick="switchTab('store')">🏪 Store Control</div>
             <div class="tab" onclick="switchTab('food')">🍕 Manage Menu</div>
             <div class="tab" onclick="switchTab('menu')">📋 Menu Status</div>
@@ -1123,6 +1260,54 @@
                     <div class="empty-state-icon">⏳</div>
                     <div class="empty-state-text">Loading orders...</div>
                 </div>
+            </div>
+        </div>
+
+        <div id="usersTab" class="tab-content">
+            <h2 class="section-title">Users Management</h2>
+            
+            <div class="users-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-value" id="totalUsers">0</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #27ae60;">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value" id="verifiedUsers">0</div>
+                    <div class="stat-label">Verified Users</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #e74c3c;">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-value" id="unverifiedUsers">0</div>
+                    <div class="stat-label">Unverified Users</div>
+                </div>
+            </div>
+
+            <div class="users-search">
+                <input type="text" class="search-input" id="userSearch" placeholder="🔍 Search users by name, email, or phone..." oninput="searchUsers()">
+            </div>
+
+            <div class="users-table-container">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Phone</th>
+                            <th>Joined</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 2rem;">
+                                <div class="empty-state-icon">⏳</div>
+                                <div class="empty-state-text">Loading users...</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -1259,6 +1444,16 @@
         </div>
     </div>
 
+    <div id="userDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">User Details</h3>
+                <button class="modal-close" onclick="closeUserModal()">&times;</button>
+            </div>
+            <div id="userDetailsContent"></div>
+        </div>
+    </div>
+
     <div id="notification" class="notification"></div>
 
     <script type="module">
@@ -1285,6 +1480,7 @@
         let currentEditCategory = null;
         let isAdmin = false;
         let allOrders = {};
+        let allUsers = {};
         let currentFilter = 'all';
 
         // Check authentication
@@ -1294,7 +1490,6 @@
                 return;
             }
 
-            // Check if user is admin
             try {
                 const adminRef = ref(db, `admins/${user.uid}`);
                 const adminSnapshot = await get(adminRef);
@@ -1317,7 +1512,6 @@
             }
         });
 
-        // Predefined categories
         const CATEGORIES = {
             'Sandwiches': '🥪',
             'Noodles': '🍜',
@@ -1326,6 +1520,176 @@
             'Packet Items': '📦',
             'Beverages': '🍺',
             'Cigarettes': '🚬'
+        };
+
+        // Load users
+        function loadUsers() {
+            const usersRef = ref(db, 'users');
+            onValue(usersRef, (snapshot) => {
+                allUsers = {};
+                const usersData = snapshot.val() || {};
+                
+                Object.keys(usersData).forEach(uid => {
+                    if (usersData[uid].allDetails) {
+                        allUsers[uid] = usersData[uid].allDetails;
+                    }
+                });
+                
+                displayUsers();
+                updateUserStats();
+            }, (error) => {
+                console.error('Error loading users:', error);
+                showNotification('Error loading users', true);
+            });
+        }
+
+        // Display users
+        function displayUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            const userKeys = Object.keys(allUsers);
+            
+            if (userKeys.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem;">
+                            <div class="empty-state-icon">📭</div>
+                            <div class="empty-state-text">No users registered yet</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            userKeys.forEach(uid => {
+                const user = allUsers[uid];
+                const row = createUserRow(user, uid);
+                tbody.appendChild(row);
+            });
+        }
+
+        // Create user row
+        function createUserRow(user, uid) {
+            const row = document.createElement('tr');
+            const joinedDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A';
+            const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?';
+            const isVerified = user.verified !== false;
+            
+            row.innerHTML = `
+                <td>
+                    <div class="user-info">
+                        <div class="user-avatar">${initials}</div>
+                        <div class="user-details">
+                            <div class="user-name">${user.name || 'N/A'}</div>
+                            <div class="user-email">${user.email || 'N/A'}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="user-phone">${user.phoneNumber || 'N/A'}</td>
+                <td class="user-date">${joinedDate}</td>
+                <td>
+                    <span class="verified-badge ${isVerified ? 'verified' : 'not-verified'}">
+                        ${isVerified ? '✅ Verified' : '⏳ Unverified'}
+                    </span>
+                </td>
+                <td>
+                    <div class="user-actions">
+                        <button class="btn-view" onclick="viewUserDetails('${uid}')">View Details</button>
+                    </div>
+                </td>
+            `;
+            
+            return row;
+        }
+
+        // Update user stats
+        function updateUserStats() {
+            const total = Object.keys(allUsers).length;
+            const verified = Object.values(allUsers).filter(u => u.verified !== false).length;
+            const unverified = total - verified;
+            
+            document.getElementById('totalUsers').textContent = total;
+            document.getElementById('verifiedUsers').textContent = verified;
+            document.getElementById('unverifiedUsers').textContent = unverified;
+        }
+
+        // Search users
+        window.searchUsers = function() {
+            const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+            const tbody = document.getElementById('usersTableBody');
+            const userKeys = Object.keys(allUsers);
+            
+            const filteredUsers = userKeys.filter(uid => {
+                const user = allUsers[uid];
+                return (user.name && user.name.toLowerCase().includes(searchTerm)) ||
+                       (user.email && user.email.toLowerCase().includes(searchTerm)) ||
+                       (user.phoneNumber && user.phoneNumber.includes(searchTerm));
+            });
+            
+            if (filteredUsers.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem;">
+                            <div class="empty-state-icon">🔍</div>
+                            <div class="empty-state-text">No users found matching "${searchTerm}"</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            filteredUsers.forEach(uid => {
+                const user = allUsers[uid];
+                const row = createUserRow(user, uid);
+                tbody.appendChild(row);
+            });
+        };
+
+        // View user details
+        window.viewUserDetails = function(uid) {
+            const user = allUsers[uid];
+            const modal = document.getElementById('userDetailsModal');
+            const content = document.getElementById('userDetailsContent');
+            
+            const joinedDate = user.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A';
+            
+            content.innerHTML = `
+                <div class="user-detail-section">
+                    <div class="user-detail-label">User ID</div>
+                    <div class="user-detail-value">${uid}</div>
+                </div>
+                <div class="user-detail-section">
+                    <div class="user-detail-label">Full Name</div>
+                    <div class="user-detail-value">${user.name || 'N/A'}</div>
+                </div>
+                <div class="user-detail-section">
+                    <div class="user-detail-label">Email Address</div>
+                    <div class="user-detail-value">${user.email || 'N/A'}</div>
+                </div>
+                <div class="user-detail-section">
+                    <div class="user-detail-label">Phone Number</div>
+                    <div class="user-detail-value">${user.phoneNumber || 'N/A'}</div>
+                </div>
+                <div class="user-detail-section">
+                    <div class="user-detail-label">Verification Status</div>
+                    <div class="user-detail-value">
+                        <span class="verified-badge ${user.verified !== false ? 'verified' : 'not-verified'}">
+                            ${user.verified !== false ? '✅ Verified' : '⏳ Unverified'}
+                        </span>
+                    </div>
+                </div>
+                <div class="user-detail-section">
+                    <div class="user-detail-label">Joined Date</div>
+                    <div class="user-detail-value">${joinedDate}</div>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        };
+
+        window.closeUserModal = function() {
+            document.getElementById('userDetailsModal').classList.remove('active');
         };
 
         // Load orders
@@ -1355,7 +1719,6 @@
                 return;
             }
 
-            // Filter orders
             const filteredOrders = orderKeys.filter(orderId => {
                 const order = allOrders[orderId];
                 if (currentFilter === 'all') return true;
@@ -1372,7 +1735,6 @@
                 return;
             }
 
-            // Sort by creation date (newest first)
             filteredOrders.sort((a, b) => {
                 const orderA = allOrders[a];
                 const orderB = allOrders[b];
@@ -1432,7 +1794,6 @@
                 `;
             }
 
-            // Add directions and call buttons for non-rejected orders
             if (status !== 'rejected' && status !== 'delivered' && order.deliveryAddress && order.deliveryAddress.coordinates) {
                 actionsHtml += `
                     <button class="action-btn btn-directions" onclick="openDirections(${order.deliveryAddress.coordinates.lat}, ${order.deliveryAddress.coordinates.lng})">
@@ -1827,7 +2188,6 @@
             }
 
             try {
-                // Ensure category exists with emoji
                 const categoryRef = ref(db, `foodItems/${categoryName}`);
                 const categorySnapshot = await get(categoryRef);
                 
@@ -1835,7 +2195,6 @@
                     await set(ref(db, `foodItems/${categoryName}/emoji`), categoryEmoji);
                 }
 
-                // Add the item under the category
                 const itemRef = push(ref(db, `foodItems/${categoryName}`));
                 await set(itemRef, {
                     name: name,
@@ -1918,7 +2277,6 @@
                 const oldItem = oldItemSnapshot.val();
 
                 if (newCategoryName !== currentEditCategory) {
-                    // Ensure new category exists
                     const newCategoryRef = ref(db, `foodItems/${newCategoryName}`);
                     const newCategorySnapshot = await get(newCategoryRef);
                     
@@ -1926,10 +2284,8 @@
                         await set(ref(db, `foodItems/${newCategoryName}/emoji`), newCategoryEmoji);
                     }
                     
-                    // Remove from old category
                     await remove(oldItemRef);
                     
-                    // Add to new category
                     await set(ref(db, `foodItems/${newCategoryName}/${currentEditId}`), {
                         name: name,
                         price: price,
@@ -1941,7 +2297,6 @@
                         updatedAt: new Date().toISOString()
                     });
                 } else {
-                    // Update in same category
                     await update(oldItemRef, {
                         name: name,
                         price: price,
@@ -2089,12 +2444,9 @@
 
         // Initialize
         loadOrders();
+        loadUsers();
         loadStoreStatus();
         loadFoodItems();
     </script>
 </body>
 </html>
-
-
-
-
