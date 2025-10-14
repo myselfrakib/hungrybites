@@ -12,6 +12,7 @@
             --baby-powder: #fffdf7;
             --non-photo-blue: #99d6ea;
             --blue-gray: #6798c0;
+            --success-green: #60b246;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--baby-powder); color: #333; padding-bottom: 2rem; }
@@ -46,7 +47,20 @@
         .remove-btn:active { transform: scale(0.95); }
         .cart-summary { margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #eee; }
         .summary-row { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: clamp(0.9rem, 2.5vw, 1rem); }
-        .summary-row.subtotal, .summary-row.delivery { color: #666; }
+        .summary-row.subtotal { color: #666; }
+        .summary-row.delivery { color: #666; position: relative; }
+        .summary-row.delivery.free { color: var(--success-green); font-weight: 600; }
+        .summary-row.delivery.free .delivery-value { text-decoration: line-through; color: #999; margin-right: 0.5rem; }
+        .free-delivery-banner { background: linear-gradient(135deg, var(--success-green) 0%, #4a9635 100%); color: white; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; text-align: center; font-weight: 600; font-size: 0.9rem; display: none; animation: slideDown 0.4s ease-out; }
+        .free-delivery-banner.show { display: block; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .delivery-progress { background: #f0f0f0; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem; display: none; }
+        .delivery-progress.show { display: block; }
+        .delivery-progress-text { font-size: 0.85rem; color: #666; margin-bottom: 0.5rem; text-align: center; }
+        .delivery-progress-text strong { color: var(--sunglow); }
+        .progress-bar-container { background: #ddd; height: 8px; border-radius: 10px; overflow: hidden; position: relative; }
+        .progress-bar-fill { background: linear-gradient(90deg, var(--sunglow), var(--mustard)); height: 100%; border-radius: 10px; transition: width 0.5s ease; position: relative; }
+        .progress-bar-fill::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: shimmer 1.5s infinite; }
         .cart-total { display: flex; justify-content: space-between; font-size: clamp(1.3rem, 4vw, 1.5rem); font-weight: bold; color: var(--blue-gray); margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #eee; }
         .section-title { font-size: clamp(1.1rem, 3vw, 1.3rem); font-weight: 600; color: #333; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
         .address-display-card { border: 2px solid var(--non-photo-blue); border-radius: 10px; padding: 0.9rem; background: #f0f9ff; }
@@ -302,6 +316,12 @@
         let finalPinLocation = null;
         let initialLocationDetected = false;
         const RAZORPAY_KEY = 'rzp_test_your_key_here';
+        const FREE_DELIVERY_THRESHOLD = 200;
+        const DELIVERY_FEE = 40;
+
+        function calculateDeliveryFee(subtotal) {
+            return subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
+        }
 
         function updateCoordinatesDisplay() {
             if (finalPinLocation) {
@@ -554,9 +574,38 @@
 
             sections.style.display = 'block';
             const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-            const delivery = 40, total = subtotal + delivery;
+            const deliveryFee = calculateDeliveryFee(subtotal);
+            const total = subtotal + deliveryFee;
+            const isFreeDelivery = deliveryFee === 0;
+            const amountNeeded = FREE_DELIVERY_THRESHOLD - subtotal;
+            const progressPercent = Math.min((subtotal / FREE_DELIVERY_THRESHOLD) * 100, 100);
 
-            content.innerHTML = cart.map((item, i) => `
+            let deliveryBannerHTML = '';
+            let deliveryProgressHTML = '';
+
+            if (isFreeDelivery) {
+                deliveryBannerHTML = `
+                    <div class="free-delivery-banner show">
+                        🎉 Yay! You've unlocked FREE Delivery!
+                    </div>`;
+            } else if (amountNeeded > 0) {
+                deliveryProgressHTML = `
+                    <div class="delivery-progress show">
+                        <div class="delivery-progress-text">
+                            Add items worth <strong>₹${amountNeeded}</strong> more for FREE delivery! 🚚
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" style="width: ${progressPercent}%"></div>
+                        </div>
+                    </div>`;
+            }
+
+            const deliveryRowClass = isFreeDelivery ? 'summary-row delivery free' : 'summary-row delivery';
+            const deliveryText = isFreeDelivery 
+                ? `<span>Delivery Fee</span><span><span class="delivery-value">₹${DELIVERY_FEE}</span> <strong style="color: var(--success-green);">FREE</strong></span>`
+                : `<span>Delivery Fee</span><span>₹${deliveryFee}</span>`;
+
+            content.innerHTML = deliveryBannerHTML + deliveryProgressHTML + cart.map((item, i) => `
                 <div class="cart-item">
                     <div class="cart-item-header">
                         <div class="cart-item-details">
@@ -577,7 +626,7 @@
             `).join('') + `
                 <div class="cart-summary">
                     <div class="summary-row subtotal"><span>Subtotal</span><span>₹${subtotal}</span></div>
-                    <div class="summary-row delivery"><span>Delivery Fee</span><span>₹${delivery}</span></div>
+                    <div class="${deliveryRowClass}">${deliveryText}</div>
                     <div class="cart-total"><span>Total</span><span>₹${total}</span></div>
                 </div>`;
         }
@@ -990,7 +1039,8 @@
 
         async function initiateRazorpay() {
             const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-            const total = subtotal + 40;
+            const deliveryFee = calculateDeliveryFee(subtotal);
+            const total = subtotal + deliveryFee;
 
             new Razorpay({
                 key: RAZORPAY_KEY,
@@ -1014,14 +1064,18 @@
             btn.disabled = true;
 
             const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-            const total = subtotal + 40;
+            const deliveryFee = calculateDeliveryFee(subtotal);
+            const total = subtotal + deliveryFee;
 
             try {
                 await push(ref(db, 'orders'), {
                     userId: currentUser.uid,
                     userEmail: currentUser.email,
                     items: cart,
-                    subtotal, deliveryFee: 40, total,
+                    subtotal, 
+                    deliveryFee, 
+                    total,
+                    freeDelivery: deliveryFee === 0,
                     deliveryAddress: {
                         address: deliveryAddress.streetAddress || deliveryAddress.address,
                         fullName: deliveryAddress.fullName,
