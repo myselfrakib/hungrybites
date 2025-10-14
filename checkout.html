@@ -6,7 +6,6 @@
     <title>Midnight Plaza - Checkout</title>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
-        /* (kept your entire original CSS unchanged) */
         :root {
             --sunglow: #fdc921;
             --mustard: #fdd85d;
@@ -497,7 +496,6 @@
                 loadGoogleMaps();
                 loadCart();
                 loadSavedAddresses().then(() => {
-                    // Preselect COD visually on load (user requested COD preselected)
                     selectPayment('cod');
                 });
             } else {
@@ -596,7 +594,6 @@
             }
         }
 
-        // --- LOAD saved addresses and show all when user clicks CHANGE ---
         async function loadSavedAddresses() {
             if (!currentUser) return;
             try {
@@ -604,12 +601,8 @@
                 if (snap.exists()) {
                     savedAddresses = [];
                     snap.forEach(child => savedAddresses.push({ id: child.key, ...child.val() }));
-                    // If there are addresses, select the first one (auto load)
                     if (savedAddresses.length) {
-                        // choose the first saved address as default selection (auto true)
-                        selectedAddressId = savedAddresses[0].id;
-                        deliveryAddress = savedAddresses[0];
-                        renderAddressDisplay();
+                        showAddressModal();
                     } else {
                         showAddressModal();
                     }
@@ -628,7 +621,6 @@
             const area = document.getElementById('addressDisplayArea');
             if (!deliveryAddress) {
                 area.innerHTML = '<button class="btn-secondary" onclick="showAddressModal()">+ Add Delivery Address</button>';
-                // ensure placeOrder button state is consistent
                 updatePlaceOrderButtonState();
                 return;
             }
@@ -655,7 +647,6 @@
                     </div>${coords}${serviceableIndicator}
                 </div>`;
 
-            // update place order button enabled state (only if payment selected)
             updatePlaceOrderButtonState();
         }
 
@@ -675,12 +666,10 @@
             list.style.display = 'block';
             form.style.display = 'none';
 
-            // Build cards with data-id attribute so we can select by id later
             cards.innerHTML = savedAddresses.map((a, i) => {
                 const coords = a.coordinates ? `<br><small style="color:#999;">📍 ${a.coordinates.lat.toFixed(4)}, ${a.coordinates.lng.toFixed(4)}</small>` : '';
                 const serviceableWarning = a.serviceable === false ? '<br><small style="color:#dc3545;">⚠️ Out of service area</small>' : '';
 
-                // mark selected visually if id matches
                 const selectedClass = (selectedAddressId === a.id) ? 'selected' : '';
                 const opacityStyle = a.serviceable === false ? 'opacity: 0.7; border-color: #ffc107;' : '';
 
@@ -705,8 +694,7 @@
             }).join('');
         }
 
-        // id = address key; auto = if true we loaded programmatically (do not animate/close modal)
-        window.selectSavedAddress = (id, auto = false) => {
+        window.selectSavedAddress = (id) => {
             const found = savedAddresses.find(a => a.id === id);
             if (!found) {
                 console.warn('Address id not found:', id);
@@ -716,7 +704,6 @@
             deliveryAddress = found;
             renderAddressDisplay();
 
-            // update selection visual inside modal (if open)
             const cards = document.querySelectorAll('#addressCards .address-card');
             cards.forEach(c => {
                 try {
@@ -724,10 +711,7 @@
                 } catch (e) {}
             });
 
-            // close modal only when user actively selected (not when auto-loading on page load)
-            if (!auto) {
-                setTimeout(closeAddressModal, 250);
-            }
+            setTimeout(closeAddressModal, 250);
         };
 
         window.deleteAddress = async id => {
@@ -735,7 +719,6 @@
             try {
                 await remove(ref(db, `users/${currentUser.uid}/addresses/${id}`));
                 savedAddresses = savedAddresses.filter(a => a.id !== id);
-                // if the deleted one was selected, clear selection or pick first
                 if (selectedAddressId === id) {
                     selectedAddressId = null;
                     deliveryAddress = null;
@@ -755,7 +738,13 @@
 
         window.showAddressModal = () => {
             document.getElementById('addressModal').classList.add('active');
-            renderSavedAddresses();
+            
+            if (savedAddresses.length > 0) {
+                renderSavedAddresses();
+            } else {
+                showAddressForm();
+            }
+            
             setTimeout(() => {
                 if (map) {
                     google.maps.event.trigger(map, 'resize');
@@ -933,7 +922,6 @@
             }
         };
 
-        // keep COD visually preselected but only enable Place Order btn when address exists
         window.selectPayment = method => {
             selectedPayment = method;
             document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
@@ -944,7 +932,6 @@
             updatePlaceOrderButtonState();
         };
 
-        // enable place order only if an address exists and payment method is chosen
         function updatePlaceOrderButtonState() {
             const btn = document.getElementById('placeOrderBtn');
             const enabled = !!deliveryAddress && !!selectedPayment;
