@@ -68,14 +68,18 @@
         .location-btn { background: var(--non-photo-blue); color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; }
         .location-btn:active { transform: scale(0.95); }
         .location-btn:disabled { background: #ccc; cursor: not-allowed; }
-        .address-card { border: 2px solid #e0e0e0; border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; cursor: pointer; transition: all 0.3s; }
-        .address-card:hover, .address-card.selected { border-color: var(--sunglow); background: #fffbf0; }
-        .address-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.6rem; }
+        .address-card { border: 2px solid #e0e0e0; border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; cursor: pointer; transition: all 0.3s; position: relative; }
+        .address-card:hover { border-color: var(--sunglow); background: #fffbf0; }
+        .address-card.selected { border-color: var(--sunglow); background: #fffbf0; box-shadow: 0 4px 12px rgba(253, 201, 33, 0.2); }
+        .address-card.selected::before { content: '✓'; position: absolute; top: 10px; right: 10px; background: var(--sunglow); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; }
+        .address-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.6rem; padding-right: 30px; }
         .address-name { font-weight: 600; font-size: 1rem; color: #333; }
         .address-phone { color: #666; font-size: 0.85rem; margin-top: 0.2rem; }
         .address-details { color: #666; line-height: 1.5; font-size: 0.85rem; }
-        .address-actions { display: flex; gap: 0.6rem; margin-top: 0.75rem; }
+        .address-actions { display: flex; gap: 0.6rem; margin-top: 0.75rem; flex-wrap: wrap; }
         .btn-small { padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-set-default { background: var(--non-photo-blue); color: white; }
+        .btn-set-default:active { transform: scale(0.95); }
         .btn-delete { background: #dc3545; color: white; }
         .btn-delete:active { transform: scale(0.95); }
         .default-badge { background: var(--non-photo-blue); color: white; padding: 0.2rem 0.6rem; border-radius: 5px; font-size: 0.75rem; font-weight: 600; }
@@ -123,6 +127,10 @@
         .modal-title { font-size: 1.3rem; font-weight: 600; color: #333; }
         .close-modal { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #666; line-height: 1; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
         .coord-display { background: #f0f9ff; border: 2px solid var(--non-photo-blue); border-radius: 8px; padding: 0.75rem; margin-top: 0.75rem; font-size: 0.85rem; color: #666; text-align: center; }
+        .addresses-list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid #f0f0f0; }
+        .addresses-list-title { font-size: 1.1rem; font-weight: 600; color: #333; }
+        .empty-addresses { text-align: center; padding: 2rem 1rem; color: #666; }
+        .empty-addresses-icon { font-size: 3rem; margin-bottom: 0.5rem; }
         @media (min-width: 768px) {
             .cart-item { flex-direction: row; align-items: center; }
             .quantity-btn:hover { background: var(--mustard); transform: scale(1.1); }
@@ -204,11 +212,14 @@
     <div class="modal-overlay" id="addressModal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">Select Address</div>
+                <div class="modal-title">Delivery Address</div>
                 <button class="close-modal" onclick="closeAddressModal()">&times;</button>
             </div>
 
             <div id="savedAddressesList" style="display: none;">
+                <div class="addresses-list-header">
+                    <div class="addresses-list-title">📍 Saved Addresses</div>
+                </div>
                 <div id="addressCards"></div>
                 <button type="button" class="btn-secondary" onclick="showAddressForm()" style="margin-top: 0.75rem;">+ Add New Address</button>
             </div>
@@ -272,7 +283,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        import { getDatabase, ref, push, set, get, remove } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { getDatabase, ref, push, set, get, remove, update } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const app = initializeApp({
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -519,7 +530,7 @@
                     cart = JSON.parse(savedCart);
                 }
             } catch (error) {
-                console.error('Error loading cart from localStorage:', error);
+                console.error('Error loading cart:', error);
                 cart = [];
             }
             renderCart();
@@ -590,7 +601,7 @@
             try {
                 localStorage.setItem('midnightPlazaCart', JSON.stringify(cart));
             } catch (error) {
-                console.error('Error saving cart to localStorage:', error);
+                console.error('Error saving cart:', error);
             }
         }
 
@@ -598,22 +609,24 @@
             if (!currentUser) return;
             try {
                 const snap = await get(ref(db, `users/${currentUser.uid}/addresses`));
+                savedAddresses = [];
                 if (snap.exists()) {
-                    savedAddresses = [];
-                    snap.forEach(child => savedAddresses.push({ id: child.key, ...child.val() }));
-                    if (savedAddresses.length) {
-                        showAddressModal();
-                    } else {
-                        showAddressModal();
+                    snap.forEach(child => {
+                        savedAddresses.push({ id: child.key, ...child.val() });
+                    });
+                    
+                    savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+                    
+                    if (savedAddresses.length > 0) {
+                        const defaultAddr = savedAddresses.find(a => a.isDefault) || savedAddresses[0];
+                        selectedAddressId = defaultAddr.id;
+                        deliveryAddress = defaultAddr;
+                        renderAddressDisplay();
                     }
-                } else {
-                    savedAddresses = [];
-                    showAddressModal();
                 }
             } catch (e) {
                 console.error('Load addresses error:', e);
                 savedAddresses = [];
-                showAddressModal();
             }
         }
 
@@ -659,14 +672,14 @@
                 list.style.display = 'none';
                 form.style.display = 'block';
                 document.getElementById('backToSavedBtn').style.display = 'none';
-                cards.innerHTML = '';
+                cards.innerHTML = '<div class="empty-addresses"><div class="empty-addresses-icon">📍</div><p>No saved addresses yet</p></div>';
                 return;
             }
 
             list.style.display = 'block';
             form.style.display = 'none';
 
-            cards.innerHTML = savedAddresses.map((a, i) => {
+            cards.innerHTML = savedAddresses.map((a) => {
                 const coords = a.coordinates ? `<br><small style="color:#999;">📍 ${a.coordinates.lat.toFixed(4)}, ${a.coordinates.lng.toFixed(4)}</small>` : '';
                 const serviceableWarning = a.serviceable === false ? '<br><small style="color:#dc3545;">⚠️ Out of service area</small>' : '';
 
@@ -680,7 +693,7 @@
                                 <div class="address-name">${a.fullName}</div>
                                 <div class="address-phone">${a.phone}</div>
                             </div>
-                            ${i === 0 ? '<span class="default-badge">Default</span>' : ''}
+                            ${a.isDefault ? '<span class="default-badge">Default</span>' : ''}
                         </div>
                         <div class="address-details">
                             ${a.streetAddress || a.address || ''}<br>
@@ -688,6 +701,7 @@
                             ${a.landmark ? `<br>Landmark: ${a.landmark}` : ''}${coords}${serviceableWarning}
                         </div>
                         <div class="address-actions">
+                            ${!a.isDefault ? `<button class="btn-small btn-set-default" onclick="event.stopPropagation(); setDefaultAddress('${a.id}')">Set as Default</button>` : ''}
                             <button class="btn-small btn-delete" onclick="event.stopPropagation(); deleteAddress('${a.id}')">Delete</button>
                         </div>
                     </div>`;
@@ -711,7 +725,31 @@
                 } catch (e) {}
             });
 
-            setTimeout(closeAddressModal, 250);
+            setTimeout(closeAddressModal, 300);
+        };
+
+        window.setDefaultAddress = async (id) => {
+            if (!currentUser) return;
+            try {
+                const updates = {};
+                savedAddresses.forEach(addr => {
+                    updates[`users/${currentUser.uid}/addresses/${addr.id}/isDefault`] = (addr.id === id);
+                });
+
+                await update(ref(db), updates);
+                
+                savedAddresses.forEach(addr => {
+                    addr.isDefault = (addr.id === id);
+                });
+                
+                savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+                
+                renderSavedAddresses();
+                showSuccess('Default address updated');
+            } catch (e) {
+                console.error('Set default error:', e);
+                showError('Failed to set default');
+            }
         };
 
         window.deleteAddress = async id => {
@@ -719,14 +757,17 @@
             try {
                 await remove(ref(db, `users/${currentUser.uid}/addresses/${id}`));
                 savedAddresses = savedAddresses.filter(a => a.id !== id);
+                
                 if (selectedAddressId === id) {
                     selectedAddressId = null;
                     deliveryAddress = null;
                     if (savedAddresses.length) {
-                        selectedAddressId = savedAddresses[0].id;
-                        deliveryAddress = savedAddresses[0];
+                        const defaultAddr = savedAddresses.find(a => a.isDefault) || savedAddresses[0];
+                        selectedAddressId = defaultAddr.id;
+                        deliveryAddress = defaultAddr;
                     }
                 }
+                
                 renderSavedAddresses();
                 renderAddressDisplay();
                 showSuccess('Address deleted');
@@ -740,7 +781,7 @@
             document.getElementById('addressModal').classList.add('active');
             
             if (savedAddresses.length > 0) {
-                renderSavedAddresses();
+                showSavedAddresses();
             } else {
                 showAddressForm();
             }
@@ -787,11 +828,9 @@
         };
 
         window.showSavedAddresses = () => {
-            if (savedAddresses.length) {
-                document.getElementById('savedAddressesList').style.display = 'block';
-                document.getElementById('addressFormContainer').style.display = 'none';
-                renderSavedAddresses();
-            }
+            document.getElementById('savedAddressesList').style.display = 'block';
+            document.getElementById('addressFormContainer').style.display = 'none';
+            renderSavedAddresses();
         };
 
         window.saveAndSelectAddress = async () => {
@@ -821,45 +860,8 @@
                 const pincodeRef = ref(db, `servicepincodes/${pin}`);
                 const pincodeSnap = await get(pincodeRef);
 
-                if (!pincodeSnap.exists() || pincodeSnap.val() !== true) {
-                    deliveryAddress = {
-                        fullName: name,
-                        phone,
-                        streetAddress: addr,
-                        city,
-                        pincode: pin,
-                        landmark,
-                        coordinates: finalPinLocation
-                    };
+                const isServiceable = pincodeSnap.exists() && pincodeSnap.val() === true;
 
-                    console.log('Saving coordinates:', finalPinLocation);
-
-                    if (save && currentUser) {
-                        try {
-                            const newRef = push(ref(db, `users/${currentUser.uid}/addresses`));
-                            await set(newRef, { ...deliveryAddress, createdAt: Date.now(), serviceable: false });
-                            savedAddresses.push({ id: newRef.key, ...deliveryAddress, serviceable: false });
-                        } catch (e) {
-                            console.error('Save error:', e);
-                        }
-                    }
-
-                    btn.disabled = false;
-                    btn.classList.remove('processing');
-                    btnText.textContent = '📍 Deliver Here';
-                    showToast('error', '⚠️ Out of Service Area', 'Pincode is out of service area. Please try another address.');
-
-                    setTimeout(() => {
-                        const toast = document.getElementById('toast');
-                        const overlay = document.getElementById('toastOverlay');
-                        toast.classList.remove('show');
-                        overlay.classList.remove('show');
-                    }, 5000);
-
-                    return;
-                }
-
-                btnText.textContent = '⏳ Saving...';
                 deliveryAddress = {
                     fullName: name,
                     phone,
@@ -868,31 +870,52 @@
                     pincode: pin,
                     landmark,
                     coordinates: finalPinLocation,
-                    serviceable: true
+                    serviceable: isServiceable
                 };
-
-                console.log('Saving serviceable address coordinates:', finalPinLocation);
 
                 if (save && currentUser) {
                     try {
+                        btnText.textContent = '⏳ Saving...';
                         const newRef = push(ref(db, `users/${currentUser.uid}/addresses`));
-                        await set(newRef, { ...deliveryAddress, createdAt: Date.now() });
-                        savedAddresses.push({ id: newRef.key, ...deliveryAddress });
+                        const isFirstAddress = savedAddresses.length === 0;
+                        
+                        await set(newRef, { 
+                            ...deliveryAddress, 
+                            createdAt: Date.now(),
+                            isDefault: isFirstAddress
+                        });
+                        
+                        savedAddresses.push({ 
+                            id: newRef.key, 
+                            ...deliveryAddress,
+                            isDefault: isFirstAddress
+                        });
                         selectedAddressId = newRef.key;
 
                         btnText.textContent = '✅ Saved!';
                         btn.style.background = '#60b246';
 
-                        setTimeout(() => {
-                            showSuccess('Address saved successfully');
-                            renderAddressDisplay();
-                            closeAddressModal();
-                            btn.disabled = false;
-                            btn.classList.remove('processing');
-                            btn.style.background = '';
-                            btnText.textContent = '📍 Deliver Here';
-                            renderSavedAddresses();
-                        }, 800);
+                        if (!isServiceable) {
+                            setTimeout(() => {
+                                btn.disabled = false;
+                                btn.classList.remove('processing');
+                                btn.style.background = '';
+                                btnText.textContent = '📍 Deliver Here';
+                                showToast('error', '⚠️ Out of Service Area', 'Address saved but pincode is out of service. Choose another address.');
+                                renderSavedAddresses();
+                            }, 1000);
+                        } else {
+                            setTimeout(() => {
+                                showSuccess('Address saved successfully');
+                                renderAddressDisplay();
+                                closeAddressModal();
+                                btn.disabled = false;
+                                btn.classList.remove('processing');
+                                btn.style.background = '';
+                                btnText.textContent = '📍 Deliver Here';
+                                renderSavedAddresses();
+                            }, 800);
+                        }
                     } catch (e) {
                         console.error('Save error:', e);
                         showError('Failed to save address');
@@ -901,6 +924,14 @@
                         btnText.textContent = '📍 Deliver Here';
                     }
                 } else {
+                    if (!isServiceable) {
+                        btn.disabled = false;
+                        btn.classList.remove('processing');
+                        btnText.textContent = '📍 Deliver Here';
+                        showToast('error', '⚠️ Out of Service Area', 'Pincode is out of service. Please try another address.');
+                        return;
+                    }
+
                     btnText.textContent = '✅ Selected!';
                     btn.style.background = '#60b246';
 
@@ -915,7 +946,7 @@
                 }
             } catch (error) {
                 console.error('Error checking pincode:', error);
-                showError('Failed to verify pincode. Please try again.');
+                showError('Failed to verify pincode');
                 btn.disabled = false;
                 btn.classList.remove('processing');
                 btnText.textContent = '📍 Deliver Here';
@@ -986,8 +1017,6 @@
             const total = subtotal + 40;
 
             try {
-                console.log('Order coordinates being saved:', deliveryAddress.coordinates);
-
                 await push(ref(db, 'orders'), {
                     userId: currentUser.uid,
                     userEmail: currentUser.email,
