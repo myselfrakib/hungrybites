@@ -1678,7 +1678,12 @@
             onValue(dbRef(db, 'users'), snapshot => {
                 allUsers = {};
                 const data = snapshot.val() || {};
-                Object.keys(data).forEach(uid => { if (data[uid].allDetails) allUsers[uid] = data[uid].allDetails; });
+                Object.keys(data).forEach(uid => { 
+                    if (data[uid] && data[uid].allDetails) {
+                        allUsers[uid] = data[uid].allDetails;
+                    }
+                });
+                console.log('Loaded users:', Object.keys(allUsers).length);
                 displayUsers();
                 updateUserStats();
                 displayCarts(); // Refresh carts when users update
@@ -1746,14 +1751,30 @@
         function displayCarts() {
             const container = $('cartsContainer');
             const userIds = Object.keys(allCarts);
-            if (!userIds.length) { container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🛒</div><div class="empty-state-text">No active carts</div></div>'; return; }
+            
+            console.log('Displaying carts. Total carts:', userIds.length);
+            console.log('Available users:', Object.keys(allUsers).length);
+            
+            if (!userIds.length) { 
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🛒</div><div class="empty-state-text">No active carts</div></div>'; 
+                return; 
+            }
+            
             container.innerHTML = '';
-            userIds.forEach(uid => container.appendChild(createCartCard(uid, allCarts[uid], allUsers[uid])));
+            userIds.forEach(uid => {
+                console.log('Processing cart for user:', uid, 'User data:', allUsers[uid]);
+                const cartCard = createCartCard(uid, allCarts[uid], allUsers[uid]);
+                container.appendChild(cartCard);
+            });
         }
 
         function createCartCard(userId, cartItems, user) {
             const card = document.createElement('div');
             card.className = 'cart-card';
+            
+            // Debug log
+            console.log('Creating cart card for user:', userId, user);
+            
             const name = user?.name || 'Unknown User';
             const email = user?.email || 'N/A';
             const phone = user?.phoneNumber || 'N/A';
