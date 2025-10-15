@@ -1753,7 +1753,7 @@
             onValue(dbRef(db, 'carts'), snapshot => { allCarts = snapshot.val() || {}; displayCarts(); updateCartStats(); });
         }
 
-        function displayCarts() {
+        async function displayCarts() {
             const container = $('cartsContainer');
             const userIds = Object.keys(allCarts);
             
@@ -1766,18 +1766,17 @@
                 return; 
             }
             
-            container.innerHTML = '';
-            userIds.forEach(async uid => {
-                console.log('Processing cart for user:', uid, 'User data:', allUsers[uid]);
-                
-                // If user data not found in cache, fetch it directly
+            container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-text">Loading cart details...</div></div>';
+            
+            // Fetch all missing user data first
+            const fetchPromises = userIds.map(async uid => {
                 if (!allUsers[uid]) {
                     console.log('User not in cache, fetching from Firebase:', uid);
                     try {
                         const userSnapshot = await get(dbRef(db, `users/${uid}/allDetails`));
                         if (userSnapshot.exists()) {
                             allUsers[uid] = userSnapshot.val();
-                            console.log('Fetched user data:', allUsers[uid]);
+                            console.log('Fetched user data:', uid, allUsers[uid]);
                         } else {
                             console.log('User not found in Firebase:', uid);
                         }
@@ -1785,7 +1784,15 @@
                         console.error('Error fetching user:', uid, error);
                     }
                 }
-                
+            });
+            
+            // Wait for all fetches to complete
+            await Promise.all(fetchPromises);
+            
+            // Now render all carts
+            container.innerHTML = '';
+            userIds.forEach(uid => {
+                console.log('Rendering cart for user:', uid, 'User data:', allUsers[uid]);
                 const cartCard = createCartCard(uid, allCarts[uid], allUsers[uid]);
                 container.appendChild(cartCard);
             });
