@@ -745,14 +745,24 @@
             onValue(userCartRef, (snapshot) => {
                 if (snapshot.exists()) {
                     const dbCart = snapshot.val();
-                    cart = Object.keys(dbCart).map(itemId => ({
+                    const newCart = Object.keys(dbCart).map(itemId => ({
                         id: itemId,
                         ...dbCart[itemId]
                     }));
-                    saveCart();
-                    updateCartBadge();
-                    updateNotificationVisibility();
-                    renderFoodItems();
+                    
+                    // Only update if cart actually changed
+                    if (JSON.stringify(cart) !== JSON.stringify(newCart)) {
+                        cart = newCart;
+                        saveCart();
+                        updateCartBadge();
+                        updateNotificationVisibility();
+                        renderFoodItems();
+                    }
+                } else {
+                    // If no cart in DB but exists locally for logged-in user, sync it
+                    if (cart.length > 0) {
+                        syncCartToDB();
+                    }
                 }
             });
         }
