@@ -630,6 +630,12 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .btn-accept { background: #27ae60; color: white; }
         .btn-reject { background: #e74c3c; color: white; }
         .btn-cooking { background: #e67e22; color: white; }
@@ -834,12 +840,17 @@
             gap: 0.8rem;
         }
 
+        .store-toggle-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .store-toggle-btn.open-store {
             background: linear-gradient(135deg, #60b246 0%, #4a9635 100%);
             color: white;
         }
 
-        .store-toggle-btn.open-store:hover {
+        .store-toggle-btn.open-store:hover:not(:disabled) {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(96, 178, 70, 0.4);
         }
@@ -849,7 +860,7 @@
             color: white;
         }
 
-        .store-toggle-btn.close-store:hover {
+        .store-toggle-btn.close-store:hover:not(:disabled) {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
         }
@@ -938,9 +949,14 @@
             width: 100%;
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .category-section {
@@ -1055,7 +1071,7 @@
             background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
         }
 
-        .btn-delete:hover {
+        .btn-delete:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
         }
@@ -1064,7 +1080,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
-        .btn-edit:hover {
+        .btn-edit:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
@@ -1077,9 +1093,14 @@
             background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
         }
 
-        .btn-toggle:hover {
+        .btn-toggle:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(96, 178, 70, 0.4);
+        }
+
+        .btn-delete:disabled, .btn-toggle:disabled, .btn-edit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .modal {
@@ -1182,9 +1203,14 @@
             transition: all 0.3s;
         }
 
-        .btn-save:hover {
+        .btn-save:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(96, 178, 70, 0.4);
+        }
+
+        .btn-save:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .user-detail-section {
@@ -1254,6 +1280,21 @@
         .empty-state-text {
             font-size: 1.1rem;
             font-weight: 600;
+        }
+
+        .loading-spinner {
+            border: 4px solid #ecf0f1;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         @media (min-width: 640px) {
@@ -1413,7 +1454,7 @@
             </div>
             <div id="cartsContainer" class="carts-grid">
                 <div class="empty-state">
-                    <div class="empty-state-icon">⏳</div>
+                    <div class="loading-spinner"></div>
                     <div class="empty-state-text">Loading carts...</div>
                 </div>
             </div>
@@ -1433,7 +1474,7 @@
             </div>
             <div id="ordersContainer" class="orders-grid">
                 <div class="empty-state">
-                    <div class="empty-state-icon">⏳</div>
+                    <div class="loading-spinner"></div>
                     <div class="empty-state-text">Loading orders...</div>
                 </div>
             </div>
@@ -1475,7 +1516,7 @@
                         </tr>
                     </thead>
                     <tbody id="usersTableBody">
-                        <tr><td colspan="6" style="text-align: center; padding: 2rem;"><div class="empty-state-icon">⏳</div></td></tr>
+                        <tr><td colspan="6" style="text-align: center; padding: 2rem;"><div class="loading-spinner"></div></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1537,7 +1578,7 @@
                             <input type="text" id="itemEmoji" placeholder="🍜" maxlength="2">
                         </div>
                         <div class="form-group">
-                            <label>Image</label>
+                            <label>Image (Max 5MB)</label>
                             <input type="file" id="itemImageFile" accept="image/*" onchange="previewImageFile()">
                         </div>
                     </div>
@@ -1546,10 +1587,15 @@
                         <label>Description</label>
                         <textarea id="itemDescription" placeholder="Describe the item"></textarea>
                     </div>
-                    <button type="submit" class="btn-primary">Add Item</button>
+                    <button type="submit" class="btn-primary" id="addItemBtn">Add Item</button>
                 </form>
             </div>
-            <div id="menuContainer"></div>
+            <div id="menuContainer">
+                <div class="empty-state">
+                    <div class="loading-spinner"></div>
+                    <div class="empty-state-text">Loading menu...</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1590,7 +1636,7 @@
                         <input type="text" id="editEmoji" maxlength="2">
                     </div>
                     <div class="form-group">
-                        <label>Image</label>
+                        <label>Image (Max 5MB)</label>
                         <input type="file" id="editImageFile" accept="image/*" onchange="previewEditImageFile()">
                     </div>
                 </div>
@@ -1601,7 +1647,7 @@
                 </div>
                 <div class="modal-buttons">
                     <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
-                    <button type="submit" class="btn-save">Save Changes</button>
+                    <button type="submit" class="btn-save" id="saveEditBtn">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -1621,7 +1667,7 @@
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-        import { getDatabase, ref as dbRef, set, get, update, remove, onValue, push } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+        import { getDatabase, ref as dbRef, set, get, update, remove, onValue, push, off } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
 
@@ -1641,10 +1687,19 @@
         const auth = getAuth(app);
         const storage = getStorage(app);
 
-        let isAdmin = false, allCarts = {}, allUsers = {}, allOrders = {}, currentFilter = 'all';
-        let currentEditId = null, currentEditCategory = null, selectedAddFile = null, selectedEditFile = null;
+        let isAdmin = false;
+        let allCarts = {};
+        let allUsers = {};
+        let allOrders = {};
+        let currentFilter = 'all';
+        let currentEditId = null;
+        let currentEditCategory = null;
+        let selectedAddFile = null;
+        let selectedEditFile = null;
+        let dbListeners = [];
 
         const $ = id => document.getElementById(id);
+        
         const showNotification = (msg, err = false) => {
             const n = $('notification');
             n.textContent = msg;
@@ -1654,51 +1709,75 @@
         };
 
         const uploadFile = async (file, path) => {
+            if (!file.type.startsWith('image/')) {
+                throw new Error('File must be an image');
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                throw new Error('Image must be less than 5MB');
+            }
             const sRef = storageRef(storage, path);
             await uploadBytes(sRef, file);
             return await getDownloadURL(sRef);
         };
 
+        const cleanupListeners = () => {
+            dbListeners.forEach(({ ref, callback }) => off(ref, 'value', callback));
+            dbListeners = [];
+        };
+
         onAuthStateChanged(auth, async user => {
-            if (!user) { window.location.href = 'adminlogin.html'; return; }
+            if (!user) { 
+                cleanupListeners();
+                window.location.href = 'adminlogin.html'; 
+                return; 
+            }
             try {
                 const admin = await get(dbRef(db, `admins/${user.uid}`));
-                if (!admin.exists() || !admin.val().admin) { showNotification('Unauthorized', true); setTimeout(() => window.location.href = 'adminlogin.html', 2000); return; }
+                if (!admin.exists() || !admin.val().admin) { 
+                    showNotification('Unauthorized access', true); 
+                    setTimeout(() => {
+                        cleanupListeners();
+                        window.location.href = 'adminlogin.html';
+                    }, 2000); 
+                    return; 
+                }
                 isAdmin = true;
-                loadUsers(); // Load users first
+                loadUsers();
                 loadCarts(); 
                 loadOrders(); 
                 loadStoreStatus(); 
                 loadFoodItems();
-            } catch (err) { showNotification('Error verifying admin', true); }
+            } catch (err) { 
+                showNotification('Error verifying admin: ' + err.message, true); 
+            }
         });
 
-        // ========== USERS (Load first for cart display) ==========
+        // ========== USERS ==========
         function loadUsers() {
-            onValue(dbRef(db, 'users'), snapshot => {
+            const usersRef = dbRef(db, 'users');
+            const callback = snapshot => {
                 allUsers = {};
                 const data = snapshot.val() || {};
-                console.log('Raw users data:', data);
                 Object.keys(data).forEach(uid => { 
                     if (data[uid] && data[uid].allDetails) {
                         allUsers[uid] = data[uid].allDetails;
-                        console.log('Added user:', uid, allUsers[uid]);
-                    } else {
-                        console.log('Skipped user (no allDetails):', uid);
                     }
                 });
-                console.log('Loaded users:', Object.keys(allUsers).length);
-                console.log('All user IDs:', Object.keys(allUsers));
                 displayUsers();
                 updateUserStats();
-                displayCarts(); // Refresh carts when users update
-            });
+                displayCarts();
+            };
+            onValue(usersRef, callback);
+            dbListeners.push({ ref: usersRef, callback });
         }
 
         function displayUsers() {
             const tbody = $('usersTableBody');
             const keys = Object.keys(allUsers);
-            if (!keys.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;">No users</td></tr>'; return; }
+            if (!keys.length) { 
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;">No users found</td></tr>'; 
+                return; 
+            }
             tbody.innerHTML = '';
             keys.forEach((uid, i) => tbody.appendChild(createUserRow(allUsers[uid], uid, i + 1)));
         }
@@ -1708,7 +1787,28 @@
             const date = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A';
             const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?';
             const verified = user.verified !== false;
-            row.innerHTML = `<td style="text-align:center;font-weight:600;">${slNo}</td><td><div class="user-info"><div class="user-avatar">${initials}</div><div class="user-details"><div class="user-name">${user.name || 'N/A'}</div><div class="user-email">${user.email || 'N/A'}</div></div></div></td><td>${user.phoneNumber || 'N/A'}</td><td>${date}</td><td><span class="verified-badge ${verified ? 'verified' : 'not-verified'}">${verified ? '✅ Verified' : '⏳ Unverified'}</span></td><td><button class="btn-view" onclick="viewUserDetails('${uid}')">View</button></td>`;
+            row.innerHTML = `
+                <td style="text-align:center;font-weight:600;">${slNo}</td>
+                <td>
+                    <div class="user-info">
+                        <div class="user-avatar">${initials}</div>
+                        <div class="user-details">
+                            <div class="user-name">${user.name || 'N/A'}</div>
+                            <div class="user-email">${user.email || 'N/A'}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>${user.phoneNumber || 'N/A'}</td>
+                <td>${date}</td>
+                <td>
+                    <span class="verified-badge ${verified ? 'verified' : 'not-verified'}">
+                        ${verified ? '✅ Verified' : '⏳ Unverified'}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn-view" onclick="viewUserDetails('${uid}')">View</button>
+                </td>
+            `;
             return row;
         }
 
@@ -1725,106 +1825,194 @@
             const tbody = $('usersTableBody');
             const keys = Object.keys(allUsers).filter(uid => {
                 const u = allUsers[uid];
-                return (u.name && u.name.toLowerCase().includes(term)) || (u.email && u.email.toLowerCase().includes(term)) || (u.phoneNumber && u.phoneNumber.includes(term));
+                return (u.name && u.name.toLowerCase().includes(term)) || 
+                       (u.email && u.email.toLowerCase().includes(term)) || 
+                       (u.phoneNumber && u.phoneNumber.includes(term));
             });
-            if (!keys.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;">No results</td></tr>'; return; }
+            if (!keys.length) { 
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;">No results found</td></tr>'; 
+                return; 
+            }
             tbody.innerHTML = '';
             keys.forEach((uid, i) => tbody.appendChild(createUserRow(allUsers[uid], uid, i + 1)));
         };
 
         window.viewUserDetails = function(uid) {
             const user = allUsers[uid];
+            if (!user) {
+                showNotification('User not found', true);
+                return;
+            }
             const date = user.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A';
             $('userDetailsContent').innerHTML = `
-                <div class="user-detail-section"><div class="user-detail-label">ID</div><div class="user-detail-value">${uid}</div></div>
-                <div class="user-detail-section"><div class="user-detail-label">Name</div><div class="user-detail-value">${user.name || 'N/A'}</div></div>
-                <div class="user-detail-section"><div class="user-detail-label">Email</div><div class="user-detail-value">${user.email || 'N/A'}</div></div>
-                <div class="user-detail-section"><div class="user-detail-label">Phone</div><div class="user-detail-value">${user.phoneNumber || 'N/A'}</div></div>
-                <div class="user-detail-section"><div class="user-detail-label">Status</div><div class="user-detail-value"><span class="verified-badge ${user.verified !== false ? 'verified' : 'not-verified'}">${user.verified !== false ? '✅ Verified' : '⏳ Unverified'}</span></div></div>
-                <div class="user-detail-section"><div class="user-detail-label">Joined</div><div class="user-detail-value">${date}</div></div>
+                <div class="user-detail-section">
+                    <div class="user-detail-label">ID</div>
+                    <div class="user-detail-value">${uid}</div>
+                </div>
+                <div class="user-detail-section">
+                    <div class="user-detail-label">Name</div>
+                    <div class="user-detail-value">${user.name || 'N/A'}</div>
+                </div>
+                <div class="user-detail-section">
+                    <div class="user-detail-label">Email</div>
+                    <div class="user-detail-value">${user.email || 'N/A'}</div>
+                </div>
+                <div class="user-detail-section">
+                    <div class="user-detail-label">Phone</div>
+                    <div class="user-detail-value">${user.phoneNumber || 'N/A'}</div>
+                </div>
+                <div class="user-detail-section">
+                    <div class="user-detail-label">Status</div>
+                    <div class="user-detail-value">
+                        <span class="verified-badge ${user.verified !== false ? 'verified' : 'not-verified'}">
+                            ${user.verified !== false ? '✅ Verified' : '⏳ Unverified'}
+                        </span>
+                    </div>
+                </div>
+                <div class="user-detail-section">
+                    <div class="user-detail-label">Joined</div>
+                    <div class="user-detail-value">${date}</div>
+                </div>
             `;
             $('userDetailsModal').classList.add('active');
         };
 
-        window.closeUserModal = function() { $('userDetailsModal').classList.remove('active'); };
+        window.closeUserModal = function() { 
+            $('userDetailsModal').classList.remove('active'); 
+        };
 
         // ========== CARTS ==========
         function loadCarts() {
-            onValue(dbRef(db, 'carts'), snapshot => { allCarts = snapshot.val() || {}; displayCarts(); updateCartStats(); });
+            const cartsRef = dbRef(db, 'carts');
+            const callback = snapshot => { 
+                allCarts = snapshot.val() || {}; 
+                displayCarts(); 
+                updateCartStats(); 
+            };
+            onValue(cartsRef, callback);
+            dbListeners.push({ ref: cartsRef, callback });
         }
 
         async function displayCarts() {
             const container = $('cartsContainer');
             const userIds = Object.keys(allCarts);
             
-            console.log('Displaying carts. Total carts:', userIds.length);
-            console.log('Available users:', Object.keys(allUsers).length);
-            console.log('Cart user IDs:', userIds);
-            
             if (!userIds.length) { 
                 container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🛒</div><div class="empty-state-text">No active carts</div></div>'; 
                 return; 
             }
             
-            container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-text">Loading cart details...</div></div>';
+            container.innerHTML = '<div class="empty-state"><div class="loading-spinner"></div><div class="empty-state-text">Loading cart details...</div></div>';
             
-            // Fetch all missing user data first
-            const fetchPromises = userIds.map(async uid => {
-                if (!allUsers[uid]) {
-                    console.log('User not in cache, fetching from Firebase:', uid);
-                    try {
-                        const userSnapshot = await get(dbRef(db, `users/${uid}/allDetails`));
-                        if (userSnapshot.exists()) {
-                            allUsers[uid] = userSnapshot.val();
-                            console.log('Fetched user data:', uid, allUsers[uid]);
-                        } else {
-                            console.log('User not found in Firebase:', uid);
+            try {
+                const fetchPromises = userIds.map(async uid => {
+                    if (!allUsers[uid]) {
+                        try {
+                            const userSnapshot = await get(dbRef(db, `users/${uid}/allDetails`));
+                            if (userSnapshot.exists()) {
+                                allUsers[uid] = userSnapshot.val();
+                            } else {
+                                allUsers[uid] = { 
+                                    name: 'Deleted User', 
+                                    email: 'N/A', 
+                                    phoneNumber: 'N/A' 
+                                };
+                            }
+                        } catch (error) {
+                            console.error('Error fetching user:', uid, error);
+                            allUsers[uid] = { 
+                                name: 'Error Loading User', 
+                                email: 'N/A', 
+                                phoneNumber: 'N/A' 
+                            };
                         }
-                    } catch (error) {
-                        console.error('Error fetching user:', uid, error);
                     }
-                }
-            });
-            
-            // Wait for all fetches to complete
-            await Promise.all(fetchPromises);
-            
-            // Now render all carts
-            container.innerHTML = '';
-            userIds.forEach(uid => {
-                console.log('Rendering cart for user:', uid, 'User data:', allUsers[uid]);
-                const cartCard = createCartCard(uid, allCarts[uid], allUsers[uid]);
-                container.appendChild(cartCard);
-            });
+                });
+                
+                await Promise.all(fetchPromises);
+                
+                container.innerHTML = '';
+                userIds.forEach(uid => {
+                    const cartCard = createCartCard(uid, allCarts[uid], allUsers[uid]);
+                    container.appendChild(cartCard);
+                });
+            } catch (error) {
+                console.error('Error displaying carts:', error);
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-text">Error loading carts. Please refresh.</div></div>';
+            }
         }
 
         function createCartCard(userId, cartItems, user) {
             const card = document.createElement('div');
             card.className = 'cart-card';
             
-            // Debug log
-            console.log('Creating cart card for user:', userId, user);
-            
             const name = user?.name || 'Unknown User';
             const email = user?.email || 'N/A';
             const phone = user?.phoneNumber || 'N/A';
             const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
             const items = Object.entries(cartItems).map(([id, item]) => ({ id, ...item }));
-            let html = '', subtotal = 0;
+            
+            let html = '';
+            let subtotal = 0;
             items.forEach(item => {
                 const total = item.price * item.quantity;
                 subtotal += total;
-                html += `<div class="cart-item"><div class="cart-item-info"><span class="cart-item-emoji">${item.emoji || '🍽️'}</span><div class="cart-item-details"><div class="cart-item-name">${item.name}</div><div class="cart-item-qty">x${item.quantity}</div></div></div><div class="cart-item-price">₹${total.toFixed(2)}</div></div>`;
+                html += `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <span class="cart-item-emoji">${item.emoji || '🍽️'}</span>
+                            <div class="cart-item-details">
+                                <div class="cart-item-name">${item.name}</div>
+                                <div class="cart-item-qty">x${item.quantity}</div>
+                            </div>
+                        </div>
+                        <div class="cart-item-price">₹${total.toFixed(2)}</div>
+                    </div>
+                `;
             });
-            const fee = subtotal >= 200 ? 0 : 30, total = subtotal + fee;
-            card.innerHTML = `<div class="cart-header"><div class="cart-user-info"><div class="cart-user-avatar">${initials}</div><div class="cart-user-details"><div class="cart-user-name">${name}</div><div class="cart-user-email">${email}</div><div class="cart-user-phone">📞 ${phone}</div></div></div></div><div class="cart-items-list">${html}</div><div class="cart-summary"><div class="cart-total-row"><span>Subtotal</span><span>₹${subtotal.toFixed(2)}</span></div><div class="cart-total-row"><span>Delivery</span><span>${fee === 0 ? '🎉 FREE' : '₹' + fee}</span></div><div class="cart-total-row grand-total"><span>Total</span><span>₹${total.toFixed(2)}</span></div></div>`;
+            
+            const fee = subtotal >= 200 ? 0 : 30;
+            const total = subtotal + fee;
+            
+            card.innerHTML = `
+                <div class="cart-header">
+                    <div class="cart-user-info">
+                        <div class="cart-user-avatar">${initials}</div>
+                        <div class="cart-user-details">
+                            <div class="cart-user-name">${name}</div>
+                            <div class="cart-user-email">${email}</div>
+                            <div class="cart-user-phone">📞 ${phone}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cart-items-list">${html}</div>
+                <div class="cart-summary">
+                    <div class="cart-total-row">
+                        <span>Subtotal</span>
+                        <span>₹${subtotal.toFixed(2)}</span>
+                    </div>
+                    <div class="cart-total-row">
+                        <span>Delivery</span>
+                        <span>${fee === 0 ? '🎉 FREE' : '₹' + fee}</span>
+                    </div>
+                    <div class="cart-total-row grand-total">
+                        <span>Total</span>
+                        <span>₹${total.toFixed(2)}</span>
+                    </div>
+                </div>
+            `;
             return card;
         }
 
         function updateCartStats() {
             const total = Object.keys(allCarts).length;
             let val = 0, cnt = 0;
-            Object.values(allCarts).forEach(cart => Object.values(cart).forEach(item => { cnt += item.quantity || 0; val += item.price * (item.quantity || 0); }));
+            Object.values(allCarts).forEach(cart => {
+                Object.values(cart).forEach(item => { 
+                    cnt += item.quantity || 0; 
+                    val += item.price * (item.quantity || 0); 
+                });
+            });
             $('totalCarts').textContent = total;
             $('totalCartValue').textContent = '₹' + val.toFixed(2);
             $('totalItems').textContent = cnt;
@@ -1832,15 +2020,31 @@
 
         // ========== ORDERS ==========
         function loadOrders() {
-            onValue(dbRef(db, 'orders'), snapshot => { allOrders = snapshot.val() || {}; displayOrders(); });
+            const ordersRef = dbRef(db, 'orders');
+            const callback = snapshot => { 
+                allOrders = snapshot.val() || {}; 
+                displayOrders(); 
+            };
+            onValue(ordersRef, callback);
+            dbListeners.push({ ref: ordersRef, callback });
         }
 
         function displayOrders() {
             const container = $('ordersContainer');
             const keys = Object.keys(allOrders);
-            if (!keys.length) { container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">No orders</div></div>'; return; }
+            
+            if (!keys.length) { 
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">No orders found</div></div>'; 
+                return; 
+            }
+            
             const filtered = keys.filter(id => currentFilter === 'all' || allOrders[id].status === currentFilter);
-            if (!filtered.length) { container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">No ${currentFilter} orders</div></div>`; return; }
+            
+            if (!filtered.length) { 
+                container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">No ${currentFilter} orders</div></div>`; 
+                return; 
+            }
+            
             filtered.sort((a, b) => (allOrders[b].createdAt || 0) - (allOrders[a].createdAt || 0));
             container.innerHTML = '';
             filtered.forEach(id => container.appendChild(createOrderCard(allOrders[id], id)));
@@ -1851,26 +2055,94 @@
             card.className = `order-card ${order.status || 'pending'}`;
             const date = order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A';
             const status = order.status || 'pending';
+            
             let actions = '';
-            if (status === 'pending') actions = `<button class="action-btn btn-accept" onclick="updateOrderStatus('${orderId}', 'confirmed')">✅ Accept</button><button class="action-btn btn-reject" onclick="updateOrderStatus('${orderId}', 'rejected')">❌ Reject</button>`;
-            else if (status === 'confirmed') actions = `<button class="action-btn btn-cooking" onclick="updateOrderStatus('${orderId}', 'cooking')">🍳 Cooking</button>`;
-            else if (status === 'cooking') actions = `<button class="action-btn btn-packing" onclick="updateOrderStatus('${orderId}', 'packing')">📦 Packing</button>`;
-            else if (status === 'packing') actions = `<button class="action-btn btn-delivery" onclick="updateOrderStatus('${orderId}', 'out-for-delivery')">🚚 Out</button>`;
-            else if (status === 'out-for-delivery') actions = `<button class="action-btn btn-delivered" onclick="updateOrderStatus('${orderId}', 'delivered')">✔️ Delivered</button>`;
-            const items = order.items ? order.items.map(item => `<div class="order-item"><div class="item-details"><span class="item-emoji">${item.emoji || '🍽️'}</span><span>${item.name}</span><span class="item-quantity">x${item.quantity}</span></div><span>₹${(item.price * item.quantity).toFixed(2)}</span></div>`).join('') : '<div>No items</div>';
-            card.innerHTML = `<div class="order-header"><div class="order-id">Order #${orderId.slice(-6).toUpperCase()}</div><div class="order-status ${status}">${status.replace('-', ' ').toUpperCase()}</div></div><div class="customer-info"><div class="customer-name">👤 ${order.deliveryAddress?.fullName || 'N/A'}</div><div class="customer-details"><div>📞 ${order.deliveryAddress?.phone || 'N/A'}</div><div>📍 ${order.deliveryAddress?.address || 'N/A'}</div></div></div><div class="order-items"><div class="order-items-title">Items</div>${items}</div><div class="order-totals"><div class="total-row"><span>Subtotal</span><span>₹${(order.subtotal || 0).toFixed(2)}</span></div><div class="total-row"><span>Delivery</span><span>₹${(order.deliveryFee || 0).toFixed(2)}</span></div><div class="total-row grand-total"><span>Total</span><span>₹${(order.total || 0).toFixed(2)}</span></div></div>${actions ? `<div class="order-actions">${actions}</div>` : ''}`;
+            if (status === 'pending') {
+                actions = `
+                    <button class="action-btn btn-accept" onclick="updateOrderStatus('${orderId}', 'confirmed')">✅ Accept</button>
+                    <button class="action-btn btn-reject" onclick="updateOrderStatus('${orderId}', 'rejected')">❌ Reject</button>
+                `;
+            } else if (status === 'confirmed') {
+                actions = `<button class="action-btn btn-cooking" onclick="updateOrderStatus('${orderId}', 'cooking')">🍳 Cooking</button>`;
+            } else if (status === 'cooking') {
+                actions = `<button class="action-btn btn-packing" onclick="updateOrderStatus('${orderId}', 'packing')">📦 Packing</button>`;
+            } else if (status === 'packing') {
+                actions = `<button class="action-btn btn-delivery" onclick="updateOrderStatus('${orderId}', 'out-for-delivery')">🚚 Out for Delivery</button>`;
+            } else if (status === 'out-for-delivery') {
+                actions = `<button class="action-btn btn-delivered" onclick="updateOrderStatus('${orderId}', 'delivered')">✔️ Delivered</button>`;
+            }
+            
+            const items = order.items ? order.items.map(item => `
+                <div class="order-item">
+                    <div class="item-details">
+                        <span class="item-emoji">${item.emoji || '🍽️'}</span>
+                        <span>${item.name}</span>
+                        <span class="item-quantity">x${item.quantity}</span>
+                    </div>
+                    <span>₹${(item.price * item.quantity).toFixed(2)}</span>
+                </div>
+            `).join('') : '<div>No items</div>';
+            
+            card.innerHTML = `
+                <div class="order-header">
+                    <div class="order-id">Order #${orderId.slice(-6).toUpperCase()}</div>
+                    <div class="order-status ${status}">${status.replace('-', ' ').toUpperCase()}</div>
+                </div>
+                <div class="customer-info">
+                    <div class="customer-name">👤 ${order.deliveryAddress?.fullName || 'N/A'}</div>
+                    <div class="customer-details">
+                        <div>📞 ${order.deliveryAddress?.phone || 'N/A'}</div>
+                        <div>📍 ${order.deliveryAddress?.address || 'N/A'}</div>
+                        <div>🕐 ${date}</div>
+                    </div>
+                </div>
+                <div class="order-items">
+                    <div class="order-items-title">Items</div>
+                    ${items}
+                </div>
+                <div class="order-totals">
+                    <div class="total-row">
+                        <span>Subtotal</span>
+                        <span>₹${(order.subtotal || 0).toFixed(2)}</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Delivery</span>
+                        <span>₹${(order.deliveryFee || 0).toFixed(2)}</span>
+                    </div>
+                    <div class="total-row grand-total">
+                        <span>Total</span>
+                        <span>₹${(order.total || 0).toFixed(2)}</span>
+                    </div>
+                </div>
+                ${actions ? `<div class="order-actions">${actions}</div>` : ''}
+            `;
             return card;
         }
 
         window.updateOrderStatus = async function(orderId, newStatus) {
-            if (!isAdmin) { showNotification('Unauthorized', true); return; }
+            if (!isAdmin) { 
+                showNotification('Unauthorized', true); 
+                return; 
+            }
+            
+            const buttons = document.querySelectorAll(`[onclick*="${orderId}"]`);
+            buttons.forEach(btn => btn.disabled = true);
+            
             try {
-                const updates = { status: newStatus, updatedAt: new Date().toISOString() };
+                const updates = { 
+                    status: newStatus, 
+                    updatedAt: new Date().toISOString() 
+                };
+                
                 if (newStatus === 'confirmed') updates.acceptedAt = new Date().toISOString();
                 if (newStatus === 'delivered') updates.deliveredAt = new Date().toISOString();
+                
                 await update(dbRef(db, `orders/${orderId}`), updates);
                 showNotification(`Order ${newStatus.replace('-', ' ')}`);
-            } catch (error) { showNotification('Error: ' + error.message, true); }
+            } catch (error) { 
+                showNotification('Error: ' + error.message, true); 
+                buttons.forEach(btn => btn.disabled = false);
+            }
         };
 
         window.filterOrders = function(filter) {
@@ -1882,10 +2154,13 @@
 
         // ========== STORE CONTROL ==========
         function loadStoreStatus() {
-            onValue(dbRef(db, 'storeStatus'), snapshot => {
+            const storeRef = dbRef(db, 'storeStatus');
+            const callback = snapshot => {
                 const status = snapshot.val() || { isOpen: false };
                 updateStoreUI(status.isOpen);
-            });
+            };
+            onValue(storeRef, callback);
+            dbListeners.push({ ref: storeRef, callback });
         }
 
         function updateStoreUI(isOpen) {
@@ -1921,59 +2196,140 @@
         }
 
         window.toggleStoreStatus = async function() {
-            if (!isAdmin) { showNotification('Unauthorized', true); return; }
+            if (!isAdmin) { 
+                showNotification('Unauthorized', true); 
+                return; 
+            }
+            
+            const btn = $('storeToggleBtn');
+            btn.disabled = true;
+            
             try {
                 const snap = await get(dbRef(db, 'storeStatus'));
                 const curr = snap.val() || { isOpen: false };
-                await set(dbRef(db, 'storeStatus'), { isOpen: !curr.isOpen, updatedAt: new Date().toISOString() });
-                showNotification(`Store ${!curr.isOpen ? 'opened' : 'closed'}`);
-            } catch (error) { showNotification('Error: ' + error.message, true); }
+                await set(dbRef(db, 'storeStatus'), { 
+                    isOpen: !curr.isOpen, 
+                    updatedAt: new Date().toISOString() 
+                });
+                showNotification(`Store ${!curr.isOpen ? 'opened' : 'closed'} successfully`);
+            } catch (error) { 
+                showNotification('Error: ' + error.message, true); 
+                btn.disabled = false;
+            }
         };
 
         // ========== FOOD ITEMS ==========
         function loadFoodItems() {
-            onValue(dbRef(db, 'foodItems'), snapshot => displayFoodItems(snapshot.val() || {}));
+            const foodRef = dbRef(db, 'foodItems');
+            const callback = snapshot => displayFoodItems(snapshot.val() || {});
+            onValue(foodRef, callback);
+            dbListeners.push({ ref: foodRef, callback });
         }
 
         function displayFoodItems(categories) {
             const container = $('menuContainer');
             container.innerHTML = '';
             const catNames = Object.keys(categories);
-            if (!catNames.length) { container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">No items</div></div>'; return; }
+            
+            if (!catNames.length) { 
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">No items in menu</div></div>'; 
+                return; 
+            }
+            
             catNames.forEach(catName => {
                 const catData = categories[catName];
                 const emoji = catData.emoji || '🍽️';
-                const items = Object.keys(catData || {}).filter(k => k !== 'emoji').reduce((o, k) => { o[k] = catData[k]; return o; }, {});
+                const items = Object.keys(catData || {})
+                    .filter(k => k !== 'emoji')
+                    .reduce((o, k) => { o[k] = catData[k]; return o; }, {});
+                
                 const sec = document.createElement('div');
                 sec.className = 'category-section';
-                sec.innerHTML = `<div class="category-header"><div class="category-title"><span>${emoji}</span><span>${catName}</span><span class="category-count">${Object.keys(items).length}</span></div></div><div class="items-grid" id="cat-${catName.replace(/\s+/g, '-')}"></div>`;
+                sec.innerHTML = `
+                    <div class="category-header">
+                        <div class="category-title">
+                            <span>${emoji}</span>
+                            <span>${catName}</span>
+                            <span class="category-count">${Object.keys(items).length}</span>
+                        </div>
+                    </div>
+                    <div class="items-grid" id="cat-${catName.replace(/\s+/g, '-')}"></div>
+                `;
                 container.appendChild(sec);
+                
                 const grid = document.getElementById(`cat-${catName.replace(/\s+/g, '-')}`);
-                if (!Object.keys(items).length) { grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div></div>'; }
-                else { Object.keys(items).forEach(itemId => grid.appendChild(createItemCard(items[itemId], itemId, catName))); }
+                if (!Object.keys(items).length) { 
+                    grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">No items</div></div>'; 
+                } else { 
+                    Object.keys(items).forEach(itemId => {
+                        grid.appendChild(createItemCard(items[itemId], itemId, catName));
+                    });
+                }
             });
         }
 
         function createItemCard(item, itemId, catName) {
             const card = document.createElement('div');
             card.className = 'item-card';
-            const img = item.imageurl ? `<img src="${item.imageurl}" alt="${item.name}" class="item-image" onerror="this.style.display='none'">` : `<div class="item-emoji-display">${item.emoji || '🍽️'}</div>`;
+            const img = item.imageurl ? 
+                `<img src="${item.imageurl}" alt="${item.name}" class="item-image" onerror="this.style.display='none'">` : 
+                `<div class="item-emoji-display">${item.emoji || '🍽️'}</div>`;
             const active = item.isActive !== false;
-            card.innerHTML = `${img}<div class="item-name">${item.name}</div>${item.description ? `<div class="item-description">${item.description}</div>` : ''}<div class="item-price">₹${parseFloat(item.price).toFixed(2)}</div><div class="item-actions"><button class="btn-edit" onclick="editItem('${catName}', '${itemId}')">Edit</button><button class="btn-toggle ${active ? '' : 'inactive'}" onclick="toggleItemStatus('${catName}', '${itemId}', ${active})">${active ? 'Active' : 'Inactive'}</button><button class="btn-delete" onclick="deleteItem('${catName}', '${itemId}')">Delete</button></div>`;
+            
+            card.innerHTML = `
+                ${img}
+                <div class="item-name">${item.name}</div>
+                ${item.description ? `<div class="item-description">${item.description}</div>` : ''}
+                <div class="item-price">₹${parseFloat(item.price).toFixed(2)}</div>
+                <div class="item-actions">
+                    <button class="btn-edit" onclick="editItem('${catName}', '${itemId}')">Edit</button>
+                    <button class="btn-toggle ${active ? '' : 'inactive'}" onclick="toggleItemStatus('${catName}', '${itemId}', ${active})">
+                        ${active ? 'Active' : 'Inactive'}
+                    </button>
+                    <button class="btn-delete" onclick="deleteItem('${catName}', '${itemId}')">Delete</button>
+                </div>
+            `;
             return card;
         }
 
         window.previewImageFile = function() {
             const file = $('itemImageFile').files?.[0];
-            selectedAddFile = file || null;
             const preview = $('imagePreview');
-            if (file) { preview.src = URL.createObjectURL(file); preview.classList.add('show'); }
-            else { preview.classList.remove('show'); }
+            
+            if (!file) { 
+                selectedAddFile = null;
+                preview.classList.remove('show'); 
+                return; 
+            }
+            
+            if (!file.type.startsWith('image/')) {
+                showNotification('Please select an image file', true);
+                $('itemImageFile').value = '';
+                return;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) {
+                showNotification('Image must be less than 5MB', true);
+                $('itemImageFile').value = '';
+                return;
+            }
+            
+            selectedAddFile = file;
+            preview.src = URL.createObjectURL(file);
+            preview.classList.add('show');
         };
 
         window.addFoodItem = async function(e) {
             e.preventDefault();
-            if (!isAdmin) { showNotification('Unauthorized', true); return; }
+            if (!isAdmin) { 
+                showNotification('Unauthorized', true); 
+                return; 
+            }
+            
+            const btn = $('addItemBtn');
+            btn.disabled = true;
+            btn.textContent = 'Adding...';
+            
             const catSel = $('categorySelect');
             const catName = catSel.value;
             const emoji = catSel.options[catSel.selectedIndex].getAttribute('data-emoji');
@@ -1981,26 +2337,58 @@
             const price = parseFloat($('itemPrice').value);
             const emojiVal = $('itemEmoji').value.trim();
             const desc = $('itemDescription').value.trim();
-            if (!catName) { showNotification('Select a category', true); return; }
+            
+            if (!catName) { 
+                showNotification('Select a category', true);
+                btn.disabled = false;
+                btn.textContent = 'Add Item';
+                return; 
+            }
+            
             try {
                 const catRef = dbRef(db, `foodItems/${catName}`);
-                if (!(await get(catRef)).exists()) { await set(dbRef(db, `foodItems/${catName}/emoji`), emoji); }
+                if (!(await get(catRef)).exists()) { 
+                    await set(dbRef(db, `foodItems/${catName}/emoji`), emoji); 
+                }
+                
                 let url = '';
-                if (selectedAddFile) { url = await uploadFile(selectedAddFile, `foodImages/${catName}/${Date.now()}_${selectedAddFile.name.replace(/\s+/g,'_')}`); }
+                if (selectedAddFile) { 
+                    url = await uploadFile(selectedAddFile, `foodImages/${catName}/${Date.now()}_${selectedAddFile.name.replace(/\s+/g,'_')}`); 
+                }
+                
                 const itemRef = push(dbRef(db, `foodItems/${catName}`));
-                await set(itemRef, { name, price, emoji: emojiVal, imageurl: url, description: desc, isActive: true, createdAt: new Date().toISOString() });
+                await set(itemRef, { 
+                    name, 
+                    price, 
+                    emoji: emojiVal, 
+                    imageurl: url, 
+                    description: desc, 
+                    isActive: true, 
+                    createdAt: new Date().toISOString() 
+                });
+                
                 $('addItemForm').reset();
                 $('imagePreview').classList.remove('show');
                 selectedAddFile = null;
-                showNotification('Item added');
-            } catch (error) { showNotification('Error: ' + error.message, true); }
+                showNotification('Item added successfully');
+            } catch (error) { 
+                showNotification('Error: ' + error.message, true); 
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Add Item';
+            }
         };
 
         window.editItem = async function(catName, itemId) {
-            if (!isAdmin) { showNotification('Unauthorized', true); return; }
+            if (!isAdmin) { 
+                showNotification('Unauthorized', true); 
+                return; 
+            }
+            
             currentEditId = itemId;
             currentEditCategory = catName;
             selectedEditFile = null;
+            
             try {
                 const item = (await get(dbRef(db, `foodItems/${catName}/${itemId}`))).val();
                 $('editCategorySelect').value = catName;
@@ -2008,43 +2396,108 @@
                 $('editPrice').value = item.price || '';
                 $('editEmoji').value = item.emoji || '';
                 $('editDescription').value = item.description || '';
-                if (item.imageurl) { const p = $('editImagePreview'); p.src = item.imageurl; p.classList.add('show'); }
-                else { $('editImagePreview').classList.remove('show'); }
+                
+                if (item.imageurl) { 
+                    const p = $('editImagePreview'); 
+                    p.src = item.imageurl; 
+                    p.classList.add('show'); 
+                } else { 
+                    $('editImagePreview').classList.remove('show'); 
+                }
+                
                 $('editModal').classList.add('active');
-            } catch (error) { showNotification('Error: ' + error.message, true); }
+            } catch (error) { 
+                showNotification('Error: ' + error.message, true); 
+            }
         };
 
         window.previewEditImageFile = function() {
             const file = $('editImageFile').files?.[0];
-            selectedEditFile = file || null;
             const preview = $('editImagePreview');
-            if (file) { preview.src = URL.createObjectURL(file); preview.classList.add('show'); }
+            
+            if (!file) { 
+                selectedEditFile = null;
+                return; 
+            }
+            
+            if (!file.type.startsWith('image/')) {
+                showNotification('Please select an image file', true);
+                $('editImageFile').value = '';
+                return;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) {
+                showNotification('Image must be less than 5MB', true);
+                $('editImageFile').value = '';
+                return;
+            }
+            
+            selectedEditFile = file;
+            preview.src = URL.createObjectURL(file);
+            preview.classList.add('show');
         };
 
         window.saveEdit = async function(e) {
             e.preventDefault();
-            if (!isAdmin) { showNotification('Unauthorized', true); return; }
+            if (!isAdmin) { 
+                showNotification('Unauthorized', true); 
+                return; 
+            }
+            
+            const btn = $('saveEditBtn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+            
             const newCat = $('editCategorySelect').value;
             const newEmoji = $('editCategorySelect').options[$('editCategorySelect').selectedIndex].getAttribute('data-emoji');
             const name = $('editName').value.trim();
             const price = parseFloat($('editPrice').value);
             const emoji = $('editEmoji').value.trim();
             const desc = $('editDescription').value.trim();
+            
             try {
                 const oldRef = dbRef(db, `foodItems/${currentEditCategory}/${currentEditId}`);
                 const oldItem = (await get(oldRef)).val();
+                
                 let url = oldItem.imageurl || '';
-                if (selectedEditFile) { url = await uploadFile(selectedEditFile, `foodImages/${newCat}/${Date.now()}_${selectedEditFile.name.replace(/\s+/g,'_')}`); }
-                if (newCat !== currentEditCategory) {
-                    if (!(await get(dbRef(db, `foodItems/${newCat}`))).exists()) { await set(dbRef(db, `foodItems/${newCat}/emoji`), newEmoji); }
-                    await remove(oldRef);
-                    await set(dbRef(db, `foodItems/${newCat}/${currentEditId}`), { name, price, emoji, imageurl: url, description: desc, isActive: oldItem.isActive !== false, createdAt: oldItem.createdAt, updatedAt: new Date().toISOString() });
-                } else {
-                    await update(oldRef, { name, price, emoji, imageurl: url, description: desc, updatedAt: new Date().toISOString() });
+                if (selectedEditFile) { 
+                    url = await uploadFile(selectedEditFile, `foodImages/${newCat}/${Date.now()}_${selectedEditFile.name.replace(/\s+/g,'_')}`); 
                 }
+                
+                if (newCat !== currentEditCategory) {
+                    if (!(await get(dbRef(db, `foodItems/${newCat}`))).exists()) { 
+                        await set(dbRef(db, `foodItems/${newCat}/emoji`), newEmoji); 
+                    }
+                    await remove(oldRef);
+                    await set(dbRef(db, `foodItems/${newCat}/${currentEditId}`), { 
+                        name, 
+                        price, 
+                        emoji, 
+                        imageurl: url, 
+                        description: desc, 
+                        isActive: oldItem.isActive !== false, 
+                        createdAt: oldItem.createdAt, 
+                        updatedAt: new Date().toISOString() 
+                    });
+                } else {
+                    await update(oldRef, { 
+                        name, 
+                        price, 
+                        emoji, 
+                        imageurl: url, 
+                        description: desc, 
+                        updatedAt: new Date().toISOString() 
+                    });
+                }
+                
                 closeEditModal();
-                showNotification('Item updated');
-            } catch (error) { showNotification('Error: ' + error.message, true); }
+                showNotification('Item updated successfully');
+            } catch (error) { 
+                showNotification('Error: ' + error.message, true); 
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save Changes';
+            }
         };
 
         window.closeEditModal = function() {
@@ -2057,31 +2510,67 @@
         };
 
         window.toggleItemStatus = async function(catName, itemId, active) {
-            if (!isAdmin) { showNotification('Unauthorized', true); return; }
+            if (!isAdmin) { 
+                showNotification('Unauthorized', true); 
+                return; 
+            }
+            
+            const buttons = document.querySelectorAll(`[onclick*="toggleItemStatus('${catName}', '${itemId}'"]`);
+            buttons.forEach(btn => btn.disabled = true);
+            
             try {
-                await update(dbRef(db, `foodItems/${catName}/${itemId}`), { isActive: !active, updatedAt: new Date().toISOString() });
-                showNotification(`Item ${!active ? 'activated' : 'deactivated'}`);
-            } catch (error) { showNotification('Error: ' + error.message, true); }
+                await update(dbRef(db, `foodItems/${catName}/${itemId}`), { 
+                    isActive: !active, 
+                    updatedAt: new Date().toISOString() 
+                });
+                showNotification(`Item ${!active ? 'activated' : 'deactivated'} successfully`);
+            } catch (error) { 
+                showNotification('Error: ' + error.message, true); 
+                buttons.forEach(btn => btn.disabled = false);
+            }
         };
 
         window.deleteItem = async function(catName, itemId) {
-            if (!isAdmin) { showNotification('Unauthorized', true); return; }
-            if (!confirm('Delete this item?')) return;
+            if (!isAdmin) { 
+                showNotification('Unauthorized', true); 
+                return; 
+            }
+            
+            if (!confirm('Are you sure you want to delete this item? This action cannot be undone.')) return;
+            
+            const buttons = document.querySelectorAll(`[onclick*="deleteItem('${catName}', '${itemId}'"]`);
+            buttons.forEach(btn => btn.disabled = true);
+            
             try {
                 await remove(dbRef(db, `foodItems/${catName}/${itemId}`));
-                showNotification('Item deleted');
-            } catch (error) { showNotification('Error: ' + error.message, true); }
+                showNotification('Item deleted successfully');
+            } catch (error) { 
+                showNotification('Error: ' + error.message, true); 
+                buttons.forEach(btn => btn.disabled = false);
+            }
         };
 
-        // ========== UI ==========
+        // ========== UI FUNCTIONS ==========
         window.switchTab = function(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.mobile-menu-item').forEach(m => m.classList.remove('active'));
+            
             const tab = document.getElementById(tabName + 'Tab');
             if (tab) tab.classList.add('active');
-            document.querySelectorAll('.tab').forEach(t => { if (t.textContent.toLowerCase().includes(tabName.toLowerCase())) t.classList.add('active'); });
-            document.querySelectorAll('.mobile-menu-item').forEach(m => { if (m.getAttribute('onclick')?.includes(tabName)) m.classList.add('active'); });
+            
+            document.querySelectorAll('.tab').forEach(t => { 
+                if (t.textContent.toLowerCase().includes(tabName.toLowerCase())) {
+                    t.classList.add('active'); 
+                }
+            });
+            
+            document.querySelectorAll('.mobile-menu-item').forEach(m => { 
+                if (m.getAttribute('onclick')?.includes(tabName)) {
+                    m.classList.add('active'); 
+                }
+            });
+            
             if (window.innerWidth <= 767) toggleMenu();
         };
 
@@ -2091,10 +2580,24 @@
         };
 
         window.logout = function() {
-            if (confirm('Logout?')) {
-                signOut(auth).then(() => { window.location.href = 'adminlogin.html'; }).catch(e => showNotification('Error', true));
+            if (confirm('Are you sure you want to logout?')) {
+                signOut(auth).then(() => { 
+                    cleanupListeners();
+                    window.location.href = 'adminlogin.html'; 
+                }).catch(e => {
+                    showNotification('Logout error: ' + e.message, true);
+                });
             }
         };
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target.id === 'editModal') closeEditModal();
+            if (e.target.id === 'userDetailsModal') closeUserModal();
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', cleanupListeners);
     </script>
 </body>
 </html>
