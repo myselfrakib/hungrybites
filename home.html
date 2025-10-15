@@ -777,7 +777,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -798,15 +798,40 @@
         let allFoodItems = {};
         let currentCategory = 'all';
         let freeDeliveryToastShown = false;
+        let currentUser = null;
         const FREE_DELIVERY_THRESHOLD = 200;
         
         loadCart();
         updateCartBadge();
         updateNotificationVisibility();
 
-        
+        // Allow both authenticated and unauthenticated users
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            loadFoodItems();
             
+            // Sync cart from DB if user is logged in
+            if (user) {
+                syncCartFromDB(user.uid);
+            }
         });
+
+        function syncCartFromDB(userId) {
+            const userCartRef = ref(db, `carts/${userId}`);
+            onValue(userCartRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const dbCart = snapshot.val();
+                    cart = Object.keys(dbCart).map(itemId => ({
+                        id: itemId,
+                        ...dbCart[itemId]
+                    }));
+                    saveCart();
+                    updateCartBadge();
+                    updateNotificationVisibility();
+                    renderFoodItems();
+                }
+            });
+        }
 
         function escapeHtml(text) {
             const div = document.createElement('div');
@@ -930,22 +955,6 @@
                         
                         const item = category[itemId];
                         if (item.isActive !== false) {
-                            foodHTML += createFoodCard(itemId, item, categoryName);
-                            itemCount++;
-                        }
-                    });
-                });
-            } else {
-                const category = allFoodItems[currentCategory];
-                if (category) {
-                    categoryEmoji.textContent = category.emoji || '🍽️';
-                    categoryNameEl.textContent = currentCategory;
-
-                    Object.keys(category).forEach(itemId => {
-                        if (itemId === 'emoji') return;
-                        
-                        const item = category[itemId];
-                        if (item.isActive !== false) {
                             foodHTML += createFoodCard(itemId, item, currentCategory);
                             itemCount++;
                         }
@@ -1003,6 +1012,32 @@
             `;
         }
 
+        function syncCartToDB() {
+            if (!currentUser) return;
+            
+            const userCartRef = ref(db, `carts/${currentUser.uid}`);
+            
+            if (cart.length === 0) {
+                remove(userCartRef);
+                return;
+            }
+            
+            const cartData = {};
+            cart.forEach(item => {
+                cartData[item.id] = {
+                    name: item.name,
+                    price: item.price,
+                    emoji: item.emoji,
+                    category: item.category,
+                    quantity: item.quantity
+                };
+            });
+            
+            set(userCartRef, cartData).catch(error => {
+                console.error('Error syncing cart to DB:', error);
+            });
+        }
+
         function checkFreeDeliveryUnlocked() {
             const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             
@@ -1051,6 +1086,7 @@
             }
 
             saveCart();
+            syncCartToDB();
             updateCartBadge();
             updateNotificationVisibility();
             updateButtonUI(id, existingItem ? existingItem.quantity : 1);
@@ -1062,6 +1098,7 @@
             if (item) {
                 item.quantity += 1;
                 saveCart();
+                syncCartToDB();
                 updateCartBadge();
                 updateNotificationVisibility();
                 updateButtonUI(id, item.quantity);
@@ -1075,6 +1112,7 @@
                 if (item.quantity > 1) {
                     item.quantity -= 1;
                     saveCart();
+                    syncCartToDB();
                     updateCartBadge();
                     updateNotificationVisibility();
                     updateButtonUI(id, item.quantity);
@@ -1082,6 +1120,7 @@
                 } else {
                     cart = cart.filter(item => item.id !== id);
                     saveCart();
+                    syncCartToDB();
                     updateCartBadge();
                     updateNotificationVisibility();
                     updateButtonUI(id, 0);
