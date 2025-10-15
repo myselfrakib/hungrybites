@@ -804,12 +804,8 @@
         updateCartBadge();
         updateNotificationVisibility();
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                loadFoodItems();
-            } else {
-                window.location.href = 'index.html';
-            }
+        
+            
         });
 
         function escapeHtml(text) {
