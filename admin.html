@@ -2056,20 +2056,74 @@
             const date = order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A';
             const status = order.status || 'pending';
             
+            // Extract address and phone for map/call buttons
+            const fullAddress = order.deliveryAddress?.address || '';
+            const phone = order.deliveryAddress?.phone || '';
+            const customerName = order.deliveryAddress?.fullName || 'N/A';
+            
+            // Create map link (Google Maps)
+            const mapUrl = fullAddress ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}` : '';
+            
+            // Create call link
+            const callUrl = phone ? `tel:${phone}` : '';
+            
+            // Call to action buttons (Map & Call)
+            let ctaButtons = '';
+            if (mapUrl || callUrl) {
+                ctaButtons = `
+                    <div class="order-cta-buttons">
+                        ${mapUrl ? `<a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="cta-btn cta-map">
+                            <span>📍</span>
+                            <span>View on Map</span>
+                        </a>` : ''}
+                        ${callUrl ? `<a href="${callUrl}" class="cta-btn cta-call">
+                            <span>📞</span>
+                            <span>Call Customer</span>
+                        </a>` : ''}
+                    </div>
+                `;
+            }
+            
             let actions = '';
             if (status === 'pending') {
                 actions = `
-                    <button class="action-btn btn-accept" onclick="updateOrderStatus('${orderId}', 'confirmed')">✅ Accept</button>
-                    <button class="action-btn btn-reject" onclick="updateOrderStatus('${orderId}', 'rejected')">❌ Reject</button>
+                    ${ctaButtons}
+                    <div class="order-actions">
+                        <button class="action-btn btn-accept" onclick="updateOrderStatus('${orderId}', 'confirmed')">✅ Accept Order</button>
+                        <button class="action-btn btn-reject" onclick="updateOrderStatus('${orderId}', 'rejected')">❌ Reject Order</button>
+                    </div>
                 `;
             } else if (status === 'confirmed') {
-                actions = `<button class="action-btn btn-cooking" onclick="updateOrderStatus('${orderId}', 'cooking')">🍳 Cooking</button>`;
+                actions = `
+                    ${ctaButtons}
+                    <div class="order-actions">
+                        <button class="action-btn btn-cooking" onclick="updateOrderStatus('${orderId}', 'cooking')">🍳 Start Cooking</button>
+                    </div>
+                `;
             } else if (status === 'cooking') {
-                actions = `<button class="action-btn btn-packing" onclick="updateOrderStatus('${orderId}', 'packing')">📦 Packing</button>`;
+                actions = `
+                    ${ctaButtons}
+                    <div class="order-actions">
+                        <button class="action-btn btn-packing" onclick="updateOrderStatus('${orderId}', 'packing')">📦 Start Packing</button>
+                    </div>
+                `;
             } else if (status === 'packing') {
-                actions = `<button class="action-btn btn-delivery" onclick="updateOrderStatus('${orderId}', 'out-for-delivery')">🚚 Out for Delivery</button>`;
+                actions = `
+                    ${ctaButtons}
+                    <div class="order-actions">
+                        <button class="action-btn btn-delivery" onclick="updateOrderStatus('${orderId}', 'out-for-delivery')">🚚 Out for Delivery</button>
+                    </div>
+                `;
             } else if (status === 'out-for-delivery') {
-                actions = `<button class="action-btn btn-delivered" onclick="updateOrderStatus('${orderId}', 'delivered')">✔️ Delivered</button>`;
+                actions = `
+                    ${ctaButtons}
+                    <div class="order-actions">
+                        <button class="action-btn btn-delivered" onclick="updateOrderStatus('${orderId}', 'delivered')">✔️ Mark Delivered</button>
+                    </div>
+                `;
+            } else if (status === 'delivered' || status === 'rejected') {
+                // Show CTA buttons even after delivery/rejection for reference
+                actions = ctaButtons;
             }
             
             const items = order.items ? order.items.map(item => `
@@ -2089,10 +2143,10 @@
                     <div class="order-status ${status}">${status.replace('-', ' ').toUpperCase()}</div>
                 </div>
                 <div class="customer-info">
-                    <div class="customer-name">👤 ${order.deliveryAddress?.fullName || 'N/A'}</div>
+                    <div class="customer-name">👤 ${customerName}</div>
                     <div class="customer-details">
-                        <div>📞 ${order.deliveryAddress?.phone || 'N/A'}</div>
-                        <div>📍 ${order.deliveryAddress?.address || 'N/A'}</div>
+                        <div>📞 ${phone || 'N/A'}</div>
+                        <div>📍 ${fullAddress || 'N/A'}</div>
                         <div>🕐 ${date}</div>
                     </div>
                 </div>
@@ -2114,7 +2168,7 @@
                         <span>₹${(order.total || 0).toFixed(2)}</span>
                     </div>
                 </div>
-                ${actions ? `<div class="order-actions">${actions}</div>` : ''}
+                ${actions}
             `;
             return card;
         }
