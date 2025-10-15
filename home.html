@@ -99,12 +99,6 @@
             display: flex;
         }
 
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
         .nav-item {
             cursor: pointer;
             padding: 0.9rem;
@@ -485,13 +479,6 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        .notification-content {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            flex: 1;
-        }
-
         .view-cart-btn {
             background: white;
             color: var(--blue-gray);
@@ -615,65 +602,7 @@
             transform: scale(0.95);
         }
 
-        @media (min-width: 480px) {
-            .navbar {
-                padding: 0.75rem 1.5rem;
-            }
-
-            .nav-items {
-                gap: 1rem;
-            }
-
-            .container {
-                padding: 2rem 1rem;
-            }
-
-            .category-tabs {
-                gap: 1rem;
-            }
-        }
-
         @media (min-width: 768px) {
-            .container {
-                padding: 2.5rem 1.5rem;
-            }
-
-            .food-grid {
-                gap: 1.75rem;
-            }
-
-            .food-card:hover {
-                transform: translateY(-8px);
-                box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-            }
-
-            .add-btn:hover {
-                background: var(--mustard);
-                transform: scale(1.05);
-            }
-
-            .category-tab:hover {
-                border-color: var(--sunglow);
-                box-shadow: 0 4px 15px rgba(253, 201, 33, 0.2);
-            }
-
-            .notification {
-                bottom: auto;
-                top: 100px;
-                right: 2rem;
-                left: auto;
-                transform: translateX(400px);
-                max-width: 350px;
-            }
-
-            .notification.show {
-                transform: translateX(0);
-            }
-
-            .view-cart-btn:hover {
-                background: #f0f0f0;
-            }
-
             .hamburger {
                 display: none;
             }
@@ -693,29 +622,27 @@
                 min-height: 40px;
             }
 
-            .nav-right {
-                gap: 1rem;
+            .food-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 8px 30px rgba(0,0,0,0.15);
             }
 
-            .quantity-btn:hover {
+            .add-btn:hover {
                 background: var(--mustard);
-                transform: scale(1.1);
+                transform: scale(1.05);
             }
 
-            .toast-close-btn:hover {
-                background: #4a9635;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(96, 178, 70, 0.4);
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .nav-items {
-                gap: 1.5rem;
+            .notification {
+                bottom: auto;
+                top: 100px;
+                right: 2rem;
+                left: auto;
+                transform: translateX(400px);
+                max-width: 350px;
             }
 
-            .category-tabs {
-                gap: 1.25rem;
+            .notification.show {
+                transform: translateX(0);
             }
         }
     </style>
@@ -766,7 +693,7 @@
         <a href="checkout.html" class="view-cart-btn">🛒 Order Now</a>
     </div>
 
-    <div class="toast-overlay" id="toastOverlay"></div>
+    <div class="toast-overlay" id="toastOverlay" onclick="closeFreeDeliveryToast()"></div>
     <div class="free-delivery-toast" id="freeDeliveryToast">
         <div class="toast-icon">🎉</div>
         <div class="toast-title">Congratulations!</div>
@@ -775,9 +702,9 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -805,12 +732,9 @@
         updateCartBadge();
         updateNotificationVisibility();
 
-        // Allow both authenticated and unauthenticated users
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             loadFoodItems();
-            
-            // Sync cart from DB if user is logged in
             if (user) {
                 syncCartFromDB(user.uid);
             }
@@ -842,7 +766,6 @@
         async function loadFoodItems() {
             const foodGrid = document.getElementById('foodGrid');
             foodGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Loading menu...</div>';
-            document.getElementById('menuTitle').style.display = 'flex';
 
             try {
                 const foodItemsRef = ref(db, 'foodItems');
@@ -915,10 +838,11 @@
 
             categoryData.forEach(cat => {
                 if (cat.count > 0) {
+                    const escapedName = escapeHtml(cat.name);
                     tabsHTML += `
-                        <div class="category-tab ${currentCategory === cat.name ? 'active' : ''}" onclick="filterCategory('${escapeHtml(cat.name)}')">
+                        <div class="category-tab ${currentCategory === cat.name ? 'active' : ''}" onclick="filterCategory('${escapedName}')">
                             <span class="category-emoji">${cat.emoji}</span>
-                            <span>${escapeHtml(cat.name)}</span>
+                            <span>${escapedName}</span>
                             <span class="category-count">${cat.count}</span>
                         </div>
                     `;
@@ -950,6 +874,22 @@
 
                 Object.keys(allFoodItems).forEach(categoryName => {
                     const category = allFoodItems[categoryName];
+                    Object.keys(category).forEach(itemId => {
+                        if (itemId === 'emoji') return;
+                        
+                        const item = category[itemId];
+                        if (item.isActive !== false) {
+                            foodHTML += createFoodCard(itemId, item, categoryName);
+                            itemCount++;
+                        }
+                    });
+                });
+            } else {
+                const category = allFoodItems[currentCategory];
+                if (category) {
+                    categoryEmoji.textContent = category.emoji || '🍽️';
+                    categoryNameEl.textContent = currentCategory;
+
                     Object.keys(category).forEach(itemId => {
                         if (itemId === 'emoji') return;
                         
