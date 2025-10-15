@@ -145,6 +145,10 @@
         .addresses-list-title { font-size: 1.1rem; font-weight: 600; color: #333; }
         .empty-addresses { text-align: center; padding: 2rem 1rem; color: #666; }
         .empty-addresses-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .sync-indicator { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #90ee90; margin-right: 0.5rem; animation: pulse 2s infinite; }
+        .sync-indicator.syncing { background: #ffc107; animation: pulse 1s infinite; }
+        .sync-indicator.error { background: #dc3545; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         @media (min-width: 768px) {
             .cart-item { flex-direction: row; align-items: center; }
             .quantity-btn:hover { background: var(--mustard); transform: scale(1.1); }
@@ -188,7 +192,10 @@
         </div>
 
         <div class="cart-container">
-            <h2>Your Cart</h2>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                <h2 style="margin: 0;">Your Cart</h2>
+                <span class="sync-indicator" id="syncIndicator" title="Cart sync status"></span>
+            </div>
             <div id="cartContent"></div>
         </div>
 
@@ -297,7 +304,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        import { getDatabase, ref, push, set, get, remove, update } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { getDatabase, ref, push, set, get, remove, update, onValue } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const app = initializeApp({
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -315,9 +322,17 @@
         let savedAddresses = [], selectedAddressId = null, map, marker;
         let finalPinLocation = null;
         let initialLocationDetected = false;
+        let cartSyncListener = null;
         const RAZORPAY_KEY = 'rzp_test_your_key_here';
         const FREE_DELIVERY_THRESHOLD = 200;
         const DELIVERY_FEE = 40;
+
+        function updateSyncIndicator(status) {
+            const indicator = document.getElementById('syncIndicator');
+            indicator.className = 'sync-indicator';
+            if (status === 'syncing') indicator.classList.add('syncing');
+            else if (status === 'error') indicator.classList.add('error');
+        }
 
         function calculateDeliveryFee(subtotal) {
             return subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
@@ -521,11 +536,71 @@
             alert('Location Detection Help:\n\n1. Allow location permission when prompted\n2. DRAG the red marker to your EXACT delivery location\n3. You can also tap anywhere on the map\n4. The coordinates shown below the map are what will be saved\n5. Make sure to position the pin at your exact address');
         };
 
+        function syncCartFromDB(userId) {
+            updateSyncIndicator('syncing');
+            
+            if (cartSyncListener) cartSyncListener();
+            
+            const userCartRef = ref(db, `carts/${userId}`);
+            cartSyncListener = onValue(userCartRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const dbCart = snapshot.val();
+                    const newCart = Object.keys(dbCart).map(itemId => ({
+                        id: itemId,
+                        ...dbCart[itemId]
+                    }));
+                    
+                    if (JSON.stringify(cart) !== JSON.stringify(newCart)) {
+                        cart = newCart;
+                        saveCart();
+                        renderCart();
+                        updateSyncIndicator('synced');
+                    }
+                } else {
+                    if (cart.length > 0) {
+                        syncCartToDB(userId);
+                    }
+                    updateSyncIndicator('synced');
+                }
+            }, (error) => {
+                console.error('Cart sync error:', error);
+                updateSyncIndicator('error');
+                setTimeout(() => updateSyncIndicator('synced'), 3000);
+            });
+        }
+
+        function syncCartToDB(userId) {
+            const userCartRef = ref(db, `carts/${userId}`);
+            
+            if (cart.length === 0) {
+                remove(userCartRef).catch(err => console.error('Error removing cart:', err));
+                return;
+            }
+            
+            const cartData = {};
+            cart.forEach(item => {
+                cartData[item.id] = {
+                    name: item.name,
+                    price: item.price,
+                    emoji: item.emoji,
+                    category: item.category,
+                    quantity: item.quantity
+                };
+            });
+            
+            set(userCartRef, cartData).catch(error => {
+                console.error('Error syncing cart to DB:', error);
+                updateSyncIndicator('error');
+                setTimeout(() => updateSyncIndicator('synced'), 3000);
+            });
+        }
+
         onAuthStateChanged(auth, user => {
             if (user) {
                 currentUser = user;
                 loadGoogleMaps();
                 loadCart();
+                syncCartFromDB(user.uid);
                 loadSavedAddresses().then(() => {
                     selectPayment('cod');
                 });
@@ -635,6 +710,7 @@
             cart[i].quantity += change;
             if (cart[i].quantity <= 0) cart.splice(i, 1);
             saveCart();
+            if (currentUser) syncCartToDB(currentUser.uid);
             renderCart();
         };
 
@@ -642,6 +718,7 @@
             if (confirm('Remove this item?')) {
                 cart.splice(i, 1);
                 saveCart();
+                if (currentUser) syncCartToDB(currentUser.uid);
                 renderCart();
             }
         };
@@ -1095,6 +1172,9 @@
                 showToast('success', '✅ Order Successful!', 'Redirecting to My Orders...');
                 localStorage.removeItem('midnightPlazaCart');
                 cart = [];
+                if (currentUser) {
+                    await remove(ref(db, `carts/${currentUser.uid}`)).catch(err => console.log('Cart cleanup:', err));
+                }
                 setTimeout(() => window.location.href = 'orders.html', 2500);
             } catch (e) {
                 console.error('Order error:', e);
@@ -1148,6 +1228,7 @@
         window.logout = async () => {
             if (confirm('Logout?')) {
                 try {
+                    if (cartSyncListener) cartSyncListener();
                     await signOut(auth);
                     localStorage.removeItem('midnightPlazaCart');
                     window.location.href = 'index.html';
