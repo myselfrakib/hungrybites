@@ -16,6 +16,7 @@
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: #2c3e50;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         .navbar {
@@ -104,9 +105,10 @@
         }
 
         .container {
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 2rem 1rem;
+            width: 100%;
         }
 
         .tabs {
@@ -244,7 +246,7 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
@@ -286,7 +288,7 @@
 
         .carts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 1.8rem;
         }
 
@@ -327,17 +329,36 @@
             color: white;
             font-weight: 700;
             font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .cart-user-details {
+            flex: 1;
+            min-width: 0;
         }
 
         .cart-user-name {
             font-weight: 700;
             color: #2c3e50;
             font-size: 1rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .cart-user-email {
             font-size: 0.85rem;
             color: #7f8c8d;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .cart-user-phone {
+            font-size: 0.85rem;
+            color: #667eea;
+            font-weight: 600;
+            margin-top: 0.2rem;
         }
 
         .cart-items-list {
@@ -358,15 +379,25 @@
             align-items: center;
             gap: 0.8rem;
             flex: 1;
+            min-width: 0;
         }
 
         .cart-item-emoji {
             font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .cart-item-details {
+            flex: 1;
+            min-width: 0;
         }
 
         .cart-item-name {
             font-weight: 600;
             color: #2c3e50;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .cart-item-qty {
@@ -379,6 +410,7 @@
             color: #60b246;
             min-width: 70px;
             text-align: right;
+            flex-shrink: 0;
         }
 
         .cart-summary {
@@ -1633,9 +1665,78 @@
                 const admin = await get(dbRef(db, `admins/${user.uid}`));
                 if (!admin.exists() || !admin.val().admin) { showNotification('Unauthorized', true); setTimeout(() => window.location.href = 'adminlogin.html', 2000); return; }
                 isAdmin = true;
-                loadCarts(); loadUsers(); loadOrders(); loadStoreStatus(); loadFoodItems();
+                loadUsers(); // Load users first
+                loadCarts(); 
+                loadOrders(); 
+                loadStoreStatus(); 
+                loadFoodItems();
             } catch (err) { showNotification('Error verifying admin', true); }
         });
+
+        // ========== USERS (Load first for cart display) ==========
+        function loadUsers() {
+            onValue(dbRef(db, 'users'), snapshot => {
+                allUsers = {};
+                const data = snapshot.val() || {};
+                Object.keys(data).forEach(uid => { if (data[uid].allDetails) allUsers[uid] = data[uid].allDetails; });
+                displayUsers();
+                updateUserStats();
+                displayCarts(); // Refresh carts when users update
+            });
+        }
+
+        function displayUsers() {
+            const tbody = $('usersTableBody');
+            const keys = Object.keys(allUsers);
+            if (!keys.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;">No users</td></tr>'; return; }
+            tbody.innerHTML = '';
+            keys.forEach((uid, i) => tbody.appendChild(createUserRow(allUsers[uid], uid, i + 1)));
+        }
+
+        function createUserRow(user, uid, slNo) {
+            const row = document.createElement('tr');
+            const date = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A';
+            const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?';
+            const verified = user.verified !== false;
+            row.innerHTML = `<td style="text-align:center;font-weight:600;">${slNo}</td><td><div class="user-info"><div class="user-avatar">${initials}</div><div class="user-details"><div class="user-name">${user.name || 'N/A'}</div><div class="user-email">${user.email || 'N/A'}</div></div></div></td><td>${user.phoneNumber || 'N/A'}</td><td>${date}</td><td><span class="verified-badge ${verified ? 'verified' : 'not-verified'}">${verified ? '✅ Verified' : '⏳ Unverified'}</span></td><td><button class="btn-view" onclick="viewUserDetails('${uid}')">View</button></td>`;
+            return row;
+        }
+
+        function updateUserStats() {
+            const total = Object.keys(allUsers).length;
+            const verified = Object.values(allUsers).filter(u => u.verified !== false).length;
+            $('totalUsers').textContent = total;
+            $('verifiedUsers').textContent = verified;
+            $('unverifiedUsers').textContent = total - verified;
+        }
+
+        window.searchUsers = function() {
+            const term = $('userSearch').value.toLowerCase();
+            const tbody = $('usersTableBody');
+            const keys = Object.keys(allUsers).filter(uid => {
+                const u = allUsers[uid];
+                return (u.name && u.name.toLowerCase().includes(term)) || (u.email && u.email.toLowerCase().includes(term)) || (u.phoneNumber && u.phoneNumber.includes(term));
+            });
+            if (!keys.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;">No results</td></tr>'; return; }
+            tbody.innerHTML = '';
+            keys.forEach((uid, i) => tbody.appendChild(createUserRow(allUsers[uid], uid, i + 1)));
+        };
+
+        window.viewUserDetails = function(uid) {
+            const user = allUsers[uid];
+            const date = user.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A';
+            $('userDetailsContent').innerHTML = `
+                <div class="user-detail-section"><div class="user-detail-label">ID</div><div class="user-detail-value">${uid}</div></div>
+                <div class="user-detail-section"><div class="user-detail-label">Name</div><div class="user-detail-value">${user.name || 'N/A'}</div></div>
+                <div class="user-detail-section"><div class="user-detail-label">Email</div><div class="user-detail-value">${user.email || 'N/A'}</div></div>
+                <div class="user-detail-section"><div class="user-detail-label">Phone</div><div class="user-detail-value">${user.phoneNumber || 'N/A'}</div></div>
+                <div class="user-detail-section"><div class="user-detail-label">Status</div><div class="user-detail-value"><span class="verified-badge ${user.verified !== false ? 'verified' : 'not-verified'}">${user.verified !== false ? '✅ Verified' : '⏳ Unverified'}</span></div></div>
+                <div class="user-detail-section"><div class="user-detail-label">Joined</div><div class="user-detail-value">${date}</div></div>
+            `;
+            $('userDetailsModal').classList.add('active');
+        };
+
+        window.closeUserModal = function() { $('userDetailsModal').classList.remove('active'); };
 
         // ========== CARTS ==========
         function loadCarts() {
@@ -1653,7 +1754,9 @@
         function createCartCard(userId, cartItems, user) {
             const card = document.createElement('div');
             card.className = 'cart-card';
-            const name = user?.name || 'Unknown', email = user?.email || 'N/A';
+            const name = user?.name || 'Unknown User';
+            const email = user?.email || 'N/A';
+            const phone = user?.phoneNumber || 'N/A';
             const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
             const items = Object.entries(cartItems).map(([id, item]) => ({ id, ...item }));
             let html = '', subtotal = 0;
@@ -1663,7 +1766,7 @@
                 html += `<div class="cart-item"><div class="cart-item-info"><span class="cart-item-emoji">${item.emoji || '🍽️'}</span><div class="cart-item-details"><div class="cart-item-name">${item.name}</div><div class="cart-item-qty">x${item.quantity}</div></div></div><div class="cart-item-price">₹${total.toFixed(2)}</div></div>`;
             });
             const fee = subtotal >= 200 ? 0 : 30, total = subtotal + fee;
-            card.innerHTML = `<div class="cart-header"><div class="cart-user-info"><div class="cart-user-avatar">${initials}</div><div class="cart-user-details"><div class="cart-user-name">${name}</div><div class="cart-user-email">${email}</div></div></div></div><div class="cart-items-list">${html}</div><div class="cart-summary"><div class="cart-total-row"><span>Subtotal</span><span>₹${subtotal.toFixed(2)}</span></div><div class="cart-total-row"><span>Delivery</span><span>${fee === 0 ? '🎉 FREE' : '₹' + fee}</span></div><div class="cart-total-row grand-total"><span>Total</span><span>₹${total.toFixed(2)}</span></div></div>`;
+            card.innerHTML = `<div class="cart-header"><div class="cart-user-info"><div class="cart-user-avatar">${initials}</div><div class="cart-user-details"><div class="cart-user-name">${name}</div><div class="cart-user-email">${email}</div><div class="cart-user-phone">📞 ${phone}</div></div></div></div><div class="cart-items-list">${html}</div><div class="cart-summary"><div class="cart-total-row"><span>Subtotal</span><span>₹${subtotal.toFixed(2)}</span></div><div class="cart-total-row"><span>Delivery</span><span>${fee === 0 ? '🎉 FREE' : '₹' + fee}</span></div><div class="cart-total-row grand-total"><span>Total</span><span>₹${total.toFixed(2)}</span></div></div>`;
             return card;
         }
 
@@ -1725,70 +1828,6 @@
             event.target.classList.add('active');
             displayOrders();
         };
-
-        // ========== USERS ==========
-        function loadUsers() {
-            onValue(dbRef(db, 'users'), snapshot => {
-                allUsers = {};
-                const data = snapshot.val() || {};
-                Object.keys(data).forEach(uid => { if (data[uid].allDetails) allUsers[uid] = data[uid].allDetails; });
-                displayUsers();
-                updateUserStats();
-            });
-        }
-
-        function displayUsers() {
-            const tbody = $('usersTableBody');
-            const keys = Object.keys(allUsers);
-            if (!keys.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;">No users</td></tr>'; return; }
-            tbody.innerHTML = '';
-            keys.forEach((uid, i) => tbody.appendChild(createUserRow(allUsers[uid], uid, i + 1)));
-        }
-
-        function createUserRow(user, uid, slNo) {
-            const row = document.createElement('tr');
-            const date = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A';
-            const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?';
-            const verified = user.verified !== false;
-            row.innerHTML = `<td style="text-align:center;font-weight:600;">${slNo}</td><td><div class="user-info"><div class="user-avatar">${initials}</div><div class="user-details"><div class="user-name">${user.name || 'N/A'}</div><div class="user-email">${user.email || 'N/A'}</div></div></div></td><td>${user.phoneNumber || 'N/A'}</td><td>${date}</td><td><span class="verified-badge ${verified ? 'verified' : 'not-verified'}">${verified ? '✅ Verified' : '⏳ Unverified'}</span></td><td><button class="btn-view" onclick="viewUserDetails('${uid}')">View</button></td>`;
-            return row;
-        }
-
-        function updateUserStats() {
-            const total = Object.keys(allUsers).length;
-            const verified = Object.values(allUsers).filter(u => u.verified !== false).length;
-            $('totalUsers').textContent = total;
-            $('verifiedUsers').textContent = verified;
-            $('unverifiedUsers').textContent = total - verified;
-        }
-
-        window.searchUsers = function() {
-            const term = $('userSearch').value.toLowerCase();
-            const tbody = $('usersTableBody');
-            const keys = Object.keys(allUsers).filter(uid => {
-                const u = allUsers[uid];
-                return (u.name && u.name.toLowerCase().includes(term)) || (u.email && u.email.toLowerCase().includes(term)) || (u.phoneNumber && u.phoneNumber.includes(term));
-            });
-            if (!keys.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;">No results</td></tr>'; return; }
-            tbody.innerHTML = '';
-            keys.forEach((uid, i) => tbody.appendChild(createUserRow(allUsers[uid], uid, i + 1)));
-        };
-
-        window.viewUserDetails = function(uid) {
-            const user = allUsers[uid];
-            const date = user.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A';
-            $('userDetailsContent').innerHTML = `
-                <div class="user-detail-section"><div class="user-detail-label">ID</div><div class="user-detail-value">${uid}</div></div>
-                <div class="user-detail-section"><div class="user-detail-label">Name</div><div class="user-detail-value">${user.name || 'N/A'}</div></div>
-                <div class="user-detail-section"><div class="user-detail-label">Email</div><div class="user-detail-value">${user.email || 'N/A'}</div></div>
-                <div class="user-detail-section"><div class="user-detail-label">Phone</div><div class="user-detail-value">${user.phoneNumber || 'N/A'}</div></div>
-                <div class="user-detail-section"><div class="user-detail-label">Status</div><div class="user-detail-value"><span class="verified-badge ${user.verified !== false ? 'verified' : 'not-verified'}">${user.verified !== false ? '✅ Verified' : '⏳ Unverified'}</span></div></div>
-                <div class="user-detail-section"><div class="user-detail-label">Joined</div><div class="user-detail-value">${date}</div></div>
-            `;
-            $('userDetailsModal').classList.add('active');
-        };
-
-        window.closeUserModal = function() { $('userDetailsModal').classList.remove('active'); };
 
         // ========== STORE CONTROL ==========
         function loadStoreStatus() {
