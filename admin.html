@@ -1678,12 +1678,17 @@
             onValue(dbRef(db, 'users'), snapshot => {
                 allUsers = {};
                 const data = snapshot.val() || {};
+                console.log('Raw users data:', data);
                 Object.keys(data).forEach(uid => { 
                     if (data[uid] && data[uid].allDetails) {
                         allUsers[uid] = data[uid].allDetails;
+                        console.log('Added user:', uid, allUsers[uid]);
+                    } else {
+                        console.log('Skipped user (no allDetails):', uid);
                     }
                 });
                 console.log('Loaded users:', Object.keys(allUsers).length);
+                console.log('All user IDs:', Object.keys(allUsers));
                 displayUsers();
                 updateUserStats();
                 displayCarts(); // Refresh carts when users update
@@ -1754,6 +1759,7 @@
             
             console.log('Displaying carts. Total carts:', userIds.length);
             console.log('Available users:', Object.keys(allUsers).length);
+            console.log('Cart user IDs:', userIds);
             
             if (!userIds.length) { 
                 container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🛒</div><div class="empty-state-text">No active carts</div></div>'; 
@@ -1761,8 +1767,25 @@
             }
             
             container.innerHTML = '';
-            userIds.forEach(uid => {
+            userIds.forEach(async uid => {
                 console.log('Processing cart for user:', uid, 'User data:', allUsers[uid]);
+                
+                // If user data not found in cache, fetch it directly
+                if (!allUsers[uid]) {
+                    console.log('User not in cache, fetching from Firebase:', uid);
+                    try {
+                        const userSnapshot = await get(dbRef(db, `users/${uid}/allDetails`));
+                        if (userSnapshot.exists()) {
+                            allUsers[uid] = userSnapshot.val();
+                            console.log('Fetched user data:', allUsers[uid]);
+                        } else {
+                            console.log('User not found in Firebase:', uid);
+                        }
+                    } catch (error) {
+                        console.error('Error fetching user:', uid, error);
+                    }
+                }
+                
                 const cartCard = createCartCard(uid, allCarts[uid], allUsers[uid]);
                 container.appendChild(cartCard);
             });
