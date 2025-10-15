@@ -664,7 +664,7 @@
     </div>
 
     <div class="nav-items" id="navMenu">
-        <a href="home.html" class="nav-item">🏠 Home</a>
+        <span class="nav-item" style="cursor: default; background: var(--baby-powder);">🏠 Home</span>
         <a href="orders.html" class="nav-item">📦 Orders</a>
         <span class="nav-item" onclick="logout()">🚪 Logout</span>
     </div>
@@ -724,13 +724,14 @@
         let cart = [];
         let allFoodItems = {};
         let currentCategory = 'all';
-        let freeDeliveryToastShown = false;
         let currentUser = null;
         const FREE_DELIVERY_THRESHOLD = 200;
+        const CATEGORY_ORDER = ['Sandwich', 'Noodles'];
         
         loadCart();
         updateCartBadge();
         updateNotificationVisibility();
+        loadFreeDeliveryToastState();
 
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
@@ -750,7 +751,6 @@
                         ...dbCart[itemId]
                     }));
                     
-                    // Only update if cart actually changed
                     if (JSON.stringify(cart) !== JSON.stringify(newCart)) {
                         cart = newCart;
                         saveCart();
@@ -759,7 +759,6 @@
                         renderFoodItems();
                     }
                 } else {
-                    // If no cart in DB but exists locally for logged-in user, sync it
                     if (cart.length > 0) {
                         syncCartToDB();
                     }
@@ -831,10 +830,18 @@
                 };
             });
 
+            // Sort categories: Sandwich first, then Noodles, then others alphabetically
             categoryData.sort((a, b) => {
-                if (a.name === 'Cigarettes') return 1;
-                if (b.name === 'Cigarettes') return -1;
-                return 0;
+                const aIndex = CATEGORY_ORDER.indexOf(a.name);
+                const bIndex = CATEGORY_ORDER.indexOf(b.name);
+                
+                if (aIndex !== -1 && bIndex !== -1) {
+                    return aIndex - bIndex;
+                }
+                if (aIndex !== -1) return -1;
+                if (bIndex !== -1) return 1;
+                
+                return a.name.localeCompare(b.name);
             });
 
             let tabsHTML = `
@@ -848,11 +855,10 @@
 
             categoryData.forEach(cat => {
                 if (cat.count > 0) {
-                    const escapedName = escapeHtml(cat.name);
                     tabsHTML += `
-                        <div class="category-tab ${currentCategory === cat.name ? 'active' : ''}" onclick="filterCategory('${escapedName}')">
+                        <div class="category-tab ${currentCategory === cat.name ? 'active' : ''}" onclick="filterCategory(\`${cat.name}\`)">
                             <span class="category-emoji">${cat.emoji}</span>
-                            <span>${escapedName}</span>
+                            <span>${escapeHtml(cat.name)}</span>
                             <span class="category-count">${cat.count}</span>
                         </div>
                     `;
@@ -932,19 +938,19 @@
             const quantity = cartItem ? cartItem.quantity : 0;
             
             const imageHTML = item.imageurl 
-                ? `<img src="${escapeHtml(item.imageurl)}" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                ? `<img src="${escapeHtml(item.imageurl)}" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'; this.parentElement.querySelector('.food-image-emoji').style.display='flex';">
                    <div class="food-image-emoji" style="display: none; position: absolute;">${item.emoji || '🍔'}</div>`
                 : `<div class="food-image-emoji">${item.emoji || '🍔'}</div>`;
             
             let buttonHTML;
             if (quantity > 0) {
                 buttonHTML = `<div class="quantity-control">
-                       <button class="quantity-btn" onclick="decreaseQuantity('${escapeHtml(itemId)}')">−</button>
+                       <button class="quantity-btn" onclick="decreaseQuantity(\`${itemId}\`)">−</button>
                        <span class="quantity-display">${quantity}</span>
-                       <button class="quantity-btn" onclick="increaseQuantity('${escapeHtml(itemId)}')">+</button>
+                       <button class="quantity-btn" onclick="increaseQuantity(\`${itemId}\`)">+</button>
                    </div>`;
             } else {
-                buttonHTML = `<button class="add-btn" onclick="addToCart('${escapeHtml(itemId)}', '${escapeHtml(item.name)}', ${item.price}, '${item.emoji || '🍔'}', '${escapeHtml(categoryName)}')">Add +</button>`;
+                buttonHTML = `<button class="add-btn" onclick="addToCart(\`${itemId}\`, \`${escapeHtml(item.name)}\`, ${item.price}, \`${item.emoji || '🍔'}\`, \`${escapeHtml(categoryName)}\`)">Add +</button>`;
             }
             
             return `
@@ -990,12 +996,13 @@
 
         function checkFreeDeliveryUnlocked() {
             const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const wasAboveThreshold = getFreeDeliveryToastState();
             
-            if (subtotal >= FREE_DELIVERY_THRESHOLD && !freeDeliveryToastShown) {
-                freeDeliveryToastShown = true;
+            if (subtotal >= FREE_DELIVERY_THRESHOLD && !wasAboveThreshold) {
+                saveFreeDeliveryToastState(true);
                 showFreeDeliveryToast();
-            } else if (subtotal < FREE_DELIVERY_THRESHOLD) {
-                freeDeliveryToastShown = false;
+            } else if (subtotal < FREE_DELIVERY_THRESHOLD && wasAboveThreshold) {
+                saveFreeDeliveryToastState(false);
             }
         }
 
@@ -1018,6 +1025,34 @@
             toast.classList.remove('show');
             overlay.classList.remove('show');
         };
+
+        function saveFreeDeliveryToastState(shown) {
+            try {
+                sessionStorage.setItem('freeDeliveryToastShown', shown.toString());
+            } catch (error) {
+                console.error('Error saving toast state:', error);
+            }
+        }
+
+        function getFreeDeliveryToastState() {
+            try {
+                return sessionStorage.getItem('freeDeliveryToastShown') === 'true';
+            } catch (error) {
+                console.error('Error loading toast state:', error);
+                return false;
+            }
+        }
+
+        function loadFreeDeliveryToastState() {
+            try {
+                const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                if (subtotal >= FREE_DELIVERY_THRESHOLD) {
+                    saveFreeDeliveryToastState(true);
+                }
+            } catch (error) {
+                console.error('Error loading toast state:', error);
+            }
+        }
 
         window.addToCart = function(id, name, price, emoji, category) {
             const existingItem = cart.find(item => item.id === id);
@@ -1089,9 +1124,9 @@
             if (quantity > 0) {
                 const quantityControl = `
                     <div class="quantity-control">
-                        <button class="quantity-btn" onclick="decreaseQuantity('${escapeHtml(id)}')">−</button>
+                        <button class="quantity-btn" onclick="decreaseQuantity(\`${id}\`)">−</button>
                         <span class="quantity-display">${quantity}</span>
-                        <button class="quantity-btn" onclick="increaseQuantity('${escapeHtml(id)}')">+</button>
+                        <button class="quantity-btn" onclick="increaseQuantity(\`${id}\`)">+</button>
                     </div>
                 `;
                 footer.innerHTML = price.outerHTML + quantityControl;
@@ -1100,7 +1135,7 @@
                 const priceVal = card.dataset.price;
                 const emoji = card.dataset.emoji;
                 const category = card.dataset.category;
-                const addBtn = `<button class="add-btn" onclick="addToCart('${escapeHtml(id)}', '${escapeHtml(name)}', ${priceVal}, '${emoji}', '${escapeHtml(category)}')">Add +</button>`;
+                const addBtn = `<button class="add-btn" onclick="addToCart(\`${id}\`, \`${escapeHtml(name)}\`, ${priceVal}, \`${emoji}\`, \`${escapeHtml(category)}\`)">Add +</button>`;
                 footer.innerHTML = price.outerHTML + addBtn;
             }
         }
@@ -1160,6 +1195,7 @@
             if (confirm('Are you sure you want to logout?')) {
                 signOut(auth).then(() => {
                     localStorage.removeItem('midnightPlazaCart');
+                    sessionStorage.removeItem('freeDeliveryToastShown');
                     cart = [];
                     window.location.href = 'index.html';
                 }).catch((error) => {
