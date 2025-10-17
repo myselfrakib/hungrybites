@@ -713,7 +713,7 @@
                 firstOrderBannerHTML = `
                     <div class="first-order-banner show">
                         <div class="first-order-icon">🎁</div>
-                        <div><strong>Welcome Offer!</strong> Your first ${FIRST_TWO_ORDERS_FREE} deliveries are FREE! 🎉</div>
+                        <div><strong>Welcome Offer!</strong> Your first ${FIRST_TWO_ORDERS_FREE} delivery is FREE! 🎉</div>
                         <div style="font-size: 0.85rem; margin-top: 0.3rem; opacity: 0.9;">
                             ${ordersRemaining === FIRST_TWO_ORDERS_FREE ? 'This is your 1st order' : `This is your ${userCompletedOrders + 1}${userCompletedOrders === 0 ? 'st' : 'nd'} order - ${ordersRemaining - 1} more free ${ordersRemaining - 1 === 1 ? 'delivery' : 'deliveries'} after this!`}
                         </div>
@@ -1316,3 +1316,4 @@
     </script>
 </body>
 </html>
+
