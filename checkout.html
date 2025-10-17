@@ -326,6 +326,10 @@
             FREE_DELIVERY_THRESHOLD: 200,
             DELIVERY_FEE: 40,
             FIRST_TWO_ORDERS_FREE: 1,
+            SERVICEABLE_PINCODES: {
+                '742101': true, '742102': true, '742103': true, '742107': true,
+                '742149': true, '742187': true
+            },
 
             // Initialize app
             init() {
@@ -648,7 +652,12 @@
             renderAddressDisplay() {
                 const area = document.getElementById('addressDisplayArea');
                 if (!this.deliveryAddress) {
-                    area.innerHTML = '<button class="btn-secondary" onclick="APP.showAddressModal()">+ Add Delivery Address</button>';
+                    area.innerHTML = `
+                        <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; text-align: center; color: #856404;">
+                            <div style="font-weight: 600; margin-bottom: 0.5rem;">🎉 Your First Delivery is FREE!</div>
+                            <div style="font-size: 0.9rem; margin-bottom: 0.75rem;">Add an address to unlock your free first order</div>
+                            <button class="btn-secondary" onclick="APP.showAddressModal()" style="margin-top: 0.5rem;">+ Add Delivery Address</button>
+                        </div>`;
                     this.updatePlaceOrderButtonState();
                     if (this.savedAddresses.length === 0 && this.googleMapsLoaded) {
                         setTimeout(() => this.showAddressModal(), 1500);
@@ -836,6 +845,12 @@
                 if (!/^[0-9]{6}$/.test(pin)) return this.showError('Enter valid 6-digit pincode');
                 if (!this.finalPinLocation) return this.showError('Please set your location on the map');
 
+                // Check if pincode is serviceable
+                const isServiceable = this.SERVICEABLE_PINCODES[pin] === true;
+                if (!isServiceable) {
+                    return this.showToast('error', 'Out of Service Area', `We don't deliver to pincode ${pin} yet. Please enter another pincode.`);
+                }
+
                 const btn = document.getElementById('deliverHereBtn');
                 const btnText = document.getElementById('deliverHereBtnText');
                 btn.disabled = true;
@@ -960,6 +975,9 @@
                 const deliveryFee = this.calculateDeliveryFee(subtotal);
                 const total = subtotal + deliveryFee;
 
+                const isFirstOrder = this.userTotalOrders === 0;
+                const isFreeByThreshold = subtotal >= this.FREE_DELIVERY_THRESHOLD;
+
                 try {
                     const newOrderRef = push(ref(db, 'orders'));
                     await set(newOrderRef, {
@@ -967,6 +985,8 @@
                         userEmail: this.currentUser.email,
                         items: this.cart,
                         subtotal, deliveryFee, total,
+                        freeDelivery: deliveryFee === 0,
+                        freeDeliveryReason: isFirstOrder ? 'first_order' : (isFreeByThreshold ? 'threshold' : null),
                         deliveryAddress: {
                             address: this.deliveryAddress.streetAddress || this.deliveryAddress.address,
                             fullName: this.deliveryAddress.fullName,
