@@ -329,6 +329,8 @@
         let cartSyncListener = null;
         let userCompletedOrders = 0;
         let userTotalOrders = 0;
+        let googleMapsLoaded = false;
+        let pendingModalOpen = false;
         const RAZORPAY_KEY = 'rzp_test_your_key_here';
         const FREE_DELIVERY_THRESHOLD = 200;
         const DELIVERY_FEE = 40;
@@ -556,6 +558,15 @@
                 finalPinLocation = { lat: e.latLng.lat(), lng: e.latLng.lng() };
                 updateCoordinatesDisplay();
             });
+
+            googleMapsLoaded = true;
+            console.log('Google Maps loaded successfully');
+
+            // If modal was waiting to open, open it now
+            if (pendingModalOpen) {
+                pendingModalOpen = false;
+                setTimeout(() => showAddressModal(), 300);
+            }
 
             setTimeout(() => window.getLocation(), 500);
         };
@@ -848,9 +859,15 @@
                 
                 // Auto-open modal for new users with no saved addresses
                 if (savedAddresses.length === 0) {
-                    setTimeout(() => {
-                        showAddressModal();
-                    }, 500);
+                    if (googleMapsLoaded) {
+                        setTimeout(() => {
+                            console.log('Auto-opening modal for new user');
+                            showAddressModal();
+                        }, 1000);
+                    } else {
+                        console.log('Waiting for Google Maps to load...');
+                        pendingModalOpen = true;
+                    }
                 }
                 return;
             }
@@ -995,7 +1012,17 @@
         };
 
         window.showAddressModal = () => {
-            document.getElementById('addressModal').classList.add('active');
+            console.log('showAddressModal called');
+            console.log('Google Maps loaded:', googleMapsLoaded);
+            console.log('Saved addresses:', savedAddresses.length);
+            
+            const modal = document.getElementById('addressModal');
+            if (!modal) {
+                console.error('Address modal element not found!');
+                return;
+            }
+            
+            modal.classList.add('active');
             
             if (savedAddresses.length > 0) {
                 showSavedAddresses();
