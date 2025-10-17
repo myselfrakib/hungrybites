@@ -328,6 +328,7 @@
         let initialLocationDetected = false;
         let cartSyncListener = null;
         let userCompletedOrders = 0;
+        let userTotalOrders = 0;
         const RAZORPAY_KEY = 'rzp_test_your_key_here';
         const FREE_DELIVERY_THRESHOLD = 200;
         const DELIVERY_FEE = 40;
@@ -356,6 +357,22 @@
             }
         }
 
+        async function getUserTotalOrdersCount() {
+            if (!currentUser) return 0;
+            try {
+                const statsRef = ref(db, `users/${currentUser.uid}/orderStats/totalOrders`);
+                const snapshot = await get(statsRef);
+                
+                if (snapshot.exists()) {
+                    return snapshot.val() || 0;
+                }
+                return 0;
+            } catch (error) {
+                console.error('Error getting total order count:', error);
+                return 0;
+            }
+        }
+
         async function initializeUserOrderStats() {
             if (!currentUser) return;
             try {
@@ -375,7 +392,7 @@
         }
 
         function calculateDeliveryFee(subtotal) {
-            if (userCompletedOrders < FIRST_TWO_ORDERS_FREE) {
+            if (userTotalOrders < FIRST_TWO_ORDERS_FREE) {
                 return 0;
             }
             return subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
@@ -646,6 +663,7 @@
                 syncCartFromDB(user.uid);
                 await initializeUserOrderStats();
                 userCompletedOrders = await getUserCompletedOrdersCount();
+                userTotalOrders = await getUserTotalOrdersCount();
                 await loadSavedAddresses();
                 selectPayment('cod');
                 renderCart();
@@ -697,7 +715,7 @@
             const deliveryFee = calculateDeliveryFee(subtotal);
             const total = subtotal + deliveryFee;
             
-            const isFirstTwoOrders = userCompletedOrders < FIRST_TWO_ORDERS_FREE;
+            const isFirstOrders = userTotalOrders < FIRST_TWO_ORDERS_FREE;
             const isFreeByThreshold = subtotal >= FREE_DELIVERY_THRESHOLD;
             const isFreeDelivery = deliveryFee === 0;
             
@@ -708,14 +726,14 @@
             let deliveryProgressHTML = '';
             let firstOrderBannerHTML = '';
 
-            if (isFirstTwoOrders) {
-                const ordersRemaining = FIRST_TWO_ORDERS_FREE - userCompletedOrders;
+            if (isFirstOrders) {
+                const ordersRemaining = FIRST_TWO_ORDERS_FREE - userTotalOrders;
                 firstOrderBannerHTML = `
                     <div class="first-order-banner show">
                         <div class="first-order-icon">🎁</div>
-                        <div><strong>Welcome Offer!</strong> Your first ${FIRST_TWO_ORDERS_FREE} delivery is FREE! 🎉</div>
+                        <div><strong>Welcome Offer!</strong> Your first ${FIRST_TWO_ORDERS_FREE} ${FIRST_TWO_ORDERS_FREE === 1 ? 'delivery is' : 'deliveries are'} FREE! 🎉</div>
                         <div style="font-size: 0.85rem; margin-top: 0.3rem; opacity: 0.9;">
-                            ${ordersRemaining === FIRST_TWO_ORDERS_FREE ? 'This is your 1st order' : `This is your ${userCompletedOrders + 1}${userCompletedOrders === 0 ? 'st' : 'nd'} order - ${ordersRemaining - 1} more free ${ordersRemaining - 1 === 1 ? 'delivery' : 'deliveries'} after this!`}
+                            ${ordersRemaining === FIRST_TWO_ORDERS_FREE ? 'This is your 1st order' : `This is your ${userTotalOrders + 1}${userTotalOrders === 0 ? 'st' : 'nd'} order - ${ordersRemaining - 1} more free ${ordersRemaining - 1 === 1 ? 'delivery' : 'deliveries'} after this!`}
                         </div>
                     </div>`;
             } else if (isFreeByThreshold) {
@@ -738,7 +756,7 @@
             const deliveryRowClass = isFreeDelivery ? 'summary-row delivery free' : 'summary-row delivery';
             let deliveryText = '';
             
-            if (isFirstTwoOrders) {
+            if (isFirstOrders) {
                 deliveryText = `<span>Delivery Fee</span><span><span class="delivery-value">₹${DELIVERY_FEE}</span> <strong style="color: #ff6b6b;">FREE (Welcome Offer)</strong></span>`;
             } else if (isFreeByThreshold) {
                 deliveryText = `<span>Delivery Fee</span><span><span class="delivery-value">₹${DELIVERY_FEE}</span> <strong style="color: var(--success-green);">FREE</strong></span>`;
@@ -827,6 +845,13 @@
             if (!deliveryAddress) {
                 area.innerHTML = '<button class="btn-secondary" onclick="showAddressModal()">+ Add Delivery Address</button>';
                 updatePlaceOrderButtonState();
+                
+                // Auto-open modal for new users with no saved addresses
+                if (savedAddresses.length === 0) {
+                    setTimeout(() => {
+                        showAddressModal();
+                    }, 500);
+                }
                 return;
             }
 
@@ -1210,7 +1235,7 @@
             const deliveryFee = calculateDeliveryFee(subtotal);
             const total = subtotal + deliveryFee;
             
-            const isFirstTwoOrders = userCompletedOrders < FIRST_TWO_ORDERS_FREE;
+            const isFirstOrders = userTotalOrders < FIRST_TWO_ORDERS_FREE;
             const isFreeByThreshold = subtotal >= FREE_DELIVERY_THRESHOLD;
 
             try {
@@ -1223,7 +1248,7 @@
                     deliveryFee, 
                     total,
                     freeDelivery: deliveryFee === 0,
-                    freeDeliveryReason: isFirstTwoOrders ? 'first_two_orders' : (isFreeByThreshold ? 'threshold' : null),
+                    freeDeliveryReason: isFirstOrders ? 'first_orders_welcome' : (isFreeByThreshold ? 'threshold' : null),
                     deliveryAddress: {
                         address: deliveryAddress.streetAddress || deliveryAddress.address,
                         fullName: deliveryAddress.fullName,
@@ -1316,4 +1341,3 @@
     </script>
 </body>
 </html>
-
