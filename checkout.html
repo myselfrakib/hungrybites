@@ -48,7 +48,7 @@
         .cart-summary { margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #eee; }
         .summary-row { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: clamp(0.9rem, 2.5vw, 1rem); }
         .summary-row.subtotal { color: #666; }
-        .summary-row.delivery { color: #666; position: relative; }
+        .summary-row.delivery { color: #666; }
         .summary-row.delivery.free { color: var(--success-green); font-weight: 600; }
         .summary-row.delivery.free .delivery-value { text-decoration: line-through; color: #999; margin-right: 0.5rem; }
         .cart-total { display: flex; justify-content: space-between; font-size: clamp(1.3rem, 4vw, 1.5rem); font-weight: bold; color: var(--blue-gray); margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #eee; }
@@ -64,6 +64,7 @@
         .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; color: #333; font-size: clamp(0.85rem, 2.5vw, 0.95rem); }
         .form-group input, .form-group textarea { width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: clamp(0.85rem, 2.5vw, 0.95rem); font-family: inherit; transition: border-color 0.3s; }
         .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--sunglow); }
+        .form-group input.auto-filled { border-color: var(--success-green); background-color: #f0fff4; }
         .form-group textarea { resize: vertical; min-height: 70px; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
         @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
@@ -72,6 +73,7 @@
         .location-btn { background: var(--non-photo-blue); color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; }
         .location-btn:active { transform: scale(0.95); }
         .location-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .location-status { font-size: 0.8rem; color: #666; margin-top: 0.3rem; }
         .address-card { border: 2px solid #e0e0e0; border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; cursor: pointer; transition: all 0.3s; position: relative; }
         .address-card:hover { border-color: var(--sunglow); background: #fffbf0; }
         .address-card.selected { border-color: var(--sunglow); background: #fffbf0; box-shadow: 0 4px 12px rgba(253, 201, 33, 0.2); }
@@ -240,6 +242,7 @@
                     Drag the red marker to your exact delivery location. Your location will be auto-detected first.
                 </div>
                 <button type="button" class="location-btn" id="locationBtn" onclick="APP.getLocation()">Detecting Location...</button>
+                <div class="location-status" id="locationStatus"></div>
                 <div id="map"></div>
                 <div class="coord-display" id="coordDisplay">
                     Selected Location: <strong id="currentCoords">Detecting...</strong>
@@ -322,6 +325,7 @@
             googleMapsLoaded: false,
             cartSyncListener: null,
             userTotalOrders: 0,
+            locationDetected: false,
             RAZORPAY_KEY: 'rzp_test_your_key_here',
             FREE_DELIVERY_THRESHOLD: 200,
             DELIVERY_FEE: 40,
@@ -415,7 +419,7 @@
                 console.log('Google Maps initialized');
             },
 
-            // Set marker position
+            // Set marker position and auto-fill form fields
             setMarkerPosition(latLng, isInitialDetection = false) {
                 this.finalPinLocation = { lat: latLng.lat(), lng: latLng.lng() };
                 this.marker.setPosition(latLng);
@@ -424,24 +428,51 @@
 
                 new google.maps.Geocoder().geocode({ location: latLng }, (results, status) => {
                     if (status === 'OK' && results[0]) {
-                        const comps = results[0].address_components;
-                        let city = '', pin = '', addr = '', area = '';
-
-                        comps.forEach(comp => {
-                            const types = comp.types;
-                            if (types.includes('locality')) city = comp.long_name;
-                            if (types.includes('postal_code')) pin = comp.long_name;
-                            if (types.includes('sublocality')) area = comp.long_name;
-                            if (types.includes('route')) addr = comp.long_name;
-                        });
-
-                        if (city) document.getElementById('city').value = city;
-                        if (pin) document.getElementById('pincode').value = pin;
-                        if (addr || area) document.getElementById('address').value = [addr, area].filter(Boolean).join(', ');
-
-                        if (!isInitialDetection) this.showSuccess('Address updated from pin location');
+                        this.populateAddressFields(results[0], isInitialDetection);
                     }
                 });
+            },
+
+            // Auto-fill address fields from geocoding
+            populateAddressFields(result, isInitialDetection) {
+                const comps = result.address_components;
+                let city = '', pin = '', streetAddr = '', area = '', country = '';
+                const addrFields = {};
+
+                comps.forEach(comp => {
+                    const types = comp.types;
+                    if (types.includes('locality')) addrFields.city = comp.long_name;
+                    if (types.includes('postal_code')) addrFields.pin = comp.long_name;
+                    if (types.includes('sublocality')) addrFields.area = comp.long_name;
+                    if (types.includes('sublocality_level_1')) addrFields.subArea = comp.long_name;
+                    if (types.includes('route')) addrFields.street = comp.long_name;
+                    if (types.includes('administrative_area_level_1')) addrFields.state = comp.long_name;
+                    if (types.includes('country')) addrFields.country = comp.long_name;
+                });
+
+                const updateField = (id, value, highlightIfNew = false) => {
+                    const el = document.getElementById(id);
+                    if (el && value) {
+                        const oldVal = el.value;
+                        el.value = value;
+                        if (highlightIfNew && !oldVal) {
+                            el.classList.add('auto-filled');
+                            setTimeout(() => el.classList.remove('auto-filled'), 3000);
+                        }
+                    }
+                };
+
+                // Build complete address
+                const addressParts = [addrFields.street, addrFields.area, addrFields.subArea].filter(Boolean);
+                const fullAddress = addressParts.join(', ');
+
+                updateField('address', fullAddress, !isInitialDetection);
+                updateField('city', addrFields.city, !isInitialDetection);
+                updateField('pincode', addrFields.pin, !isInitialDetection);
+
+                if (!isInitialDetection) {
+                    this.showSuccess('Address auto-filled from location');
+                }
             },
 
             updateCoordinatesDisplay() {
@@ -451,42 +482,51 @@
                 }
             },
 
-            // Get user location
+            // Get user location with enhanced feedback
             getLocation() {
                 const btn = document.getElementById('locationBtn');
+                const status = document.getElementById('locationStatus');
                 btn.disabled = true;
-                btn.textContent = 'Detecting...';
-                let locationFound = false;
+                btn.innerHTML = '<span>⏳ Detecting...</span>';
+                status.textContent = 'Getting your location...';
+                this.locationDetected = false;
 
-                const onSuccess = (lat, lng, source) => {
-                    if (locationFound) return;
-                    locationFound = true;
+                const onSuccess = (lat, lng) => {
+                    if (this.locationDetected) return;
+                    this.locationDetected = true;
                     const latLng = new google.maps.LatLng(lat, lng);
                     this.map.setCenter(latLng);
                     this.map.setZoom(15);
                     this.setMarkerPosition(latLng, true);
-                    btn.textContent = '✓ Located';
+                    btn.innerHTML = '<span>✓ Located</span>';
                     btn.disabled = false;
-                    this.showSuccess('Location detected');
+                    status.textContent = '✓ Location detected successfully';
+                    status.style.color = '#60b246';
                 };
 
                 const onError = (msg) => {
-                    if (locationFound) return;
-                    btn.textContent = 'Use My Location';
+                    if (this.locationDetected) return;
+                    btn.innerHTML = '<span>📍 Use My Location</span>';
                     btn.disabled = false;
-                    this.showError(msg);
+                    status.textContent = msg;
+                    status.style.color = '#ff6b6b';
                     const defaultLatLng = new google.maps.LatLng(22.9734, 78.6569);
                     this.setMarkerPosition(defaultLatLng, false);
                 };
 
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
-                        (pos) => onSuccess(pos.coords.latitude, pos.coords.longitude, 'Geolocation'),
-                        (err) => onError('Enable location permission - drag pin to your address'),
-                        { enableHighAccuracy: true, timeout: 10000 }
+                        (pos) => onSuccess(pos.coords.latitude, pos.coords.longitude),
+                        (err) => {
+                            let msg = 'Enable location permission - drag pin to your address';
+                            if (err.code === 1) msg = 'Location permission denied - please enable it';
+                            if (err.code === 3) msg = 'Location request timed out - drag pin to set location';
+                            onError(msg);
+                        },
+                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                     );
                 } else {
-                    onError('Drag marker to set your location');
+                    onError('Geolocation unavailable - drag marker to set location');
                 }
             },
 
@@ -553,8 +593,6 @@
 
                 const isFirstOrders = this.userTotalOrders < this.FIRST_TWO_ORDERS_FREE;
                 const isFreeByThreshold = subtotal >= this.FREE_DELIVERY_THRESHOLD;
-                const amountNeeded = this.FREE_DELIVERY_THRESHOLD - subtotal;
-                const progressPercent = Math.min((subtotal / this.FREE_DELIVERY_THRESHOLD) * 100, 100);
 
                 const cartHTML = this.cart.map((item, i) => `
                     <div class="cart-item">
@@ -654,7 +692,7 @@
                 if (!this.deliveryAddress) {
                     area.innerHTML = `
                         <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; text-align: center; color: #856404;">
-                            <div style="font-weight: 600; margin-bottom: 0.5rem;">🎉 Your First Delivery is FREE!</div>
+                            <div style="font-weight: 600; margin-bottom: 0.5rem;">Your First Delivery is FREE!</div>
                             <div style="font-size: 0.9rem; margin-bottom: 0.75rem;">Add an address to unlock your free first order</div>
                             <button class="btn-secondary" onclick="APP.showAddressModal()" style="margin-top: 0.5rem;">+ Add Delivery Address</button>
                         </div>`;
@@ -795,6 +833,7 @@
                             this.map.setZoom(5);
                             this.marker.setPosition(defaultLocation);
                             this.updateCoordinatesDisplay();
+                            this.locationDetected = false;
                             this.getLocation();
                         }
                     }
@@ -820,6 +859,7 @@
                         this.map.setZoom(5);
                         this.marker.setPosition(defaultLocation);
                         this.updateCoordinatesDisplay();
+                        this.locationDetected = false;
                         this.getLocation();
                     }
                 }, 100);
