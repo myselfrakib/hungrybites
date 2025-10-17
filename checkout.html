@@ -51,20 +51,6 @@
         .summary-row.delivery { color: #666; position: relative; }
         .summary-row.delivery.free { color: var(--success-green); font-weight: 600; }
         .summary-row.delivery.free .delivery-value { text-decoration: line-through; color: #999; margin-right: 0.5rem; }
-        .first-order-banner { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; text-align: center; font-weight: 600; font-size: 0.95rem; display: none; animation: slideDown 0.4s ease-out; box-shadow: 0 4px 12px rgba(255,107,107,0.3); }
-        .first-order-banner.show { display: block; }
-        .first-order-icon { font-size: 1.8rem; margin-bottom: 0.5rem; animation: bounce 2s infinite; }
-        .free-delivery-banner { background: linear-gradient(135deg, var(--success-green) 0%, #4a9635 100%); color: white; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; text-align: center; font-weight: 600; font-size: 0.9rem; display: none; animation: slideDown 0.4s ease-out; }
-        .free-delivery-banner.show { display: block; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-        .delivery-progress { background: #f0f0f0; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem; display: none; }
-        .delivery-progress.show { display: block; }
-        .delivery-progress-text { font-size: 0.85rem; color: #666; margin-bottom: 0.5rem; text-align: center; }
-        .delivery-progress-text strong { color: var(--sunglow); }
-        .progress-bar-container { background: #ddd; height: 8px; border-radius: 10px; overflow: hidden; position: relative; }
-        .progress-bar-fill { background: linear-gradient(90deg, var(--sunglow), var(--mustard)); height: 100%; border-radius: 10px; transition: width 0.5s ease; position: relative; }
-        .progress-bar-fill::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: shimmer 1.5s infinite; }
         .cart-total { display: flex; justify-content: space-between; font-size: clamp(1.3rem, 4vw, 1.5rem); font-weight: bold; color: var(--blue-gray); margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #eee; }
         .section-title { font-size: clamp(1.1rem, 3vw, 1.3rem); font-weight: 600; color: #333; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
         .address-display-card { border: 2px solid var(--non-photo-blue); border-radius: 10px; padding: 0.9rem; background: #f0f9ff; }
@@ -170,18 +156,18 @@
 <body>
     <div class="navbar">
         <div class="nav-left">
-            <div class="hamburger" onclick="toggleMenu()">
+            <div class="hamburger" onclick="APP.toggleMenu()">
                 <span></span><span></span><span></span>
             </div>
-            <div class="logo" onclick="window.location.href='home.html'">🍔 Midnight Plaza</div>
+            <div class="logo" onclick="window.location.href='home.html'">Midnight Plaza</div>
         </div>
     </div>
 
     <div class="nav-items" id="navMenu">
-        <a href="home.html" class="nav-item">🏠 Home</a>
-        <a href="orders.html" class="nav-item">📦 Orders</a>
-        <a href="checkout.html" class="nav-item">🛒 Cart</a>
-        <span class="nav-item" onclick="logout()">🚪 Logout</span>
+        <a href="home.html" class="nav-item">Home</a>
+        <a href="orders.html" class="nav-item">Orders</a>
+        <a href="checkout.html" class="nav-item">Cart</a>
+        <span class="nav-item" onclick="APP.logout()" style="cursor:pointer;">Logout</span>
     </div>
 
     <div class="container">
@@ -205,23 +191,23 @@
 
         <div id="checkoutSections" style="display: none;">
             <div class="section-container">
-                <div class="section-title">📍 Delivery Address</div>
+                <div class="section-title">Delivery Address</div>
                 <div id="addressDisplayArea"></div>
             </div>
 
             <div class="section-container">
-                <div class="section-title">💳 Payment Method</div>
-                <div class="payment-option" id="payment-cod" onclick="selectPayment('cod')">
+                <div class="section-title">Payment Method</div>
+                <div class="payment-option" id="payment-cod" onclick="APP.selectPayment('cod')">
                     <input type="radio" name="payment" id="cod" value="cod">
                     <div class="payment-details">
-                        <div class="payment-title">💵 Cash on Delivery</div>
+                        <div class="payment-title">Cash on Delivery</div>
                         <div class="payment-description">Pay when order arrives</div>
                     </div>
                 </div>
-                <div class="payment-option" id="payment-online" onclick="selectPayment('online')">
+                <div class="payment-option" id="payment-online" onclick="APP.selectPayment('online')">
                     <input type="radio" name="payment" id="online" value="online">
                     <div class="payment-details">
-                        <div class="payment-title">💳 Online Payment</div>
+                        <div class="payment-title">Online Payment</div>
                         <div class="payment-description">Razorpay (UPI, Card, Net Banking)</div>
                     </div>
                 </div>
@@ -229,7 +215,7 @@
                     <div class="spinner"></div>
                     <p style="margin-top: 0.75rem; color: #666; font-size: 0.9rem;">Processing...</p>
                 </div>
-                <button class="btn" id="placeOrderBtn" onclick="handlePlaceOrder()" disabled>Select Payment Method</button>
+                <button class="btn" id="placeOrderBtn" onclick="APP.handlePlaceOrder()" disabled>Select Payment Method</button>
             </div>
         </div>
     </div>
@@ -238,28 +224,25 @@
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">Delivery Address</div>
-                <button class="close-modal" onclick="closeAddressModal()">&times;</button>
+                <button class="close-modal" onclick="APP.closeAddressModal()">&times;</button>
             </div>
 
             <div id="savedAddressesList" style="display: none;">
                 <div class="addresses-list-header">
-                    <div class="addresses-list-title">📍 Saved Addresses</div>
+                    <div class="addresses-list-title">Saved Addresses</div>
                 </div>
                 <div id="addressCards"></div>
-                <button type="button" class="btn-secondary" onclick="showAddressForm()" style="margin-top: 0.75rem;">+ Add New Address</button>
+                <button type="button" class="btn-secondary" onclick="APP.showAddressForm()" style="margin-top: 0.75rem;">+ Add New Address</button>
             </div>
 
-            <div id="addressFormContainer">
+            <div id="addressFormContainer" style="display:none;">
                 <div class="map-instruction">
-                    📍 Drag the red marker to your exact delivery location. Your location will be auto-detected first.
+                    Drag the red marker to your exact delivery location. Your location will be auto-detected first.
                 </div>
-                <button type="button" class="location-btn" id="locationBtn" onclick="getLocation()">📍 Detecting Location...</button>
+                <button type="button" class="location-btn" id="locationBtn" onclick="APP.getLocation()">Detecting Location...</button>
                 <div id="map"></div>
                 <div class="coord-display" id="coordDisplay">
-                    📌 Selected Location: <strong id="currentCoords">Detecting...</strong>
-                </div>
-                <div style="text-align: center; margin-top: 0.5rem; color: #666; font-size: 0.85rem;">
-                    💡 Can't detect? <span style="color: var(--sunglow); font-weight: 600; cursor: pointer;" onclick="showLocationHelp()">Click here for help</span>
+                    Selected Location: <strong id="currentCoords">Detecting...</strong>
                 </div>
                 <form id="addressForm" onsubmit="event.preventDefault();">
                     <div class="form-group">
@@ -295,10 +278,10 @@
                         </label>
                     </div>
                     <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                        <button type="button" class="btn" id="deliverHereBtn" onclick="saveAndSelectAddress()" style="flex: 1; min-width: 150px;">
-                            <span id="deliverHereBtnText">📍 Deliver Here</span>
+                        <button type="button" class="btn" id="deliverHereBtn" onclick="APP.saveAndSelectAddress()" style="flex: 1; min-width: 150px;">
+                            <span id="deliverHereBtnText">Deliver Here</span>
                         </button>
-                        <button type="button" class="btn-secondary" onclick="showSavedAddresses()" id="backToSavedBtn" style="display: none; flex: 1; min-width: 150px;">← Back</button>
+                        <button type="button" class="btn-secondary" onclick="APP.showSavedAddresses()" id="backToSavedBtn" style="display: none; flex: 1; min-width: 150px;">Back</button>
                     </div>
                 </form>
             </div>
@@ -310,7 +293,7 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
         import { getDatabase, ref, push, set, get, remove, update, onValue } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
-        const app = initializeApp({
+        const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
             authDomain: "hungrybites-c7930.firebaseapp.com",
             projectId: "hungrybites-c7930",
@@ -319,1052 +302,790 @@
             appId: "1:346758544945:web:4bcad30016540d18e79f10",
             measurementId: "G-B5GP5SYMRC",
             databaseURL: "https://hungrybites-c7930-default-rtdb.firebaseio.com"
-        });
+        };
 
-        const auth = getAuth(app), db = getDatabase(app);
-        let cart = [], currentUser = null, selectedPayment = null, deliveryAddress = null;
-        let savedAddresses = [], selectedAddressId = null, map, marker;
-        let finalPinLocation = null;
-        let initialLocationDetected = false;
-        let cartSyncListener = null;
-        let userCompletedOrders = 0;
-        let userTotalOrders = 0;
-        let googleMapsLoaded = false;
-        let pendingModalOpen = false;
-        const RAZORPAY_KEY = 'rzp_test_your_key_here';
-        const FREE_DELIVERY_THRESHOLD = 200;
-        const DELIVERY_FEE = 40;
-        const FIRST_TWO_ORDERS_FREE = 1;  // Change this to 1, 2, 3, etc.
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
 
-        function updateSyncIndicator(status) {
-            const indicator = document.getElementById('syncIndicator');
-            indicator.className = 'sync-indicator';
-            if (status === 'syncing') indicator.classList.add('syncing');
-            else if (status === 'error') indicator.classList.add('error');
-        }
+        // Global app state
+        const APP = {
+            cart: [],
+            currentUser: null,
+            selectedPayment: null,
+            deliveryAddress: null,
+            savedAddresses: [],
+            selectedAddressId: null,
+            map: null,
+            marker: null,
+            finalPinLocation: null,
+            googleMapsLoaded: false,
+            cartSyncListener: null,
+            userTotalOrders: 0,
+            RAZORPAY_KEY: 'rzp_test_your_key_here',
+            FREE_DELIVERY_THRESHOLD: 200,
+            DELIVERY_FEE: 40,
+            FIRST_TWO_ORDERS_FREE: 1,
 
-        async function getUserCompletedOrdersCount() {
-            if (!currentUser) return 0;
-            try {
-                const statsRef = ref(db, `users/${currentUser.uid}/orderStats/completedOrders`);
-                const snapshot = await get(statsRef);
-                
-                if (snapshot.exists()) {
-                    return snapshot.val() || 0;
+            // Initialize app
+            init() {
+                this.loadCart();
+                this.loadGoogleMaps();
+                this.setupAuthListener();
+                this.setupEventListeners();
+            },
+
+            // Setup event listeners
+            setupEventListeners() {
+                document.getElementById('addressModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'addressModal') this.closeAddressModal();
+                });
+            },
+
+            // Auth listener
+            setupAuthListener() {
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        this.currentUser = user;
+                        await this.initializeUserOrderStats();
+                        this.userTotalOrders = await this.getUserTotalOrdersCount();
+                        this.syncCartFromDB(user.uid);
+                        await this.loadSavedAddresses();
+                        this.selectPayment('cod');
+                        this.renderCart();
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                });
+            },
+
+            // Load Google Maps
+            loadGoogleMaps() {
+                if (window.google?.maps) {
+                    this.initMap();
+                    return;
                 }
-                return 0;
-            } catch (error) {
-                console.error('Error getting order count:', error);
-                return 0;
-            }
-        }
+                const script = document.createElement('script');
+                script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDsn16p7w8b-x8pEA_WTO5F2oUk4MHwcUc&callback=APP.initMap';
+                script.async = true;
+                script.defer = true;
+                document.head.appendChild(script);
+            },
 
-        async function getUserTotalOrdersCount() {
-            if (!currentUser) return 0;
-            try {
-                const statsRef = ref(db, `users/${currentUser.uid}/orderStats/totalOrders`);
-                const snapshot = await get(statsRef);
-                
-                if (snapshot.exists()) {
-                    return snapshot.val() || 0;
+            // Initialize map
+            initMap() {
+                const defaultLocation = { lat: 22.9734, lng: 78.6569 };
+                this.map = new google.maps.Map(document.getElementById('map'), {
+                    center: defaultLocation,
+                    zoom: 5,
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                    fullscreenControl: false
+                });
+
+                this.marker = new google.maps.Marker({
+                    position: defaultLocation,
+                    map: this.map,
+                    draggable: true,
+                    animation: google.maps.Animation.DROP
+                });
+
+                this.finalPinLocation = defaultLocation;
+                this.updateCoordinatesDisplay();
+
+                this.map.addListener('click', (e) => {
+                    this.setMarkerPosition(e.latLng, false);
+                });
+
+                this.marker.addListener('dragend', (e) => {
+                    this.setMarkerPosition(e.latLng, false);
+                    this.showSuccess('Pin location updated');
+                });
+
+                this.marker.addListener('drag', (e) => {
+                    this.finalPinLocation = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+                    this.updateCoordinatesDisplay();
+                });
+
+                this.googleMapsLoaded = true;
+                console.log('Google Maps initialized');
+            },
+
+            // Set marker position
+            setMarkerPosition(latLng, isInitialDetection = false) {
+                this.finalPinLocation = { lat: latLng.lat(), lng: latLng.lng() };
+                this.marker.setPosition(latLng);
+                this.map.panTo(latLng);
+                this.updateCoordinatesDisplay();
+
+                new google.maps.Geocoder().geocode({ location: latLng }, (results, status) => {
+                    if (status === 'OK' && results[0]) {
+                        const comps = results[0].address_components;
+                        let city = '', pin = '', addr = '', area = '';
+
+                        comps.forEach(comp => {
+                            const types = comp.types;
+                            if (types.includes('locality')) city = comp.long_name;
+                            if (types.includes('postal_code')) pin = comp.long_name;
+                            if (types.includes('sublocality')) area = comp.long_name;
+                            if (types.includes('route')) addr = comp.long_name;
+                        });
+
+                        if (city) document.getElementById('city').value = city;
+                        if (pin) document.getElementById('pincode').value = pin;
+                        if (addr || area) document.getElementById('address').value = [addr, area].filter(Boolean).join(', ');
+
+                        if (!isInitialDetection) this.showSuccess('Address updated from pin location');
+                    }
+                });
+            },
+
+            updateCoordinatesDisplay() {
+                if (this.finalPinLocation) {
+                    document.getElementById('currentCoords').textContent = 
+                        `${this.finalPinLocation.lat.toFixed(6)}, ${this.finalPinLocation.lng.toFixed(6)}`;
                 }
-                return 0;
-            } catch (error) {
-                console.error('Error getting total order count:', error);
-                return 0;
-            }
-        }
+            },
 
-        async function initializeUserOrderStats() {
-            if (!currentUser) return;
-            try {
-                const statsRef = ref(db, `users/${currentUser.uid}/orderStats`);
-                const snapshot = await get(statsRef);
-                
-                if (!snapshot.exists()) {
-                    await set(statsRef, {
-                        completedOrders: 0,
-                        totalOrders: 0,
+            // Get user location
+            getLocation() {
+                const btn = document.getElementById('locationBtn');
+                btn.disabled = true;
+                btn.textContent = 'Detecting...';
+                let locationFound = false;
+
+                const onSuccess = (lat, lng, source) => {
+                    if (locationFound) return;
+                    locationFound = true;
+                    const latLng = new google.maps.LatLng(lat, lng);
+                    this.map.setCenter(latLng);
+                    this.map.setZoom(15);
+                    this.setMarkerPosition(latLng, true);
+                    btn.textContent = '✓ Located';
+                    btn.disabled = false;
+                    this.showSuccess('Location detected');
+                };
+
+                const onError = (msg) => {
+                    if (locationFound) return;
+                    btn.textContent = 'Use My Location';
+                    btn.disabled = false;
+                    this.showError(msg);
+                    const defaultLatLng = new google.maps.LatLng(22.9734, 78.6569);
+                    this.setMarkerPosition(defaultLatLng, false);
+                };
+
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => onSuccess(pos.coords.latitude, pos.coords.longitude, 'Geolocation'),
+                        (err) => onError('Enable location permission - drag pin to your address'),
+                        { enableHighAccuracy: true, timeout: 10000 }
+                    );
+                } else {
+                    onError('Drag marker to set your location');
+                }
+            },
+
+            // Cart operations
+            loadCart() {
+                try {
+                    const saved = localStorage.getItem('midnightPlazaCart');
+                    this.cart = saved ? JSON.parse(saved) : [];
+                } catch (e) {
+                    this.cart = [];
+                }
+            },
+
+            saveCart() {
+                try {
+                    localStorage.setItem('midnightPlazaCart', JSON.stringify(this.cart));
+                } catch (e) {
+                    console.error('Error saving cart:', e);
+                }
+            },
+
+            updateQuantity(index, change) {
+                this.cart[index].quantity += change;
+                if (this.cart[index].quantity <= 0) this.cart.splice(index, 1);
+                this.saveCart();
+                if (this.currentUser) this.syncCartToDB(this.currentUser.uid);
+                this.renderCart();
+            },
+
+            removeItem(index) {
+                if (confirm('Remove this item?')) {
+                    this.cart.splice(index, 1);
+                    this.saveCart();
+                    if (this.currentUser) this.syncCartToDB(this.currentUser.uid);
+                    this.renderCart();
+                }
+            },
+
+            calculateDeliveryFee(subtotal) {
+                if (this.userTotalOrders < this.FIRST_TWO_ORDERS_FREE) return 0;
+                return subtotal >= this.FREE_DELIVERY_THRESHOLD ? 0 : this.DELIVERY_FEE;
+            },
+
+            renderCart() {
+                const content = document.getElementById('cartContent');
+                const sections = document.getElementById('checkoutSections');
+
+                if (!this.cart.length) {
+                    content.innerHTML = `
+                        <div class="empty-cart">
+                            <div class="empty-cart-icon">🛒</div>
+                            <h3>Your cart is empty</h3>
+                            <p>Add delicious items to get started!</p>
+                            <a href="home.html" class="continue-shopping">Browse Menu</a>
+                        </div>`;
+                    sections.style.display = 'none';
+                    return;
+                }
+
+                sections.style.display = 'block';
+                const subtotal = this.cart.reduce((s, i) => s + i.price * i.quantity, 0);
+                const deliveryFee = this.calculateDeliveryFee(subtotal);
+                const total = subtotal + deliveryFee;
+
+                const isFirstOrders = this.userTotalOrders < this.FIRST_TWO_ORDERS_FREE;
+                const isFreeByThreshold = subtotal >= this.FREE_DELIVERY_THRESHOLD;
+                const amountNeeded = this.FREE_DELIVERY_THRESHOLD - subtotal;
+                const progressPercent = Math.min((subtotal / this.FREE_DELIVERY_THRESHOLD) * 100, 100);
+
+                const cartHTML = this.cart.map((item, i) => `
+                    <div class="cart-item">
+                        <div class="cart-item-header">
+                            <div class="cart-item-details">
+                                <div class="cart-item-name">${item.emoji || ''} ${item.name}</div>
+                                <div class="cart-item-price">₹${item.price}</div>
+                            </div>
+                            <div class="cart-item-total">₹${item.price * item.quantity}</div>
+                        </div>
+                        <div class="cart-item-actions">
+                            <div class="cart-item-quantity">
+                                <button class="quantity-btn" onclick="APP.updateQuantity(${i}, -1)">−</button>
+                                <div class="quantity-display">${item.quantity}</div>
+                                <button class="quantity-btn" onclick="APP.updateQuantity(${i}, 1)">+</button>
+                            </div>
+                            <button class="remove-btn" onclick="APP.removeItem(${i})">Remove</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                const deliveryFeeClass = deliveryFee === 0 ? 'summary-row delivery free' : 'summary-row delivery';
+                let deliveryText = '';
+                if (isFirstOrders) {
+                    deliveryText = `<span>Delivery Fee</span><span><span class="delivery-value">₹${this.DELIVERY_FEE}</span> <strong>FREE</strong></span>`;
+                } else if (isFreeByThreshold) {
+                    deliveryText = `<span>Delivery Fee</span><span><span class="delivery-value">₹${this.DELIVERY_FEE}</span> <strong>FREE</strong></span>`;
+                } else {
+                    deliveryText = `<span>Delivery Fee</span><span>₹${deliveryFee}</span>`;
+                }
+
+                content.innerHTML = cartHTML + `
+                    <div class="cart-summary">
+                        <div class="summary-row subtotal"><span>Subtotal</span><span>₹${subtotal}</span></div>
+                        <div class="${deliveryFeeClass}">${deliveryText}</div>
+                        <div class="cart-total"><span>Total</span><span>₹${total}</span></div>
+                    </div>`;
+            },
+
+            // Sync cart
+            syncCartFromDB(userId) {
+                if (this.cartSyncListener) this.cartSyncListener();
+                const userCartRef = ref(db, `carts/${userId}`);
+                this.cartSyncListener = onValue(userCartRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const dbCart = Object.keys(snapshot.val()).map(itemId => ({
+                            id: itemId,
+                            ...snapshot.val()[itemId]
+                        }));
+                        if (JSON.stringify(this.cart) !== JSON.stringify(dbCart)) {
+                            this.cart = dbCart;
+                            this.saveCart();
+                            this.renderCart();
+                        }
+                    }
+                });
+            },
+
+            syncCartToDB(userId) {
+                const userCartRef = ref(db, `carts/${userId}`);
+                if (this.cart.length === 0) {
+                    remove(userCartRef).catch(e => console.error('Cart removal error:', e));
+                    return;
+                }
+                const cartData = {};
+                this.cart.forEach(item => {
+                    cartData[item.id] = { name: item.name, price: item.price, emoji: item.emoji, quantity: item.quantity };
+                });
+                set(userCartRef, cartData).catch(e => console.error('Cart sync error:', e));
+            },
+
+            // Address operations
+            async loadSavedAddresses() {
+                if (!this.currentUser) return;
+                try {
+                    const snap = await get(ref(db, `users/${this.currentUser.uid}/addresses`));
+                    this.savedAddresses = [];
+                    if (snap.exists()) {
+                        snap.forEach(child => {
+                            this.savedAddresses.push({ id: child.key, ...child.val() });
+                        });
+                        this.savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+                        if (this.savedAddresses.length > 0) {
+                            const defaultAddr = this.savedAddresses.find(a => a.isDefault) || this.savedAddresses[0];
+                            this.selectedAddressId = defaultAddr.id;
+                            this.deliveryAddress = defaultAddr;
+                        }
+                    }
+                    this.renderAddressDisplay();
+                } catch (e) {
+                    console.error('Load addresses error:', e);
+                }
+            },
+
+            renderAddressDisplay() {
+                const area = document.getElementById('addressDisplayArea');
+                if (!this.deliveryAddress) {
+                    area.innerHTML = '<button class="btn-secondary" onclick="APP.showAddressModal()">+ Add Delivery Address</button>';
+                    this.updatePlaceOrderButtonState();
+                    if (this.savedAddresses.length === 0 && this.googleMapsLoaded) {
+                        setTimeout(() => this.showAddressModal(), 1500);
+                    }
+                    return;
+                }
+
+                const coords = this.deliveryAddress.coordinates ?
+                    `<div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--non-photo-blue);font-size:0.8rem;color:#666;">📍 ${this.deliveryAddress.coordinates.lat.toFixed(6)}, ${this.deliveryAddress.coordinates.lng.toFixed(6)}</div>` : '';
+
+                area.innerHTML = `
+                    <div class="address-display-card">
+                        <div class="address-display-header">
+                            <div>
+                                <div class="address-display-name">${this.deliveryAddress.fullName}</div>
+                                <div class="address-display-phone">${this.deliveryAddress.phone}</div>
+                            </div>
+                            <button class="change-address-btn" onclick="APP.showAddressModal()">Change</button>
+                        </div>
+                        <div class="address-display-text">
+                            ${this.deliveryAddress.streetAddress || this.deliveryAddress.address || ''}<br>
+                            ${this.deliveryAddress.city || ''}, ${this.deliveryAddress.pincode || ''}
+                            ${this.deliveryAddress.landmark ? `<br>Landmark: ${this.deliveryAddress.landmark}` : ''}
+                        </div>${coords}
+                    </div>`;
+                this.updatePlaceOrderButtonState();
+            },
+
+            renderSavedAddresses() {
+                const list = document.getElementById('savedAddressesList');
+                const form = document.getElementById('addressFormContainer');
+                const cards = document.getElementById('addressCards');
+
+                if (!this.savedAddresses.length) {
+                    list.style.display = 'none';
+                    form.style.display = 'block';
+                    document.getElementById('backToSavedBtn').style.display = 'none';
+                    return;
+                }
+
+                list.style.display = 'block';
+                form.style.display = 'none';
+
+                cards.innerHTML = this.savedAddresses.map((a) => {
+                    const selectedClass = this.selectedAddressId === a.id ? 'selected' : '';
+                    return `
+                        <div class="address-card ${selectedClass}" onclick="APP.selectSavedAddress('${a.id}')">
+                            <div class="address-card-header">
+                                <div>
+                                    <div class="address-name">${a.fullName}</div>
+                                    <div class="address-phone">${a.phone}</div>
+                                </div>
+                                ${a.isDefault ? '<span class="default-badge">Default</span>' : ''}
+                            </div>
+                            <div class="address-details">
+                                ${a.streetAddress || a.address || ''}<br>
+                                ${a.city || ''}, ${a.pincode || ''}
+                                ${a.landmark ? `<br>Landmark: ${a.landmark}` : ''}
+                            </div>
+                            <div class="address-actions">
+                                ${!a.isDefault ? `<button class="btn-small btn-set-default" onclick="event.stopPropagation(); APP.setDefaultAddress('${a.id}')">Set as Default</button>` : ''}
+                                <button class="btn-small btn-delete" onclick="event.stopPropagation(); APP.deleteAddress('${a.id}')">Delete</button>
+                            </div>
+                        </div>`;
+                }).join('');
+            },
+
+            selectSavedAddress(id) {
+                const found = this.savedAddresses.find(a => a.id === id);
+                if (!found) return;
+                this.selectedAddressId = id;
+                this.deliveryAddress = found;
+                this.renderAddressDisplay();
+                setTimeout(() => this.closeAddressModal(), 300);
+            },
+
+            async setDefaultAddress(id) {
+                if (!this.currentUser) return;
+                try {
+                    const updates = {};
+                    this.savedAddresses.forEach(addr => {
+                        updates[`users/${this.currentUser.uid}/addresses/${addr.id}/isDefault`] = (addr.id === id);
+                    });
+                    await update(ref(db), updates);
+                    this.savedAddresses.forEach(addr => {
+                        addr.isDefault = (addr.id === id);
+                    });
+                    this.savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+                    this.renderSavedAddresses();
+                    this.showSuccess('Default address updated');
+                } catch (e) {
+                    console.error('Set default error:', e);
+                    this.showError('Failed to set default');
+                }
+            },
+
+            async deleteAddress(id) {
+                if (!confirm('Delete this address?')) return;
+                try {
+                    await remove(ref(db, `users/${this.currentUser.uid}/addresses/${id}`));
+                    this.savedAddresses = this.savedAddresses.filter(a => a.id !== id);
+                    if (this.selectedAddressId === id) {
+                        this.selectedAddressId = null;
+                        this.deliveryAddress = null;
+                        if (this.savedAddresses.length) {
+                            const defaultAddr = this.savedAddresses.find(a => a.isDefault) || this.savedAddresses[0];
+                            this.selectedAddressId = defaultAddr.id;
+                            this.deliveryAddress = defaultAddr;
+                        }
+                    }
+                    this.renderSavedAddresses();
+                    this.renderAddressDisplay();
+                    this.showSuccess('Address deleted');
+                } catch (e) {
+                    console.error('Delete error:', e);
+                    this.showError('Failed to delete');
+                }
+            },
+
+            showAddressModal() {
+                const modal = document.getElementById('addressModal');
+                modal.classList.add('active');
+                if (this.savedAddresses.length > 0) {
+                    this.showSavedAddresses();
+                } else {
+                    this.showAddressForm();
+                }
+                setTimeout(() => {
+                    if (this.map) {
+                        google.maps.event.trigger(this.map, 'resize');
+                        if (document.getElementById('addressFormContainer').style.display !== 'none') {
+                            const defaultLocation = { lat: 22.9734, lng: 78.6569 };
+                            this.finalPinLocation = defaultLocation;
+                            this.map.setCenter(defaultLocation);
+                            this.map.setZoom(5);
+                            this.marker.setPosition(defaultLocation);
+                            this.updateCoordinatesDisplay();
+                            this.getLocation();
+                        }
+                    }
+                }, 300);
+            },
+
+            closeAddressModal() {
+                document.getElementById('addressModal').classList.remove('active');
+            },
+
+            showAddressForm() {
+                document.getElementById('savedAddressesList').style.display = 'none';
+                document.getElementById('addressFormContainer').style.display = 'block';
+                document.getElementById('backToSavedBtn').style.display = this.savedAddresses.length ? 'block' : 'none';
+                document.getElementById('addressForm').reset();
+                document.getElementById('saveAddress').checked = true;
+                const defaultLocation = { lat: 22.9734, lng: 78.6569 };
+                this.finalPinLocation = defaultLocation;
+                setTimeout(() => {
+                    if (this.map) {
+                        google.maps.event.trigger(this.map, 'resize');
+                        this.map.setCenter(defaultLocation);
+                        this.map.setZoom(5);
+                        this.marker.setPosition(defaultLocation);
+                        this.updateCoordinatesDisplay();
+                        this.getLocation();
+                    }
+                }, 100);
+            },
+
+            showSavedAddresses() {
+                document.getElementById('savedAddressesList').style.display = 'block';
+                document.getElementById('addressFormContainer').style.display = 'none';
+                this.renderSavedAddresses();
+            },
+
+            async saveAndSelectAddress() {
+                const name = document.getElementById('fullName').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const addr = document.getElementById('address').value.trim();
+                const city = document.getElementById('city').value.trim();
+                const pin = document.getElementById('pincode').value.trim();
+                const landmark = document.getElementById('landmark').value.trim();
+                const save = document.getElementById('saveAddress').checked;
+
+                if (!name || !phone || !addr || !city || !pin) return this.showError('Fill all required fields');
+                if (!/^[0-9]{10}$/.test(phone)) return this.showError('Enter valid 10-digit phone');
+                if (!/^[0-9]{6}$/.test(pin)) return this.showError('Enter valid 6-digit pincode');
+                if (!this.finalPinLocation) return this.showError('Please set your location on the map');
+
+                const btn = document.getElementById('deliverHereBtn');
+                const btnText = document.getElementById('deliverHereBtnText');
+                btn.disabled = true;
+                btn.classList.add('processing');
+                btnText.textContent = 'Checking...';
+
+                try {
+                    this.deliveryAddress = {
+                        fullName: name,
+                        phone,
+                        streetAddress: addr,
+                        city,
+                        pincode: pin,
+                        landmark,
+                        coordinates: this.finalPinLocation,
+                        serviceable: true
+                    };
+
+                    if (save && this.currentUser) {
+                        btnText.textContent = 'Saving...';
+                        const newRef = push(ref(db, `users/${this.currentUser.uid}/addresses`));
+                        const isFirstAddress = this.savedAddresses.length === 0;
+                        await set(newRef, { ...this.deliveryAddress, createdAt: Date.now(), isDefault: isFirstAddress });
+                        this.savedAddresses.push({ id: newRef.key, ...this.deliveryAddress, isDefault: isFirstAddress });
+                        this.selectedAddressId = newRef.key;
+                        btnText.textContent = 'Saved!';
+                        btn.style.background = '#60b246';
+                        setTimeout(() => {
+                            this.showSuccess('Address saved successfully');
+                            this.renderAddressDisplay();
+                            this.closeAddressModal();
+                            btn.disabled = false;
+                            btn.classList.remove('processing');
+                            btn.style.background = '';
+                            btnText.textContent = 'Deliver Here';
+                            this.renderSavedAddresses();
+                        }, 800);
+                    } else {
+                        btnText.textContent = 'Selected!';
+                        btn.style.background = '#60b246';
+                        setTimeout(() => {
+                            this.renderAddressDisplay();
+                            this.closeAddressModal();
+                            btn.disabled = false;
+                            btn.classList.remove('processing');
+                            btn.style.background = '';
+                            btnText.textContent = 'Deliver Here';
+                        }, 600);
+                    }
+                } catch (e) {
+                    console.error('Error saving address:', e);
+                    this.showError('Failed to save address');
+                    btn.disabled = false;
+                    btn.classList.remove('processing');
+                    btnText.textContent = 'Deliver Here';
+                }
+            },
+
+            // Payment operations
+            selectPayment(method) {
+                this.selectedPayment = method;
+                document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+                const radio = document.getElementById(method);
+                if (radio) radio.checked = true;
+                const opt = document.getElementById(`payment-${method}`);
+                if (opt) opt.classList.add('selected');
+                this.updatePlaceOrderButtonState();
+            },
+
+            updatePlaceOrderButtonState() {
+                const btn = document.getElementById('placeOrderBtn');
+                const enabled = !!this.deliveryAddress && !!this.selectedPayment;
+                btn.disabled = !enabled;
+                if (this.selectedPayment === 'cod') btn.textContent = 'Place Order (COD)';
+                else if (this.selectedPayment === 'online') btn.textContent = 'Pay Now';
+                else btn.textContent = 'Select Payment Method';
+            },
+
+            async handlePlaceOrder() {
+                if (!this.deliveryAddress) {
+                    this.showError('Add delivery address');
+                    this.showAddressModal();
+                    return;
+                }
+                if (!this.selectedPayment) return this.showError('Select payment method');
+
+                const snap = await get(ref(db, 'storeStatus'));
+                if (!snap.exists() || !snap.val().isOpen) {
+                    return this.showToast('error', 'Store Closed', 'Not taking orders now. Try again later.');
+                }
+
+                this.selectedPayment === 'cod' ? this.placeOrder('cod', null) : this.initiateRazorpay();
+            },
+
+            initiateRazorpay() {
+                const subtotal = this.cart.reduce((s, i) => s + i.price * i.quantity, 0);
+                const deliveryFee = this.calculateDeliveryFee(subtotal);
+                const total = subtotal + deliveryFee;
+
+                new Razorpay({
+                    key: this.RAZORPAY_KEY,
+                    amount: total * 100,
+                    currency: 'INR',
+                    name: 'Midnight Plaza',
+                    description: 'Food Order',
+                    handler: (res) => this.placeOrder('online', res.razorpay_payment_id),
+                    prefill: { name: this.deliveryAddress.fullName, email: this.currentUser.email, contact: this.deliveryAddress.phone },
+                    theme: { color: '#fdc921' },
+                    modal: { ondismiss: () => this.showError('Payment cancelled') }
+                }).open();
+            },
+
+            async placeOrder(method, paymentId) {
+                if (!this.currentUser || !this.cart.length) return this.showError('Unable to place order');
+
+                const loader = document.getElementById('loader');
+                const btn = document.getElementById('placeOrderBtn');
+                loader.style.display = 'block';
+                btn.disabled = true;
+
+                const subtotal = this.cart.reduce((s, i) => s + i.price * i.quantity, 0);
+                const deliveryFee = this.calculateDeliveryFee(subtotal);
+                const total = subtotal + deliveryFee;
+
+                try {
+                    const newOrderRef = push(ref(db, 'orders'));
+                    await set(newOrderRef, {
+                        userId: this.currentUser.uid,
+                        userEmail: this.currentUser.email,
+                        items: this.cart,
+                        subtotal, deliveryFee, total,
+                        deliveryAddress: {
+                            address: this.deliveryAddress.streetAddress || this.deliveryAddress.address,
+                            fullName: this.deliveryAddress.fullName,
+                            phone: this.deliveryAddress.phone,
+                            city: this.deliveryAddress.city,
+                            pincode: this.deliveryAddress.pincode,
+                            landmark: this.deliveryAddress.landmark || '',
+                            coordinates: this.deliveryAddress.coordinates
+                        },
+                        paymentMethod: method,
+                        paymentStatus: method === 'online' ? 'paid' : 'pending',
+                        ...(paymentId && { paymentId }),
+                        status: 'pending',
                         createdAt: Date.now()
                     });
-                }
-            } catch (error) {
-                console.error('Error initializing order stats:', error);
-            }
-        }
 
-        function calculateDeliveryFee(subtotal) {
-            if (userTotalOrders < FIRST_TWO_ORDERS_FREE) {
-                return 0;
-            }
-            return subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
-        }
+                    const totalOrdersRef = ref(db, `users/${this.currentUser.uid}/orderStats/totalOrders`);
+                    const totalOrdersSnap = await get(totalOrdersRef);
+                    const currentTotal = totalOrdersSnap.exists() ? totalOrdersSnap.val() : 0;
+                    await set(totalOrdersRef, currentTotal + 1);
 
-        function updateCoordinatesDisplay() {
-            if (finalPinLocation) {
-                document.getElementById('currentCoords').textContent =
-                    `${finalPinLocation.lat.toFixed(6)}, ${finalPinLocation.lng.toFixed(6)}`;
-            }
-        }
-
-        window.getLocation = function() {
-            const btn = document.getElementById('locationBtn');
-            btn.disabled = true;
-            btn.innerHTML = '📍 Detecting...';
-            let locationFound = false;
-
-            const onSuccess = (lat, lng, source) => {
-                if (locationFound) return;
-                locationFound = true;
-                console.log(`Location from ${source}:`, lat, lng);
-                const latLng = new google.maps.LatLng(lat, lng);
-                map.setCenter(latLng);
-                map.setZoom(15);
-                setMarkerPosition(latLng, true);
-                initialLocationDetected = true;
-                btn.innerHTML = '✅ Located';
-                btn.disabled = false;
-                showSuccess('Location detected - drag pin if needed');
-            };
-
-            const onError = (msg) => {
-                if (locationFound) return;
-                console.error('Location error:', msg);
-                btn.innerHTML = '📍 Use My Location';
-                btn.disabled = false;
-                showError(msg);
-                const defaultLatLng = new google.maps.LatLng(22.9734, 78.6569);
-                setMarkerPosition(defaultLatLng, false);
-                document.getElementById('currentCoords').textContent = 'Default location - please drag pin';
-            };
-
-            if (window.Android && typeof window.Android.getCurrentLocation === 'function') {
-                try {
-                    const loc = window.Android.getCurrentLocation();
-                    if (loc) {
-                        const parsed = typeof loc === 'string' ? JSON.parse(loc) : loc;
-                        if (parsed && parsed.lat && parsed.lng) {
-                            return onSuccess(parsed.lat, parsed.lng, 'Android Interface');
-                        }
-                    }
-                } catch(e) {
-                    console.log('Android interface failed:', e);
-                }
-            }
-
-            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.getCurrentLocation) {
-                try {
-                    window.webkit.messageHandlers.getCurrentLocation.postMessage({});
-                    window.setLocation = (lat, lng) => onSuccess(lat, lng, 'iOS WebKit');
-                    setTimeout(() => {
-                        if (!locationFound) tryStandardGeo();
-                    }, 2000);
-                    return;
-                } catch(e) {
-                    console.log('iOS WebKit failed:', e);
-                }
-            }
-
-            const tryStandardGeo = () => {
-                if (!navigator.geolocation) {
-                    return onError('Geolocation not supported - drag marker to set location');
-                }
-
-                const optsHigh = {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0
-                };
-
-                navigator.geolocation.getCurrentPosition(
-                    pos => onSuccess(pos.coords.latitude, pos.coords.longitude, 'HTML5 High Accuracy'),
-                    err1 => {
-                        console.log('High accuracy failed, trying low accuracy:', err1);
-                        const optsLow = {
-                            enableHighAccuracy: false,
-                            timeout: 8000,
-                            maximumAge: 5000
-                        };
-
-                        navigator.geolocation.getCurrentPosition(
-                            pos => onSuccess(pos.coords.latitude, pos.coords.longitude, 'HTML5 Low Accuracy'),
-                            err2 => {
-                                const msgs = {
-                                    1: 'Location permission denied - enable in app settings',
-                                    2: 'Location unavailable - drag marker to your location',
-                                    3: 'Location timeout - drag marker to your location'
-                                };
-                                onError(msgs[err2.code] || 'Drag marker to set your location');
-                            },
-                            optsLow
-                        );
-                    },
-                    optsHigh
-                );
-            };
-
-            const tryIPLocation = () => {
-                setTimeout(() => {
-                    if (!locationFound) {
-                        fetch('https://ipapi.co/json/')
-                            .then(r => r.json())
-                            .then(data => {
-                                if (data.latitude && data.longitude) {
-                                    onSuccess(data.latitude, data.longitude, 'IP Location (approximate)');
-                                }
-                            })
-                            .catch(() => {
-                                onError('Drag marker to set your location');
-                            });
-                    }
-                }, 12000);
-            };
-
-            tryStandardGeo();
-            tryIPLocation();
-        };
-
-        window.initMap = function() {
-            const defaultLocation = { lat: 22.9734, lng: 78.6569 };
-
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: defaultLocation,
-                zoom: 5,
-                mapTypeControl: false,
-                streetViewControl: false,
-                fullscreenControl: false
-            });
-
-            marker = new google.maps.Marker({
-                position: defaultLocation,
-                map: map,
-                draggable: true,
-                animation: google.maps.Animation.DROP
-            });
-
-            finalPinLocation = defaultLocation;
-            updateCoordinatesDisplay();
-
-            map.addListener('click', e => {
-                setMarkerPosition(e.latLng, false);
-            });
-
-            marker.addListener('dragend', e => {
-                setMarkerPosition(e.latLng, false);
-                showSuccess('Pin location updated');
-            });
-
-            marker.addListener('drag', e => {
-                finalPinLocation = { lat: e.latLng.lat(), lng: e.latLng.lng() };
-                updateCoordinatesDisplay();
-            });
-
-            googleMapsLoaded = true;
-            console.log('Google Maps loaded successfully');
-
-            // If modal was waiting to open, open it now
-            if (pendingModalOpen) {
-                pendingModalOpen = false;
-                setTimeout(() => showAddressModal(), 300);
-            }
-
-            setTimeout(() => window.getLocation(), 500);
-        };
-
-        function setMarkerPosition(latLng, isInitialDetection = false) {
-            finalPinLocation = { lat: latLng.lat(), lng: latLng.lng() };
-            marker.setPosition(latLng);
-            map.panTo(latLng);
-            updateCoordinatesDisplay();
-
-            new google.maps.Geocoder().geocode({ location: latLng }, (results, status) => {
-                if (status === 'OK' && results[0]) {
-                    const c = results[0].address_components;
-                    let city = '', pin = '', addr = '', area = '', state = '';
-
-                    c.forEach(comp => {
-                        const t = comp.types;
-                        if (t.includes('locality') || t.includes('administrative_area_level_2')) city = comp.long_name;
-                        if (t.includes('postal_code')) pin = comp.long_name;
-                        if (t.includes('sublocality') || t.includes('neighborhood')) area = comp.long_name;
-                        if (t.includes('route')) addr = comp.long_name;
-                        if (t.includes('administrative_area_level_1')) state = comp.long_name;
-                    });
-
-                    if (city) document.getElementById('city').value = city;
-                    if (pin) document.getElementById('pincode').value = pin;
-                    if (addr || area) document.getElementById('address').value = [addr, area].filter(Boolean).join(', ');
-                    if (state) document.getElementById('landmark').value = `Near ${area || city}, ${state}`;
-
-                    if (!isInitialDetection) {
-                        showSuccess('Address updated from pin location');
-                    }
-                }
-            });
-        }
-
-        window.showLocationHelp = function() {
-            alert('Location Detection Help:\n\n1. Allow location permission when prompted\n2. DRAG the red marker to your EXACT delivery location\n3. You can also tap anywhere on the map\n4. The coordinates shown below the map are what will be saved\n5. Make sure to position the pin at your exact address');
-        };
-
-        function syncCartFromDB(userId) {
-            updateSyncIndicator('syncing');
-            
-            if (cartSyncListener) cartSyncListener();
-            
-            const userCartRef = ref(db, `carts/${userId}`);
-            cartSyncListener = onValue(userCartRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    const dbCart = snapshot.val();
-                    const newCart = Object.keys(dbCart).map(itemId => ({
-                        id: itemId,
-                        ...dbCart[itemId]
-                    }));
-                    
-                    if (JSON.stringify(cart) !== JSON.stringify(newCart)) {
-                        cart = newCart;
-                        saveCart();
-                        renderCart();
-                        updateSyncIndicator('synced');
-                    }
-                } else {
-                    if (cart.length > 0) {
-                        syncCartToDB(userId);
-                    }
-                    updateSyncIndicator('synced');
-                }
-            }, (error) => {
-                console.error('Cart sync error:', error);
-                updateSyncIndicator('error');
-                setTimeout(() => updateSyncIndicator('synced'), 3000);
-            });
-        }
-
-        function syncCartToDB(userId) {
-            const userCartRef = ref(db, `carts/${userId}`);
-            
-            if (cart.length === 0) {
-                remove(userCartRef).catch(err => console.error('Error removing cart:', err));
-                return;
-            }
-            
-            const cartData = {};
-            cart.forEach(item => {
-                cartData[item.id] = {
-                    name: item.name,
-                    price: item.price,
-                    emoji: item.emoji,
-                    category: item.category,
-                    quantity: item.quantity
-                };
-            });
-            
-            set(userCartRef, cartData).catch(error => {
-                console.error('Error syncing cart to DB:', error);
-                updateSyncIndicator('error');
-                setTimeout(() => updateSyncIndicator('synced'), 3000);
-            });
-        }
-
-        onAuthStateChanged(auth, async user => {
-            if (user) {
-                currentUser = user;
-                loadGoogleMaps();
-                loadCart();
-                syncCartFromDB(user.uid);
-                await initializeUserOrderStats();
-                userCompletedOrders = await getUserCompletedOrdersCount();
-                userTotalOrders = await getUserTotalOrdersCount();
-                await loadSavedAddresses();
-                selectPayment('cod');
-                renderCart();
-            } else {
-                window.location.href = 'index.html';
-            }
-        });
-
-        function loadGoogleMaps() {
-            if (window.google?.maps) { window.initMap(); return; }
-            const s = document.createElement('script');
-            s.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDsn16p7w8b-x8pEA_WTO5F2oUk4MHwcUc&callback=initMap';
-            s.async = true;
-            s.defer = true;
-            document.head.appendChild(s);
-        }
-
-        function loadCart() {
-            try {
-                const savedCart = localStorage.getItem('midnightPlazaCart');
-                if (savedCart) {
-                    cart = JSON.parse(savedCart);
-                }
-            } catch (error) {
-                console.error('Error loading cart:', error);
-                cart = [];
-            }
-            renderCart();
-        }
-
-        function renderCart() {
-            const content = document.getElementById('cartContent');
-            const sections = document.getElementById('checkoutSections');
-
-            if (!cart.length) {
-                content.innerHTML = `
-                    <div class="empty-cart">
-                        <div class="empty-cart-icon">🛒</div>
-                        <h3>Your cart is empty</h3>
-                        <p>Add delicious items to get started!</p>
-                        <a href="home.html" class="continue-shopping">Browse Menu</a>
-                    </div>`;
-                sections.style.display = 'none';
-                return;
-            }
-
-            sections.style.display = 'block';
-            const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-            const deliveryFee = calculateDeliveryFee(subtotal);
-            const total = subtotal + deliveryFee;
-            
-            const isFirstOrders = userTotalOrders < FIRST_TWO_ORDERS_FREE;
-            const isFreeByThreshold = subtotal >= FREE_DELIVERY_THRESHOLD;
-            const isFreeDelivery = deliveryFee === 0;
-            
-            const amountNeeded = FREE_DELIVERY_THRESHOLD - subtotal;
-            const progressPercent = Math.min((subtotal / FREE_DELIVERY_THRESHOLD) * 100, 100);
-
-            let deliveryBannerHTML = '';
-            let deliveryProgressHTML = '';
-            let firstOrderBannerHTML = '';
-
-            if (isFirstOrders) {
-                const ordersRemaining = FIRST_TWO_ORDERS_FREE - userTotalOrders;
-                firstOrderBannerHTML = `
-                    <div class="first-order-banner show">
-                        <div class="first-order-icon">🎁</div>
-                        <div><strong>Welcome Offer!</strong> Your first ${FIRST_TWO_ORDERS_FREE} ${FIRST_TWO_ORDERS_FREE === 1 ? 'delivery is' : 'deliveries are'} FREE! 🎉</div>
-                        <div style="font-size: 0.85rem; margin-top: 0.3rem; opacity: 0.9;">
-                            ${ordersRemaining === FIRST_TWO_ORDERS_FREE ? 'This is your 1st order' : `This is your ${userTotalOrders + 1}${userTotalOrders === 0 ? 'st' : 'nd'} order - ${ordersRemaining - 1} more free ${ordersRemaining - 1 === 1 ? 'delivery' : 'deliveries'} after this!`}
-                        </div>
-                    </div>`;
-            } else if (isFreeByThreshold) {
-                deliveryBannerHTML = `
-                    <div class="free-delivery-banner show">
-                        🎉 Yay! You've unlocked FREE Delivery!
-                    </div>`;
-            } else if (amountNeeded > 0) {
-                deliveryProgressHTML = `
-                    <div class="delivery-progress show">
-                        <div class="delivery-progress-text">
-                            Add items worth <strong>₹${amountNeeded}</strong> more for FREE delivery! 🚚
-                        </div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar-fill" style="width: ${progressPercent}%"></div>
-                        </div>
-                    </div>`;
-            }
-
-            const deliveryRowClass = isFreeDelivery ? 'summary-row delivery free' : 'summary-row delivery';
-            let deliveryText = '';
-            
-            if (isFirstOrders) {
-                deliveryText = `<span>Delivery Fee</span><span><span class="delivery-value">₹${DELIVERY_FEE}</span> <strong style="color: #ff6b6b;">FREE (Welcome Offer)</strong></span>`;
-            } else if (isFreeByThreshold) {
-                deliveryText = `<span>Delivery Fee</span><span><span class="delivery-value">₹${DELIVERY_FEE}</span> <strong style="color: var(--success-green);">FREE</strong></span>`;
-            } else {
-                deliveryText = `<span>Delivery Fee</span><span>₹${deliveryFee}</span>`;
-            }
-
-            content.innerHTML = firstOrderBannerHTML + deliveryBannerHTML + deliveryProgressHTML + cart.map((item, i) => `
-                <div class="cart-item">
-                    <div class="cart-item-header">
-                        <div class="cart-item-details">
-                            <div class="cart-item-name">${item.emoji || '🍔'} ${item.name}</div>
-                            <div class="cart-item-price">₹${item.price}</div>
-                        </div>
-                        <div class="cart-item-total">₹${item.price * item.quantity}</div>
-                    </div>
-                    <div class="cart-item-actions">
-                        <div class="cart-item-quantity">
-                            <button class="quantity-btn" onclick="updateQuantity(${i}, -1)">-</button>
-                            <div class="quantity-display">${item.quantity}</div>
-                            <button class="quantity-btn" onclick="updateQuantity(${i}, 1)">+</button>
-                        </div>
-                        <button class="remove-btn" onclick="removeItem(${i})">Remove</button>
-                    </div>
-                </div>
-            `).join('') + `
-                <div class="cart-summary">
-                    <div class="summary-row subtotal"><span>Subtotal</span><span>₹${subtotal}</span></div>
-                    <div class="${deliveryRowClass}">${deliveryText}</div>
-                    <div class="cart-total"><span>Total</span><span>₹${total}</span></div>
-                </div>`;
-        }
-
-        window.updateQuantity = (i, change) => {
-            cart[i].quantity += change;
-            if (cart[i].quantity <= 0) cart.splice(i, 1);
-            saveCart();
-            if (currentUser) syncCartToDB(currentUser.uid);
-            renderCart();
-        };
-
-        window.removeItem = i => {
-            if (confirm('Remove this item?')) {
-                cart.splice(i, 1);
-                saveCart();
-                if (currentUser) syncCartToDB(currentUser.uid);
-                renderCart();
-            }
-        };
-
-        function saveCart() {
-            try {
-                localStorage.setItem('midnightPlazaCart', JSON.stringify(cart));
-            } catch (error) {
-                console.error('Error saving cart:', error);
-            }
-        }
-
-        async function loadSavedAddresses() {
-            if (!currentUser) return;
-            try {
-                const snap = await get(ref(db, `users/${currentUser.uid}/addresses`));
-                savedAddresses = [];
-                if (snap.exists()) {
-                    snap.forEach(child => {
-                        savedAddresses.push({ id: child.key, ...child.val() });
-                    });
-                    
-                    savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
-                    
-                    if (savedAddresses.length > 0) {
-                        const defaultAddr = savedAddresses.find(a => a.isDefault) || savedAddresses[0];
-                        selectedAddressId = defaultAddr.id;
-                        deliveryAddress = defaultAddr;
-                        renderAddressDisplay();
-                    }
-                }
-            } catch (e) {
-                console.error('Load addresses error:', e);
-                savedAddresses = [];
-            }
-        }
-
-        function renderAddressDisplay() {
-            const area = document.getElementById('addressDisplayArea');
-            if (!deliveryAddress) {
-                area.innerHTML = '<button class="btn-secondary" onclick="showAddressModal()">+ Add Delivery Address</button>';
-                updatePlaceOrderButtonState();
-                
-                // Auto-open modal for new users with no saved addresses
-                if (savedAddresses.length === 0) {
-                    if (googleMapsLoaded) {
-                        setTimeout(() => {
-                            console.log('Auto-opening modal for new user');
-                            showAddressModal();
-                        }, 1000);
-                    } else {
-                        console.log('Waiting for Google Maps to load...');
-                        pendingModalOpen = true;
-                    }
-                }
-                return;
-            }
-
-            const serviceableIndicator = deliveryAddress.serviceable === false ?
-                '<div style="margin-top:0.5rem;padding:0.5rem;background:#fff3cd;border-left:4px solid #ffc107;border-radius:4px;font-size:0.8rem;color:#856404;">⚠️ This address is out of service area</div>' : '';
-
-            const coords = deliveryAddress.coordinates ?
-                `<div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--non-photo-blue);font-size:0.8rem;color:#666;">📍 ${deliveryAddress.coordinates.lat.toFixed(6)}, ${deliveryAddress.coordinates.lng.toFixed(6)}</div>` : '';
-
-            area.innerHTML = `
-                <div class="address-display-card">
-                    <div class="address-display-header">
-                        <div>
-                            <div class="address-display-name">${deliveryAddress.fullName}</div>
-                            <div class="address-display-phone">${deliveryAddress.phone}</div>
-                        </div>
-                        <button class="change-address-btn" onclick="showAddressModal()">Change</button>
-                    </div>
-                    <div class="address-display-text">
-                        ${deliveryAddress.streetAddress || deliveryAddress.address || ''}<br>
-                        ${deliveryAddress.city || ''}, ${deliveryAddress.pincode || ''}
-                        ${deliveryAddress.landmark ? `<br>Landmark: ${deliveryAddress.landmark}` : ''}
-                    </div>${coords}${serviceableIndicator}
-                </div>`;
-
-            updatePlaceOrderButtonState();
-        }
-
-        function renderSavedAddresses() {
-            const list = document.getElementById('savedAddressesList');
-            const form = document.getElementById('addressFormContainer');
-            const cards = document.getElementById('addressCards');
-
-            if (!savedAddresses.length) {
-                list.style.display = 'none';
-                form.style.display = 'block';
-                document.getElementById('backToSavedBtn').style.display = 'none';
-                cards.innerHTML = '<div class="empty-addresses"><div class="empty-addresses-icon">📍</div><p>No saved addresses yet</p></div>';
-                return;
-            }
-
-            list.style.display = 'block';
-            form.style.display = 'none';
-
-            cards.innerHTML = savedAddresses.map((a) => {
-                const coords = a.coordinates ? `<br><small style="color:#999;">📍 ${a.coordinates.lat.toFixed(4)}, ${a.coordinates.lng.toFixed(4)}</small>` : '';
-                const serviceableWarning = a.serviceable === false ? '<br><small style="color:#dc3545;">⚠️ Out of service area</small>' : '';
-
-                const selectedClass = (selectedAddressId === a.id) ? 'selected' : '';
-                const opacityStyle = a.serviceable === false ? 'opacity: 0.7; border-color: #ffc107;' : '';
-
-                return `
-                    <div class="address-card ${selectedClass}" data-id="${a.id}" style="${opacityStyle}" onclick="selectSavedAddress('${a.id}')">
-                        <div class="address-card-header">
-                            <div>
-                                <div class="address-name">${a.fullName}</div>
-                                <div class="address-phone">${a.phone}</div>
-                            </div>
-                            ${a.isDefault ? '<span class="default-badge">Default</span>' : ''}
-                        </div>
-                        <div class="address-details">
-                            ${a.streetAddress || a.address || ''}<br>
-                            ${a.city || ''}, ${a.pincode || ''}
-                            ${a.landmark ? `<br>Landmark: ${a.landmark}` : ''}${coords}${serviceableWarning}
-                        </div>
-                        <div class="address-actions">
-                            ${!a.isDefault ? `<button class="btn-small btn-set-default" onclick="event.stopPropagation(); setDefaultAddress('${a.id}')">Set as Default</button>` : ''}
-                            <button class="btn-small btn-delete" onclick="event.stopPropagation(); deleteAddress('${a.id}')">Delete</button>
-                        </div>
-                    </div>`;
-            }).join('');
-        }
-
-        window.selectSavedAddress = (id) => {
-            const found = savedAddresses.find(a => a.id === id);
-            if (!found) {
-                console.warn('Address id not found:', id);
-                return;
-            }
-            selectedAddressId = id;
-            deliveryAddress = found;
-            renderAddressDisplay();
-
-            const cards = document.querySelectorAll('#addressCards .address-card');
-            cards.forEach(c => {
-                try {
-                    c.classList.toggle('selected', c.dataset.id === id);
-                } catch (e) {}
-            });
-
-            setTimeout(closeAddressModal, 300);
-        };
-
-        window.setDefaultAddress = async (id) => {
-            if (!currentUser) return;
-            try {
-                const updates = {};
-                savedAddresses.forEach(addr => {
-                    updates[`users/${currentUser.uid}/addresses/${addr.id}/isDefault`] = (addr.id === id);
-                });
-
-                await update(ref(db), updates);
-                
-                savedAddresses.forEach(addr => {
-                    addr.isDefault = (addr.id === id);
-                });
-                
-                savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
-                
-                renderSavedAddresses();
-                showSuccess('Default address updated');
-            } catch (e) {
-                console.error('Set default error:', e);
-                showError('Failed to set default');
-            }
-        };
-
-        window.deleteAddress = async id => {
-            if (!confirm('Delete this address?')) return;
-            try {
-                await remove(ref(db, `users/${currentUser.uid}/addresses/${id}`));
-                savedAddresses = savedAddresses.filter(a => a.id !== id);
-                
-                if (selectedAddressId === id) {
-                    selectedAddressId = null;
-                    deliveryAddress = null;
-                    if (savedAddresses.length) {
-                        const defaultAddr = savedAddresses.find(a => a.isDefault) || savedAddresses[0];
-                        selectedAddressId = defaultAddr.id;
-                        deliveryAddress = defaultAddr;
-                    }
-                }
-                
-                renderSavedAddresses();
-                renderAddressDisplay();
-                showSuccess('Address deleted');
-            } catch (e) {
-                console.error('Delete error:', e);
-                showError('Failed to delete');
-            }
-        };
-
-        window.showAddressModal = () => {
-            console.log('showAddressModal called');
-            console.log('Google Maps loaded:', googleMapsLoaded);
-            console.log('Saved addresses:', savedAddresses.length);
-            
-            const modal = document.getElementById('addressModal');
-            if (!modal) {
-                console.error('Address modal element not found!');
-                return;
-            }
-            
-            modal.classList.add('active');
-            
-            if (savedAddresses.length > 0) {
-                showSavedAddresses();
-            } else {
-                showAddressForm();
-            }
-            
-            setTimeout(() => {
-                if (map) {
-                    google.maps.event.trigger(map, 'resize');
-                    if (document.getElementById('addressFormContainer').style.display !== 'none') {
-                        const defaultLocation = { lat: 22.9734, lng: 78.6569 };
-                        finalPinLocation = defaultLocation;
-                        map.setCenter(defaultLocation);
-                        map.setZoom(5);
-                        marker.setPosition(defaultLocation);
-                        updateCoordinatesDisplay();
-                        initialLocationDetected = false;
-                        window.getLocation();
-                    }
-                }
-            }, 300);
-        };
-
-        window.closeAddressModal = () => document.getElementById('addressModal').classList.remove('active');
-
-        window.showAddressForm = () => {
-            document.getElementById('savedAddressesList').style.display = 'none';
-            document.getElementById('addressFormContainer').style.display = 'block';
-            document.getElementById('backToSavedBtn').style.display = savedAddresses.length ? 'block' : 'none';
-            document.getElementById('addressForm').reset();
-            document.getElementById('saveAddress').checked = true;
-            initialLocationDetected = false;
-            const defaultLocation = { lat: 22.9734, lng: 78.6569 };
-            finalPinLocation = defaultLocation;
-
-            setTimeout(() => {
-                if (map) {
-                    google.maps.event.trigger(map, 'resize');
-                    map.setCenter(defaultLocation);
-                    map.setZoom(5);
-                    marker.setPosition(defaultLocation);
-                    updateCoordinatesDisplay();
-                    window.getLocation();
-                }
-            }, 100);
-        };
-
-        window.showSavedAddresses = () => {
-            document.getElementById('savedAddressesList').style.display = 'block';
-            document.getElementById('addressFormContainer').style.display = 'none';
-            renderSavedAddresses();
-        };
-
-        window.saveAndSelectAddress = async () => {
-            const name = document.getElementById('fullName').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const addr = document.getElementById('address').value.trim();
-            const city = document.getElementById('city').value.trim();
-            const pin = document.getElementById('pincode').value.trim();
-            const landmark = document.getElementById('landmark').value.trim();
-            const save = document.getElementById('saveAddress').checked;
-
-            if (!name || !phone || !addr || !city || !pin) return showError('Fill all required fields');
-            if (!/^[0-9]{10}$/.test(phone)) return showError('Enter valid 10-digit phone');
-            if (!/^[0-9]{6}$/.test(pin)) return showError('Enter valid 6-digit pincode');
-
-            if (!finalPinLocation) {
-                return showError('Please set your location on the map');
-            }
-
-            const btn = document.getElementById('deliverHereBtn');
-            const btnText = document.getElementById('deliverHereBtnText');
-            btn.disabled = true;
-            btn.classList.add('processing');
-            btnText.textContent = '⏳ Checking...';
-
-            try {
-                const pincodeRef = ref(db, `servicepincodes/${pin}`);
-                const pincodeSnap = await get(pincodeRef);
-
-                const isServiceable = pincodeSnap.exists() && pincodeSnap.val() === true;
-
-                deliveryAddress = {
-                    fullName: name,
-                    phone,
-                    streetAddress: addr,
-                    city,
-                    pincode: pin,
-                    landmark,
-                    coordinates: finalPinLocation,
-                    serviceable: isServiceable
-                };
-
-                if (save && currentUser) {
-                    try {
-                        btnText.textContent = '⏳ Saving...';
-                        const newRef = push(ref(db, `users/${currentUser.uid}/addresses`));
-                        const isFirstAddress = savedAddresses.length === 0;
-                        
-                        await set(newRef, { 
-                            ...deliveryAddress, 
-                            createdAt: Date.now(),
-                            isDefault: isFirstAddress
-                        });
-                        
-                        savedAddresses.push({ 
-                            id: newRef.key, 
-                            ...deliveryAddress,
-                            isDefault: isFirstAddress
-                        });
-                        selectedAddressId = newRef.key;
-
-                        btnText.textContent = '✅ Saved!';
-                        btn.style.background = '#60b246';
-
-                        if (!isServiceable) {
-                            setTimeout(() => {
-                                btn.disabled = false;
-                                btn.classList.remove('processing');
-                                btn.style.background = '';
-                                btnText.textContent = '📍 Deliver Here';
-                                showToast('error', '⚠️ Out of Service Area', 'Address saved but pincode is out of service. Choose another address.');
-                                renderSavedAddresses();
-                            }, 1000);
-                        } else {
-                            setTimeout(() => {
-                                showSuccess('Address saved successfully');
-                                renderAddressDisplay();
-                                closeAddressModal();
-                                btn.disabled = false;
-                                btn.classList.remove('processing');
-                                btn.style.background = '';
-                                btnText.textContent = '📍 Deliver Here';
-                                renderSavedAddresses();
-                            }, 800);
-                        }
-                    } catch (e) {
-                        console.error('Save error:', e);
-                        showError('Failed to save address');
-                        btn.disabled = false;
-                        btn.classList.remove('processing');
-                        btnText.textContent = '📍 Deliver Here';
-                    }
-                } else {
-                    if (!isServiceable) {
-                        btn.disabled = false;
-                        btn.classList.remove('processing');
-                        btnText.textContent = '📍 Deliver Here';
-                        showToast('error', '⚠️ Out of Service Area', 'Pincode is out of service. Please try another address.');
-                        return;
-                    }
-
-                    btnText.textContent = '✅ Selected!';
-                    btn.style.background = '#60b246';
-
-                    setTimeout(() => {
-                        renderAddressDisplay();
-                        closeAddressModal();
-                        btn.disabled = false;
-                        btn.classList.remove('processing');
-                        btn.style.background = '';
-                        btnText.textContent = '📍 Deliver Here';
-                    }, 600);
-                }
-            } catch (error) {
-                console.error('Error checking pincode:', error);
-                showError('Failed to verify pincode');
-                btn.disabled = false;
-                btn.classList.remove('processing');
-                btnText.textContent = '📍 Deliver Here';
-            }
-        };
-
-        window.selectPayment = method => {
-            selectedPayment = method;
-            document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
-            const radio = document.getElementById(method);
-            if (radio) radio.checked = true;
-            const opt = document.getElementById(`payment-${method}`);
-            if (opt) opt.classList.add('selected');
-            updatePlaceOrderButtonState();
-        };
-
-        function updatePlaceOrderButtonState() {
-            const btn = document.getElementById('placeOrderBtn');
-            const enabled = !!deliveryAddress && !!selectedPayment;
-            btn.disabled = !enabled;
-            if (selectedPayment === 'cod') btn.textContent = 'Place Order (COD)';
-            else if (selectedPayment === 'online') btn.textContent = 'Pay Now';
-            else btn.textContent = 'Select Payment Method';
-        }
-
-        window.handlePlaceOrder = async () => {
-            if (!deliveryAddress) { showError('Add delivery address'); showAddressModal(); return; }
-            if (!selectedPayment) return showError('Select payment method');
-
-            if (deliveryAddress.serviceable === false || !deliveryAddress.serviceable) {
-                return showToast('error', '⚠️ Out of Service Area', 'Selected address is out of service area. Please choose another address.');
-            }
-
-            const snap = await get(ref(db, 'storeStatus'));
-            if (!snap.exists() || !snap.val().isOpen) {
-                return showToast('error', '🔒 Store Closed', 'Not taking orders now. Try again later.');
-            }
-
-            selectedPayment === 'cod' ? await placeOrder('cod', null) : await initiateRazorpay();
-        };
-
-        async function initiateRazorpay() {
-            const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-            const deliveryFee = calculateDeliveryFee(subtotal);
-            const total = subtotal + deliveryFee;
-
-            new Razorpay({
-                key: RAZORPAY_KEY,
-                amount: total * 100,
-                currency: 'INR',
-                name: 'Midnight Plaza',
-                description: 'Food Order',
-                handler: async res => await placeOrder('online', res.razorpay_payment_id),
-                prefill: { name: deliveryAddress.fullName, email: currentUser.email, contact: deliveryAddress.phone },
-                theme: { color: '#fdc921' },
-                modal: { ondismiss: () => showError('Payment cancelled') }
-            }).open();
-        }
-
-        async function placeOrder(method, paymentId) {
-            if (!currentUser || !cart.length) return showError('Unable to place order');
-
-            const loader = document.getElementById('loader');
-            const btn = document.getElementById('placeOrderBtn');
-            loader.style.display = 'block';
-            btn.disabled = true;
-
-            const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-            const deliveryFee = calculateDeliveryFee(subtotal);
-            const total = subtotal + deliveryFee;
-            
-            const isFirstOrders = userTotalOrders < FIRST_TWO_ORDERS_FREE;
-            const isFreeByThreshold = subtotal >= FREE_DELIVERY_THRESHOLD;
-
-            try {
-                const newOrderRef = push(ref(db, 'orders'));
-                await set(newOrderRef, {
-                    userId: currentUser.uid,
-                    userEmail: currentUser.email,
-                    items: cart,
-                    subtotal, 
-                    deliveryFee, 
-                    total,
-                    freeDelivery: deliveryFee === 0,
-                    freeDeliveryReason: isFirstOrders ? 'first_orders_welcome' : (isFreeByThreshold ? 'threshold' : null),
-                    deliveryAddress: {
-                        address: deliveryAddress.streetAddress || deliveryAddress.address,
-                        fullName: deliveryAddress.fullName,
-                        phone: deliveryAddress.phone,
-                        city: deliveryAddress.city,
-                        pincode: deliveryAddress.pincode,
-                        landmark: deliveryAddress.landmark || '',
-                        coordinates: deliveryAddress.coordinates
-                    },
-                    paymentMethod: method,
-                    paymentStatus: method === 'online' ? 'paid' : 'pending',
-                    ...(paymentId && { paymentId }),
-                    status: 'pending',
-                    createdAt: Date.now()
-                });
-
-                const totalOrdersRef = ref(db, `users/${currentUser.uid}/orderStats/totalOrders`);
-                const totalOrdersSnap = await get(totalOrdersRef);
-                const currentTotal = totalOrdersSnap.exists() ? totalOrdersSnap.val() : 0;
-                await set(totalOrdersRef, currentTotal + 1);
-
-                showToast('success', '✅ Order Successful!', 'Redirecting to My Orders...');
-                localStorage.removeItem('midnightPlazaCart');
-                cart = [];
-                if (currentUser) {
-                    await remove(ref(db, `carts/${currentUser.uid}`)).catch(err => console.log('Cart cleanup:', err));
-                }
-                setTimeout(() => window.location.href = 'orders.html', 2500);
-            } catch (e) {
-                console.error('Order error:', e);
-                showError('Failed to place order');
-                loader.style.display = 'none';
-                btn.disabled = false;
-            }
-        }
-
-        function showToast(type, msg, sub) {
-            const toast = document.getElementById('toast');
-            const overlay = document.getElementById('toastOverlay');
-            toast.className = `toast show toast-${type}`;
-            overlay.classList.add('show');
-            document.getElementById('toastIcon').textContent = type === 'success' ? '✅' : '❌';
-            document.getElementById('toastMessage').textContent = msg;
-            document.getElementById('toastSubMessage').textContent = sub;
-            if (type === 'error') setTimeout(() => { toast.classList.remove('show'); overlay.classList.remove('show'); }, 3000);
-        }
-
-        function showSuccess(msg) {
-            const el = document.getElementById('successMessage');
-            el.textContent = msg;
-            el.style.display = 'block';
-            setTimeout(() => el.style.display = 'none', 3000);
-        }
-
-        function showError(msg) {
-            const el = document.getElementById('errorMessage');
-            el.textContent = msg;
-            el.style.display = 'block';
-            setTimeout(() => el.style.display = 'none', 3000);
-        }
-
-        window.toggleMenu = () => {
-            document.querySelector('.hamburger').classList.toggle('active');
-            document.getElementById('navMenu').classList.toggle('active');
-        };
-
-        document.addEventListener('click', e => {
-            const navLeft = document.querySelector('.nav-left');
-            const navMenu = document.getElementById('navMenu');
-            const modal = document.getElementById('addressModal');
-            if (!navLeft.contains(e.target) && !navMenu.contains(e.target)) {
-                document.querySelector('.hamburger').classList.remove('active');
-                navMenu.classList.remove('active');
-            }
-            if (e.target === modal) closeAddressModal();
-        });
-
-        window.logout = async () => {
-            if (confirm('Logout?')) {
-                try {
-                    if (cartSyncListener) cartSyncListener();
-                    await signOut(auth);
+                    this.showToast('success', 'Order Successful!', 'Redirecting to My Orders...');
                     localStorage.removeItem('midnightPlazaCart');
-                    window.location.href = 'index.html';
+                    this.cart = [];
+                    if (this.currentUser) {
+                        await remove(ref(db, `carts/${this.currentUser.uid}`)).catch(e => console.log('Cart cleanup:', e));
+                    }
+                    setTimeout(() => window.location.href = 'orders.html', 2500);
                 } catch (e) {
-                    console.error('Logout error:', e);
+                    console.error('Order error:', e);
+                    this.showError('Failed to place order');
+                    loader.style.display = 'none';
+                    btn.disabled = false;
+                }
+            },
+
+            // User order stats
+            async initializeUserOrderStats() {
+                if (!this.currentUser) return;
+                try {
+                    const statsRef = ref(db, `users/${this.currentUser.uid}/orderStats`);
+                    const snapshot = await get(statsRef);
+                    if (!snapshot.exists()) {
+                        await set(statsRef, { completedOrders: 0, totalOrders: 0, createdAt: Date.now() });
+                    }
+                } catch (e) {
+                    console.error('Error initializing order stats:', e);
+                }
+            },
+
+            async getUserTotalOrdersCount() {
+                if (!this.currentUser) return 0;
+                try {
+                    const statsRef = ref(db, `users/${this.currentUser.uid}/orderStats/totalOrders`);
+                    const snapshot = await get(statsRef);
+                    return snapshot.exists() ? snapshot.val() || 0 : 0;
+                } catch (e) {
+                    console.error('Error getting total order count:', e);
+                    return 0;
+                }
+            },
+
+            // UI helpers
+            showToast(type, msg, sub) {
+                const toast = document.getElementById('toast');
+                const overlay = document.getElementById('toastOverlay');
+                toast.className = `toast show toast-${type}`;
+                overlay.classList.add('show');
+                document.getElementById('toastIcon').textContent = type === 'success' ? '✓' : '✕';
+                document.getElementById('toastMessage').textContent = msg;
+                document.getElementById('toastSubMessage').textContent = sub;
+                if (type === 'error') {
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                        overlay.classList.remove('show');
+                    }, 3000);
+                }
+            },
+
+            showSuccess(msg) {
+                const el = document.getElementById('successMessage');
+                el.textContent = msg;
+                el.style.display = 'block';
+                setTimeout(() => el.style.display = 'none', 3000);
+            },
+
+            showError(msg) {
+                const el = document.getElementById('errorMessage');
+                el.textContent = msg;
+                el.style.display = 'block';
+                setTimeout(() => el.style.display = 'none', 3000);
+            },
+
+            toggleMenu() {
+                document.querySelector('.hamburger').classList.toggle('active');
+                document.getElementById('navMenu').classList.toggle('active');
+            },
+
+            async logout() {
+                if (confirm('Logout?')) {
+                    try {
+                        if (this.cartSyncListener) this.cartSyncListener();
+                        await signOut(auth);
+                        localStorage.removeItem('midnightPlazaCart');
+                        window.location.href = 'index.html';
+                    } catch (e) {
+                        console.error('Logout error:', e);
+                    }
                 }
             }
         };
+
+        // Initialize app when document is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            APP.init();
+        });
+
+        // Expose APP to global scope for inline onclick handlers
+        window.APP = APP;
     </script>
 </body>
 </html>
