@@ -726,7 +726,7 @@
         let currentCategory = 'all';
         let currentUser = null;
         const FREE_DELIVERY_THRESHOLD = 200;
-        const CATEGORY_ORDER = ['Sandwich', 'Noodles'];
+        const CATEGORY_ORDER = ['Sandwich', 'Maagie'];
         
         loadCart();
         updateCartBadge();
@@ -830,7 +830,7 @@
                 };
             });
 
-            // Sort categories: Sandwich first, then Noodles, then others alphabetically
+            // Sort categories: Sandwich first, then Maagie, then others alphabetically
             categoryData.sort((a, b) => {
                 const aIndex = CATEGORY_ORDER.indexOf(a.name);
                 const bIndex = CATEGORY_ORDER.indexOf(b.name);
