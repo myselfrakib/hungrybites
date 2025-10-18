@@ -203,84 +203,49 @@
             padding: 1.5rem 0.75rem;
         }
 
-        .category-tabs {
-            display: flex;
-            gap: 0.75rem;
-            overflow-x: auto;
-            padding: 1rem 0;
-            margin-bottom: 1.5rem;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
+        .category-section {
+            margin-bottom: 3rem;
+            animation: fadeIn 0.5s ease;
         }
 
-        .category-tabs::-webkit-scrollbar {
-            display: none;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .category-tab {
-            background: white;
-            border: 2px solid #e0e0e0;
-            padding: 0.75rem 1.5rem;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            white-space: nowrap;
+        .category-header {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: clamp(0.9rem, 2.5vw, 1rem);
-            min-height: 44px;
-            touch-action: manipulation;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .category-tab:active {
-            transform: scale(0.95);
-        }
-
-        .category-tab.active {
-            background: linear-gradient(135deg, var(--sunglow) 0%, var(--mustard) 100%);
-            color: #333;
-            border-color: var(--sunglow);
-            box-shadow: 0 4px 15px rgba(253, 201, 33, 0.3);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid var(--sunglow);
         }
 
         .category-emoji {
-            font-size: 1.3rem;
+            font-size: clamp(2rem, 5vw, 2.5rem);
+        }
+
+        .category-info {
+            flex: 1;
+        }
+
+        .category-title {
+            font-size: clamp(1.4rem, 4vw, 1.8rem);
+            color: var(--blue-gray);
+            font-weight: 700;
+            margin-bottom: 0.25rem;
         }
 
         .category-count {
-            background: rgba(0,0,0,0.1);
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            margin-left: 0.3rem;
-        }
-
-        .category-tab.active .category-count {
-            background: rgba(255,255,255,0.5);
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
-        }
-
-        .section-title {
-            font-size: clamp(1.3rem, 4vw, 1.6rem);
-            color: var(--sunglow);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-        }
-
-        .item-count {
             color: #666;
-            font-size: clamp(0.9rem, 2vw, 1rem);
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
             font-weight: 500;
         }
 
@@ -296,18 +261,6 @@
             overflow: hidden;
             box-shadow: 0 2px 12px rgba(0,0,0,0.08);
             transition: transform 0.3s, box-shadow 0.3s;
-            animation: fadeIn 0.4s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .food-image {
@@ -443,14 +396,13 @@
             100% { transform: rotate(360deg); }
         }
 
-        .empty-category {
+        .empty-state {
             text-align: center;
             padding: 3rem 1rem;
             color: #666;
-            grid-column: 1 / -1;
         }
 
-        .empty-category-icon {
+        .empty-state-icon {
             font-size: clamp(3rem, 10vw, 4rem);
             margin-bottom: 1rem;
         }
@@ -675,18 +627,11 @@
         <span class="delivery-icon">🎉</span>
     </div>
 
-    <div class="container">
-        <div id="categoryTabsContainer"></div>
-        
-        <div class="section-header">
-            <h2 class="section-title" id="menuTitle">
-                <span id="categoryEmoji"></span>
-                <span id="categoryName">Our Menu</span>
-            </h2>
-            <span class="item-count" id="itemCount"></span>
+    <div class="container" id="mainContainer">
+        <div class="loading">
+            <div class="spinner"></div>
+            Loading menu...
         </div>
-        
-        <div id="foodGrid" class="food-grid"></div>
     </div>
 
     <div class="notification" id="notification">
@@ -723,10 +668,19 @@
 
         let cart = [];
         let allFoodItems = {};
-        let currentCategory = 'all';
         let currentUser = null;
         const FREE_DELIVERY_THRESHOLD = 200;
-        const CATEGORY_ORDER = ['Sandwich', 'Maagie'];
+        
+        // Define category order and name mapping
+        const CATEGORY_ORDER = [
+            { key: 'Maagie', display: 'Maggi' },
+            { key: 'Pasta', display: 'Pasta' },
+            { key: 'Sandwich', display: 'Sandwich' },
+            { key: 'Chai', display: 'Chai' },
+            { key: 'Packet Items', display: 'Packet Items' },
+            { key: 'Beverages', display: 'Beverages' },
+            { key: 'Cigarette', display: 'Cigarette' }
+        ];
         
         loadCart();
         updateCartBadge();
@@ -756,7 +710,7 @@
                         saveCart();
                         updateCartBadge();
                         updateNotificationVisibility();
-                        renderFoodItems();
+                        renderAllCategories();
                     }
                 } else {
                     if (cart.length > 0) {
@@ -772,35 +726,49 @@
             return div.innerHTML;
         }
 
+        function normalizeCategory(categoryName) {
+            const normalized = categoryName.toLowerCase().trim();
+            const mapping = {
+                'maagie': 'Maagie',
+                'maggi': 'Maagie',
+                'pasta': 'Pasta',
+                'sandwich': 'Sandwich',
+                'chai': 'Chai',
+                'packet items': 'Packet Items',
+                'beverages': 'Beverages',
+                'cigarette': 'Cigarette',
+                'ciggerette': 'Cigarette'
+            };
+            return mapping[normalized] || categoryName;
+        }
+
         async function loadFoodItems() {
-            const foodGrid = document.getElementById('foodGrid');
-            foodGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Loading menu...</div>';
+            const container = document.getElementById('mainContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading menu...</div>';
 
             try {
                 const foodItemsRef = ref(db, 'foodItems');
                 
                 onValue(foodItemsRef, (snapshot) => {
                     if (!snapshot.exists()) {
-                        foodGrid.innerHTML = `
-                            <div class="empty-category">
-                                <div class="empty-category-icon">🍽️</div>
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🍽️</div>
                                 <h3>No items available yet</h3>
                                 <p>Check back soon for delicious food!</p>
                             </div>
                         `;
-                        document.getElementById('categoryTabsContainer').innerHTML = '';
                         return;
                     }
 
                     allFoodItems = snapshot.val();
-                    renderCategoryTabs();
-                    renderFoodItems();
+                    renderAllCategories();
                 });
             } catch (error) {
                 console.error('Error loading food items:', error);
-                foodGrid.innerHTML = `
-                    <div class="empty-category">
-                        <div class="empty-category-icon">❌</div>
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
                         <h3>Error loading menu</h3>
                         <p>Please try again later</p>
                     </div>
@@ -808,129 +776,96 @@
             }
         }
 
-        function renderCategoryTabs() {
-            const container = document.getElementById('categoryTabsContainer');
-            const categories = Object.keys(allFoodItems);
+        function renderAllCategories() {
+            const container = document.getElementById('mainContainer');
+            let html = '';
+            let totalItems = 0;
+
+            // Organize items by normalized category
+            const categorizedItems = {};
             
-            if (categories.length === 0) {
-                container.innerHTML = '';
+            Object.keys(allFoodItems).forEach(categoryName => {
+                const category = allFoodItems[categoryName];
+                const normalizedCat = normalizeCategory(categoryName);
+                
+                if (!categorizedItems[normalizedCat]) {
+                    categorizedItems[normalizedCat] = {
+                        emoji: category.emoji || '🍽️',
+                        items: []
+                    };
+                }
+                
+                Object.keys(category).forEach(itemId => {
+                    if (itemId === 'emoji') return;
+                    
+                    const item = category[itemId];
+                    if (item.isActive !== false) {
+                        categorizedItems[normalizedCat].items.push({
+                            id: itemId,
+                            ...item,
+                            originalCategory: categoryName
+                        });
+                        totalItems++;
+                    }
+                });
+            });
+
+            if (totalItems === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>No items available</h3>
+                        <p>Check back soon!</p>
+                    </div>
+                `;
                 return;
             }
 
-            let totalItems = 0;
-            const categoryData = categories.map(categoryName => {
-                const categoryInfo = allFoodItems[categoryName];
-                const items = Object.keys(categoryInfo).filter(key => key !== 'emoji' && categoryInfo[key].isActive !== false);
-                totalItems += items.length;
+            // Render categories in specified order
+            CATEGORY_ORDER.forEach(catConfig => {
+                const categoryData = categorizedItems[catConfig.key];
                 
-                return {
-                    name: categoryName,
-                    emoji: categoryInfo.emoji || '🍽️',
-                    count: items.length
-                };
-            });
-
-            // Sort categories: Sandwich first, then Maagie, then others alphabetically
-            categoryData.sort((a, b) => {
-                const aIndex = CATEGORY_ORDER.indexOf(a.name);
-                const bIndex = CATEGORY_ORDER.indexOf(b.name);
-                
-                if (aIndex !== -1 && bIndex !== -1) {
-                    return aIndex - bIndex;
-                }
-                if (aIndex !== -1) return -1;
-                if (bIndex !== -1) return 1;
-                
-                return a.name.localeCompare(b.name);
-            });
-
-            let tabsHTML = `
-                <div class="category-tabs">
-                    <div class="category-tab ${currentCategory === 'all' ? 'active' : ''}" onclick="filterCategory('all')">
-                        <span class="category-emoji">🍽️</span>
-                        <span>All Items</span>
-                        <span class="category-count">${totalItems}</span>
-                    </div>
-            `;
-
-            categoryData.forEach(cat => {
-                if (cat.count > 0) {
-                    tabsHTML += `
-                        <div class="category-tab ${currentCategory === cat.name ? 'active' : ''}" onclick="filterCategory(\`${cat.name}\`)">
-                            <span class="category-emoji">${cat.emoji}</span>
-                            <span>${escapeHtml(cat.name)}</span>
-                            <span class="category-count">${cat.count}</span>
+                if (categoryData && categoryData.items.length > 0) {
+                    html += `
+                        <div class="category-section">
+                            <div class="category-header">
+                                <div class="category-emoji">${categoryData.emoji}</div>
+                                <div class="category-info">
+                                    <h2 class="category-title">${escapeHtml(catConfig.display)}</h2>
+                                    <div class="category-count">${categoryData.items.length} item${categoryData.items.length !== 1 ? 's' : ''}</div>
+                                </div>
+                            </div>
+                            <div class="food-grid">
+                                ${categoryData.items.map(item => createFoodCard(item.id, item, item.originalCategory)).join('')}
+                            </div>
                         </div>
                     `;
                 }
             });
 
-            tabsHTML += '</div>';
-            container.innerHTML = tabsHTML;
-        }
-
-        window.filterCategory = function(category) {
-            currentCategory = category;
-            renderCategoryTabs();
-            renderFoodItems();
-        };
-
-        function renderFoodItems() {
-            const foodGrid = document.getElementById('foodGrid');
-            const categoryEmoji = document.getElementById('categoryEmoji');
-            const categoryNameEl = document.getElementById('categoryName');
-            const itemCountEl = document.getElementById('itemCount');
-            
-            let foodHTML = '';
-            let itemCount = 0;
-
-            if (currentCategory === 'all') {
-                categoryEmoji.textContent = '🍽️';
-                categoryNameEl.textContent = 'All Items';
-
-                Object.keys(allFoodItems).forEach(categoryName => {
-                    const category = allFoodItems[categoryName];
-                    Object.keys(category).forEach(itemId => {
-                        if (itemId === 'emoji') return;
-                        
-                        const item = category[itemId];
-                        if (item.isActive !== false) {
-                            foodHTML += createFoodCard(itemId, item, categoryName);
-                            itemCount++;
-                        }
-                    });
-                });
-            } else {
-                const category = allFoodItems[currentCategory];
-                if (category) {
-                    categoryEmoji.textContent = category.emoji || '🍽️';
-                    categoryNameEl.textContent = currentCategory;
-
-                    Object.keys(category).forEach(itemId => {
-                        if (itemId === 'emoji') return;
-                        
-                        const item = category[itemId];
-                        if (item.isActive !== false) {
-                            foodHTML += createFoodCard(itemId, item, currentCategory);
-                            itemCount++;
-                        }
-                    });
+            // Add any remaining categories not in the order
+            Object.keys(categorizedItems).forEach(catName => {
+                const isInOrder = CATEGORY_ORDER.some(c => c.key === catName);
+                if (!isInOrder && categorizedItems[catName].items.length > 0) {
+                    const categoryData = categorizedItems[catName];
+                    html += `
+                        <div class="category-section">
+                            <div class="category-header">
+                                <div class="category-emoji">${categoryData.emoji}</div>
+                                <div class="category-info">
+                                    <h2 class="category-title">${escapeHtml(catName)}</h2>
+                                    <div class="category-count">${categoryData.items.length} item${categoryData.items.length !== 1 ? 's' : ''}</div>
+                                </div>
+                            </div>
+                            <div class="food-grid">
+                                ${categoryData.items.map(item => createFoodCard(item.id, item, item.originalCategory)).join('')}
+                            </div>
+                        </div>
+                    `;
                 }
-            }
+            });
 
-            itemCountEl.textContent = `${itemCount} item${itemCount !== 1 ? 's' : ''}`;
-
-            if (itemCount === 0) {
-                foodGrid.innerHTML = `
-                    <div class="empty-category">
-                        <div class="empty-category-icon">📭</div>
-                        <h3>No items in this category</h3>
-                        <p>Try selecting another category</p>
-                    </div>
-                `;
-            } else {
-                foodGrid.innerHTML = foodHTML;
-            }
+            container.innerHTML = html;
         }
 
         function createFoodCard(itemId, item, categoryName) {
