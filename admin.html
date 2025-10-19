@@ -643,6 +643,41 @@
         .btn-delivery { background: #1abc9c; color: white; }
         .btn-delivered { background: #27ae60; color: white; }
 
+        .order-cta-buttons {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-btn {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .cta-map {
+            background: #3498db;
+            color: white;
+        }
+
+        .cta-call {
+            background: #27ae60;
+            color: white;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
         .users-search {
             background: white;
             padding: 1.5rem;
@@ -1297,9 +1332,193 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Reviews Tab Styles */
+        .reviews-filter {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .reviews-container {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .review-category-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .review-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .review-category-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .review-category-stats {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .review-avg-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #f39c12;
+        }
+
+        .review-count {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .review-items-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .review-item-section {
+            background: linear-gradient(135deg, #f5f7fa 0%, #ecf0f1 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px solid #ecf0f1;
+            transition: all 0.3s;
+        }
+
+        .review-item-section:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .review-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .review-item-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .review-item-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .rating-stars {
+            color: #ffd700;
+            font-size: 1.1rem;
+        }
+
+        .rating-value {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+
+        .review-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .review-card {
+            background: white;
+            padding: 1.2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .review-user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.8rem;
+        }
+
+        .review-user-name {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 1rem;
+        }
+
+        .review-user-rating {
+            color: #ffd700;
+            font-size: 1rem;
+        }
+
+        .review-comment {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            font-style: italic;
+            margin-bottom: 0.8rem;
+        }
+
+        .review-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+
+        .review-date {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .review-order-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .review-order-link:hover {
+            text-decoration: underline;
+        }
+
+        .no-reviews {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
         @media (min-width: 640px) {
             .form-row {
                 grid-template-columns: repeat(2, 1fr);
+            }
+
+            .notification {
+                left: auto;
+                max-width: 450px;
             }
         }
 
@@ -1312,12 +1531,11 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .notification {
-                left: auto;
-                max-width: 450px;
+            .carts-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
 
-            .carts-grid {
+            .review-items-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
@@ -1328,6 +1546,10 @@
             }
 
             .carts-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .review-items-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
@@ -1417,6 +1639,7 @@
         <div class="mobile-menu-item active" onclick="switchTab('carts')">🛒 Carts</div>
         <div class="mobile-menu-item" onclick="switchTab('orders')">📦 Orders</div>
         <div class="mobile-menu-item" onclick="switchTab('users')">👥 Users</div>
+        <div class="mobile-menu-item" onclick="switchTab('reviews')">⭐ Reviews</div>
         <div class="mobile-menu-item" onclick="switchTab('store')">🏪 Store Control</div>
         <div class="mobile-menu-item" onclick="switchTab('food')">🍕 Manage Menu</div>
     </div>
@@ -1428,6 +1651,7 @@
             <button class="tab active" onclick="switchTab('carts')">🛒 Carts</button>
             <button class="tab" onclick="switchTab('orders')">📦 Orders</button>
             <button class="tab" onclick="switchTab('users')">👥 Users</button>
+            <button class="tab" onclick="switchTab('reviews')">⭐ Reviews</button>
             <button class="tab" onclick="switchTab('store')">🏪 Store Control</button>
             <button class="tab" onclick="switchTab('food')">🍕 Manage Menu</button>
         </div>
@@ -1519,6 +1743,41 @@
                         <tr><td colspan="6" style="text-align: center; padding: 2rem;"><div class="loading-spinner"></div></td></tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- REVIEWS TAB -->
+        <div id="reviewsTab" class="tab-content">
+            <h2 class="section-title">⭐ Customer Reviews</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-value" id="totalReviews">0</div>
+                    <div class="stat-label">Total Reviews</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-value" id="avgRating">0</div>
+                    <div class="stat-label">Average Rating</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🍽️</div>
+                    <div class="stat-value" id="reviewedItems">0</div>
+                    <div class="stat-label">Reviewed Items</div>
+                </div>
+            </div>
+            <div class="reviews-filter">
+                <button class="filter-btn active" onclick="filterReviews('all')">All Categories</button>
+                <button class="filter-btn" onclick="filterReviews('5stars')">⭐ 5 Stars</button>
+                <button class="filter-btn" onclick="filterReviews('4stars')">⭐ 4+ Stars</button>
+                <button class="filter-btn" onclick="filterReviews('3stars')">⭐ 3+ Stars</button>
+                <button class="filter-btn" onclick="filterReviews('below3')">⚠️ Below 3</button>
+            </div>
+            <div id="reviewsContainer" class="reviews-container">
+                <div class="empty-state">
+                    <div class="loading-spinner"></div>
+                    <div class="empty-state-text">Loading reviews...</div>
+                </div>
             </div>
         </div>
 
@@ -1691,7 +1950,9 @@
         let allCarts = {};
         let allUsers = {};
         let allOrders = {};
+        let allReviews = {};
         let currentFilter = 'all';
+        let currentReviewFilter = 'all';
         let currentEditId = null;
         let currentEditCategory = null;
         let selectedAddFile = null;
@@ -1747,6 +2008,7 @@
                 loadOrders(); 
                 loadStoreStatus(); 
                 loadFoodItems();
+                loadReviews();
             } catch (err) { 
                 showNotification('Error verifying admin: ' + err.message, true); 
             }
@@ -1919,7 +2181,6 @@
                                 };
                             }
                         } catch (error) {
-                            console.error('Error fetching user:', uid, error);
                             allUsers[uid] = { 
                                 name: 'Error Loading User', 
                                 email: 'N/A', 
@@ -1937,7 +2198,6 @@
                     container.appendChild(cartCard);
                 });
             } catch (error) {
-                console.error('Error displaying carts:', error);
                 container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-text">Error loading carts. Please refresh.</div></div>';
             }
         }
@@ -2056,18 +2316,13 @@
             const date = order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A';
             const status = order.status || 'pending';
             
-            // Extract address and phone for map/call buttons
             const fullAddress = order.deliveryAddress?.address || '';
             const phone = order.deliveryAddress?.phone || '';
             const customerName = order.deliveryAddress?.fullName || 'N/A';
             
-            // Create map link (Google Maps)
             const mapUrl = fullAddress ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}` : '';
-            
-            // Create call link
             const callUrl = phone ? `tel:${phone}` : '';
             
-            // Call to action buttons (Map & Call)
             let ctaButtons = '';
             if (mapUrl || callUrl) {
                 ctaButtons = `
@@ -2122,7 +2377,6 @@
                     </div>
                 `;
             } else if (status === 'delivered' || status === 'rejected') {
-                // Show CTA buttons even after delivery/rejection for reference
                 actions = ctaButtons;
             }
             
@@ -2201,9 +2455,186 @@
 
         window.filterOrders = function(filter) {
             currentFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.orders-filter .filter-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             displayOrders();
+        };
+
+        // ========== REVIEWS ==========
+        function loadReviews() {
+            const reviewsRef = dbRef(db, 'reviews');
+            const callback = snapshot => {
+                allReviews = snapshot.val() || {};
+                displayReviews();
+                updateReviewStats();
+            };
+            onValue(reviewsRef, callback);
+            dbListeners.push({ ref: reviewsRef, callback });
+        }
+
+        function displayReviews() {
+            const container = $('reviewsContainer');
+            const categories = Object.keys(allReviews);
+            
+            if (!categories.length) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⭐</div><div class="empty-state-text">No reviews yet</div></div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            categories.forEach(category => {
+                const categoryData = allReviews[category];
+                const items = Object.keys(categoryData);
+                
+                const categorySection = document.createElement('div');
+                categorySection.className = 'review-category-section';
+                
+                let totalAvg = 0;
+                let totalCount = 0;
+                
+                items.forEach(itemName => {
+                    const itemData = categoryData[itemName];
+                    if (itemData.averageRating) {
+                        totalAvg += itemData.averageRating;
+                        totalCount++;
+                    }
+                });
+                
+                const catAvg = totalCount > 0 ? (totalAvg / totalCount).toFixed(1) : 'N/A';
+                
+                categorySection.innerHTML = `
+                    <div class="review-category-header">
+                        <div class="review-category-title">${category}</div>
+                        <div class="review-category-stats">
+                            <div class="review-avg-rating">
+                                <span>⭐</span>
+                                <span>${catAvg}</span>
+                            </div>
+                            <div class="review-count">${items.length} items</div>
+                        </div>
+                    </div>
+                    <div class="review-items-grid" id="review-cat-${category.replace(/\s+/g, '-')}"></div>
+                `;
+                
+                container.appendChild(categorySection);
+                
+                const itemsGrid = document.getElementById(`review-cat-${category.replace(/\s+/g, '-')}`);
+                
+                items.forEach(itemName => {
+                    const itemData = categoryData[itemName];
+                    
+                    if (shouldShowItem(itemData.averageRating || 0)) {
+                        itemsGrid.appendChild(createReviewItemCard(itemName, itemData));
+                    }
+                });
+                
+                if (itemsGrid.children.length === 0) {
+                    itemsGrid.innerHTML = '<div class="no-reviews">No reviews match the filter</div>';
+                }
+            });
+        }
+
+        function shouldShowItem(avgRating) {
+            if (currentReviewFilter === 'all') return true;
+            if (currentReviewFilter === '5stars') return avgRating === 5;
+            if (currentReviewFilter === '4stars') return avgRating >= 4;
+            if (currentReviewFilter === '3stars') return avgRating >= 3;
+            if (currentReviewFilter === 'below3') return avgRating < 3;
+            return true;
+        }
+
+        function createReviewItemCard(itemName, itemData) {
+            const card = document.createElement('div');
+            card.className = 'review-item-section';
+            
+            const avgRating = itemData.averageRating || 0;
+            const reviewCount = itemData.reviewsCount || 0;
+            const stars = '⭐'.repeat(Math.round(avgRating));
+            
+            let reviewsHTML = '<div class="no-reviews">No user reviews yet</div>';
+            
+            if (itemData.userReviews) {
+                const userReviews = Object.entries(itemData.userReviews)
+                    .sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
+                
+                reviewsHTML = '<div class="review-list">';
+                userReviews.forEach(([userName, review]) => {
+                    const date = review.timestamp ? new Date(review.timestamp).toLocaleDateString() : 'N/A';
+                    const userStars = '⭐'.repeat(review.rating || 0);
+                    
+                    reviewsHTML += `
+                        <div class="review-card">
+                            <div class="review-user-info">
+                                <div class="review-user-name">${userName.replace(/_/g, ' ')}</div>
+                                <div class="review-user-rating">${userStars}</div>
+                            </div>
+                            ${review.comment ? `<div class="review-comment">"${review.comment}"</div>` : ''}
+                            <div class="review-meta">
+                                <div class="review-date">📅 ${date}</div>
+                                ${review.orderId ? `<a href="#" class="review-order-link" onclick="viewOrderFromReview('${review.orderId}'); return false;">View Order</a>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                reviewsHTML += '</div>';
+            }
+            
+            card.innerHTML = `
+                <div class="review-item-header">
+                    <div class="review-item-name">${itemName}</div>
+                    <div class="review-item-rating">
+                        <div class="rating-stars">${stars}</div>
+                        <div class="rating-value">${avgRating.toFixed(1)}</div>
+                    </div>
+                </div>
+                <div class="review-count" style="margin-bottom: 1rem; color: #7f8c8d;">
+                    ${reviewCount} ${reviewCount === 1 ? 'review' : 'reviews'}
+                </div>
+                ${reviewsHTML}
+            `;
+            
+            return card;
+        }
+
+        function updateReviewStats() {
+            let totalReviews = 0;
+            let totalRatingSum = 0;
+            let itemsWithReviews = 0;
+            
+            Object.values(allReviews).forEach(category => {
+                Object.values(category).forEach(item => {
+                    if (item.reviewsCount) {
+                        totalReviews += item.reviewsCount;
+                        totalRatingSum += item.averageRating * item.reviewsCount;
+                        itemsWithReviews++;
+                    }
+                });
+            });
+            
+            const avgRating = totalReviews > 0 ? (totalRatingSum / totalReviews).toFixed(1) : '0';
+            
+            $('totalReviews').textContent = totalReviews;
+            $('avgRating').textContent = avgRating;
+            $('reviewedItems').textContent = itemsWithReviews;
+        }
+
+        window.filterReviews = function(filter) {
+            currentReviewFilter = filter;
+            document.querySelectorAll('.reviews-filter .filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            displayReviews();
+        };
+
+        window.viewOrderFromReview = function(orderId) {
+            switchTab('orders');
+            setTimeout(() => {
+                const orderCard = document.querySelector(`[data-order-id="${orderId}"]`);
+                if (orderCard) {
+                    orderCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    orderCard.style.animation = 'highlight 2s ease-in-out';
+                }
+            }, 300);
         };
 
         // ========== STORE CONTROL ==========
@@ -2644,15 +3075,12 @@
             }
         };
 
-        // Close modals when clicking outside
         window.addEventListener('click', function(e) {
             if (e.target.id === 'editModal') closeEditModal();
             if (e.target.id === 'userDetailsModal') closeUserModal();
         });
 
-        // Cleanup on page unload
         window.addEventListener('beforeunload', cleanupListeners);
     </script>
 </body>
 </html>
-
