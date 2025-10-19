@@ -286,9 +286,14 @@
             color: #0c5460;
         }
 
-        .status-preparing {
+        .status-preparing, .status-cooking {
             background: linear-gradient(135deg, var(--mustard) 0%, var(--sunglow) 100%);
             color: #333;
+        }
+
+        .status-packing {
+            background: linear-gradient(135deg, #e8daef 0%, #d7bde2 100%);
+            color: #5b2c6f;
         }
 
         .status-out-for-delivery, .status-outfordelivery {
@@ -301,7 +306,7 @@
             color: #155724;
         }
 
-        .status-cancelled {
+        .status-cancelled, .status-rejected {
             background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
             color: #721c24;
         }
@@ -453,6 +458,187 @@
             font-size: 1rem;
         }
 
+        .review-section {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+            border-radius: 10px;
+            border: 2px solid var(--sunglow);
+        }
+
+        .review-header {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .review-prompt {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.8rem;
+        }
+
+        .items-to-review {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-item-card {
+            background: white;
+            padding: 0.8rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .review-item-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .review-item-emoji {
+            font-size: 1.5rem;
+        }
+
+        .review-item-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 0.3rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .star {
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .star:hover {
+            transform: scale(1.2);
+        }
+
+        .star.filled {
+            color: #ffd700;
+        }
+
+        .star.empty {
+            color: #ddd;
+        }
+
+        .review-textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 80px;
+            transition: border-color 0.3s;
+        }
+
+        .review-textarea:focus {
+            outline: none;
+            border-color: var(--sunglow);
+        }
+
+        .submit-review-btn {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, var(--sunglow) 0%, var(--mustard) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .submit-review-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(253, 201, 33, 0.4);
+        }
+
+        .submit-review-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .review-submitted {
+            padding: 1rem;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-radius: 10px;
+            border: 2px solid #28a745;
+            margin-top: 1rem;
+        }
+
+        .review-submitted-header {
+            font-weight: 700;
+            color: #155724;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .review-submitted-text {
+            color: #155724;
+            font-size: 0.9rem;
+        }
+
+        .existing-reviews {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .existing-review-item {
+            padding: 0.8rem;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .existing-review-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .review-stars-display {
+            color: #ffd700;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .review-comment {
+            color: #555;
+            font-size: 0.85rem;
+            font-style: italic;
+            margin-bottom: 0.3rem;
+        }
+
+        .review-date {
+            color: #888;
+            font-size: 0.75rem;
+        }
+
         @media (min-width: 480px) {
             .navbar {
                 padding: 0.75rem 1.5rem;
@@ -549,7 +735,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        import { getDatabase, ref, query, orderByChild, equalTo, onValue, off } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { getDatabase, ref, query, orderByChild, equalTo, onValue, off, get, set, push, update } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -568,6 +754,8 @@
 
         let ordersListener = null;
         let previousOrders = {};
+        let currentUser = null;
+        let itemReviews = {};
 
         let cart = JSON.parse(localStorage.getItem('midnightPlazaCart') || '[]');
         updateCartBadge();
@@ -579,8 +767,13 @@
             badge.style.display = totalItems > 0 ? 'flex' : 'none';
         }
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
+                currentUser = user;
+                const userDetails = await get(ref(db, `users/${user.uid}/allDetails`));
+                if (userDetails.exists()) {
+                    currentUser.displayName = userDetails.val().name || user.email;
+                }
                 setupRealtimeOrders(user.uid);
             } else {
                 window.location.href = 'index.html';
@@ -648,11 +841,12 @@
             });
         }
 
-        function renderOrders(orders, updatedOrderIds) {
+        async function renderOrders(orders, updatedOrderIds) {
             const ordersList = document.getElementById('ordersList');
             
             let ordersHTML = '';
-            orders.forEach((order, index) => {
+            for (let index = 0; index < orders.length; index++) {
+                const order = orders[index];
                 const orderDate = order.createdAt 
                     ? new Date(order.createdAt).toLocaleString('en-IN', {
                         day: 'numeric',
@@ -665,6 +859,8 @@
                 
                 const isUpdated = updatedOrderIds.has(order.id);
                 const statusClass = order.status.toLowerCase().replace(/\s+/g, '');
+                
+                const reviewSection = order.status === 'delivered' ? await generateReviewSection(order) : '';
                 
                 ordersHTML += `
                     <div class="order-card ${isUpdated ? 'updated' : ''}" data-order-id="${order.id}">
@@ -697,9 +893,10 @@
                             <span class="total-amount">₹${parseFloat(order.total).toFixed(2)}</span>
                         </div>
                         ${getStatusTimeline(order.status)}
+                        ${reviewSection}
                     </div>
                 `;
-            });
+            }
 
             ordersList.innerHTML = ordersHTML;
 
@@ -709,6 +906,243 @@
                 });
             }, 1000);
         }
+
+        async function generateReviewSection(order) {
+            const hasReviewed = await checkIfReviewed(order.id);
+            
+            if (hasReviewed) {
+                const reviews = await getOrderReviews(order.id);
+                return `
+                    <div class="review-submitted">
+                        <div class="review-submitted-header">
+                            ✅ Thank you for your review!
+                        </div>
+                        <div class="review-submitted-text">
+                            Your feedback helps us improve our service.
+                        </div>
+                    </div>
+                    ${reviews.length > 0 ? `
+                        <div class="existing-reviews">
+                            ${reviews.map(r => `
+                                <div class="existing-review-item">
+                                    <div><strong>${escapeHtml(r.itemName)}</strong></div>
+                                    <div class="review-stars-display">${'⭐'.repeat(r.rating)}</div>
+                                    ${r.comment ? `<div class="review-comment">"${escapeHtml(r.comment)}"</div>` : ''}
+                                    <div class="review-date">${new Date(r.timestamp).toLocaleDateString()}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                `;
+            }
+
+            return `
+                <div class="review-section" id="review-${order.id}">
+                    <div class="review-header">
+                        ⭐ Rate Your Order
+                    </div>
+                    <div class="review-prompt">
+                        Help us serve you better by rating each item!
+                    </div>
+                    <div class="items-to-review">
+                        ${order.items.map((item, idx) => `
+                            <div class="review-item-card">
+                                <div class="review-item-header">
+                                    <span class="review-item-emoji">${item.emoji || '🍔'}</span>
+                                    <span class="review-item-name">${escapeHtml(item.name)}</span>
+                                </div>
+                                <div class="star-rating" data-item-index="${idx}">
+                                    ${[1, 2, 3, 4, 5].map(star => `
+                                        <span class="star empty" data-rating="${star}" onclick="setRating('${order.id}', ${idx}, ${star})">⭐</span>
+                                    `).join('')}
+                                </div>
+                                <textarea 
+                                    class="review-textarea" 
+                                    placeholder="Share your thoughts about this item (optional)..."
+                                    id="comment-${order.id}-${idx}"
+                                ></textarea>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="submit-review-btn" onclick="submitReviews('${order.id}', ${order.items.length})">
+                        Submit Reviews
+                    </button>
+                </div>
+            `;
+        }
+
+        async function checkIfReviewed(orderId) {
+            try {
+                const reviewRef = ref(db, `orderReviews/${orderId}`);
+                const snapshot = await get(reviewRef);
+                return snapshot.exists();
+            } catch (error) {
+                console.error('Error checking reviews:', error);
+                return false;
+            }
+        }
+
+        async function getOrderReviews(orderId) {
+            try {
+                const reviewRef = ref(db, `orderReviews/${orderId}`);
+                const snapshot = await get(reviewRef);
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    return Object.values(data);
+                }
+                return [];
+            } catch (error) {
+                console.error('Error getting reviews:', error);
+                return [];
+            }
+        }
+
+        window.setRating = function(orderId, itemIndex, rating) {
+            const stars = document.querySelectorAll(`[data-item-index="${itemIndex}"] .star`);
+            stars.forEach((star, idx) => {
+                if (idx < rating) {
+                    star.classList.remove('empty');
+                    star.classList.add('filled');
+                } else {
+                    star.classList.remove('filled');
+                    star.classList.add('empty');
+                }
+            });
+            
+            if (!itemReviews[orderId]) {
+                itemReviews[orderId] = {};
+            }
+            itemReviews[orderId][itemIndex] = rating;
+        };
+
+        window.submitReviews = async function(orderId, itemCount) {
+            if (!currentUser) {
+                alert('Please login to submit reviews');
+                return;
+            }
+
+            const order = previousOrders[orderId];
+            if (!order) {
+                alert('Order not found');
+                return;
+            }
+
+            const reviews = itemReviews[orderId] || {};
+            const reviewCount = Object.keys(reviews).length;
+
+            if (reviewCount === 0) {
+                alert('Please rate at least one item before submitting');
+                return;
+            }
+
+            const button = event.target;
+            button.disabled = true;
+            button.textContent = 'Submitting...';
+
+            try {
+                const timestamp = Date.now();
+                const userName = currentUser.displayName || currentUser.email;
+
+                for (let i = 0; i < order.items.length; i++) {
+                    const item = order.items[i];
+                    const rating = reviews[i];
+                    
+                    if (rating) {
+                        const comment = document.getElementById(`comment-${orderId}-${i}`)?.value.trim() || '';
+                        
+                        let category = 'General';
+                        const itemName = item.name;
+                        
+                        try {
+                            const foodItemsSnapshot = await get(ref(db, 'foodItems'));
+                            if (foodItemsSnapshot.exists()) {
+                                const allCategories = foodItemsSnapshot.val();
+                                
+                                outerLoop:
+                                for (const catName in allCategories) {
+                                    const catData = allCategories[catName];
+                                    for (const itemId in catData) {
+                                        if (itemId !== 'emoji' && catData[itemId].name === itemName) {
+                                            category = catName;
+                                            break outerLoop;
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (err) {
+                            console.log('Category lookup failed, using General:', err);
+                        }
+                        
+                        const reviewData = {
+                            userName: userName,
+                            rating: rating,
+                            comment: comment,
+                            timestamp: timestamp,
+                            itemName: itemName,
+                            category: category
+                        };
+
+                        await set(ref(db, `orderReviews/${orderId}/${i}`), reviewData);
+
+                        const categoryRef = ref(db, `reviews/${category}/${itemName}`);
+                        const categorySnapshot = await get(categoryRef);
+                        
+                        let totalRating = rating;
+                        let reviewsCount = 1;
+                        let userReviews = {};
+                        
+                        if (categorySnapshot.exists()) {
+                            const data = categorySnapshot.val();
+                            totalRating = (data.totalRating || 0) + rating;
+                            reviewsCount = (data.reviewsCount || 0) + 1;
+                            userReviews = data.userReviews || {};
+                        }
+                        
+                        const sanitizedUserName = userName.replace(/[.#$[\]]/g, '_');
+                        userReviews[sanitizedUserName] = {
+                            rating: rating,
+                            comment: comment,
+                            timestamp: timestamp,
+                            orderId: orderId
+                        };
+
+                        const averageRating = totalRating / reviewsCount;
+
+                        await update(categoryRef, {
+                            averageRating: parseFloat(averageRating.toFixed(2)),
+                            totalRating: totalRating,
+                            reviewsCount: reviewsCount,
+                            userReviews: userReviews,
+                            lastUpdated: timestamp
+                        });
+                    }
+                }
+
+                itemReviews[orderId] = {};
+
+                const reviewSection = document.getElementById(`review-${orderId}`);
+                if (reviewSection) {
+                    reviewSection.innerHTML = `
+                        <div class="review-submitted">
+                            <div class="review-submitted-header">
+                                ✅ Thank you for your review!
+                            </div>
+                            <div class="review-submitted-text">
+                                Your feedback helps us improve our service.
+                            </div>
+                        </div>
+                    `;
+                }
+
+                console.log('Reviews submitted successfully!');
+                alert('Thank you for your reviews! 🎉');
+            } catch (error) {
+                console.error('Error submitting reviews:', error);
+                alert('Failed to submit reviews: ' + error.message);
+                button.disabled = false;
+                button.textContent = 'Submit Reviews';
+            }
+        };
 
         function escapeHtml(text) {
             const div = document.createElement('div');
@@ -721,10 +1155,13 @@
                 'pending': '⏳',
                 'confirmed': '✅',
                 'preparing': '👨‍🍳',
+                'cooking': '👨‍🍳',
+                'packing': '📦',
                 'out-for-delivery': '🚚',
                 'outfordelivery': '🚚',
-                'delivered': '📦',
-                'cancelled': '❌'
+                'delivered': '✔️',
+                'cancelled': '❌',
+                'rejected': '❌'
             };
             return statusMap[status.toLowerCase().replace(/\s+/g, '')] || '📋';
         }
@@ -737,19 +1174,21 @@
         }
 
         function getStatusTimeline(currentStatus) {
-            const statuses = ['pending', 'confirmed', 'preparing', 'outfordelivery', 'delivered'];
-            const currentIndex = statuses.indexOf(currentStatus.toLowerCase().replace(/\s+/g, ''));
+            const statuses = ['pending', 'confirmed', 'cooking', 'packing', 'outfordelivery', 'delivered'];
+            const normalizedStatus = currentStatus.toLowerCase().replace(/\s+/g, '').replace('preparing', 'cooking');
+            const currentIndex = statuses.indexOf(normalizedStatus);
             
-            if (currentStatus.toLowerCase() === 'cancelled' || currentIndex === -1) {
+            if (['cancelled', 'rejected'].includes(currentStatus.toLowerCase()) || currentIndex === -1) {
                 return '';
             }
 
             const timeline = [
                 { status: 'pending', icon: '⏳', text: 'Order Placed' },
                 { status: 'confirmed', icon: '✅', text: 'Confirmed' },
-                { status: 'preparing', icon: '👨‍🍳', text: 'Preparing' },
+                { status: 'cooking', icon: '👨‍🍳', text: 'Cooking' },
+                { status: 'packing', icon: '📦', text: 'Packing' },
                 { status: 'outfordelivery', icon: '🚚', text: 'Out for Delivery' },
-                { status: 'delivered', icon: '📦', text: 'Delivered' }
+                { status: 'delivered', icon: '✔️', text: 'Delivered' }
             ];
 
             let timelineHTML = '<div class="status-timeline">';
@@ -772,7 +1211,8 @@
             if ('Notification' in window && Notification.permission === 'granted') {
                 new Notification('Order Status Updated', {
                     body: `Order #${order.id.substring(0, 8)} is now ${formatStatus(order.status)}`,
-                    icon: '🍔'
+                    icon: '🍔',
+                    badge: '🍔'
                 });
             }
         }
