@@ -761,23 +761,23 @@
                 <span></span>
                 <span></span>
             </div>
-            <div class="logo" onclick="window.location.href='home.html'">🍔 Midnight Plaza</div>
+            <div class="logo" onclick="window.location.href='home.html'">Midnight Plaza</div>
         </div>
         <a href="checkout.html" class="cart-item">
-            Cart 🛒
+            Cart
             <span class="cart-badge" id="cartBadge">0</span>
         </a>
     </div>
 
     <div class="nav-items" id="navMenu">
-        <a href="home.html" class="nav-item">🏠 Home</a>
-        <a href="orders.html" class="nav-item">📦 Orders</a>
-        <span class="nav-item" onclick="logout()">🚪 Logout</span>
+        <a href="home.html" class="nav-item">Home</a>
+        <a href="orders.html" class="nav-item">Orders</a>
+        <span class="nav-item" onclick="logout()">Logout</span>
     </div>
 
     <div class="container">
         <div class="header-section">
-            <h2>My Orders 📦</h2>
+            <h2>My Orders</h2>
             <div class="live-indicator">
                 <span class="live-dot"></span>
                 Live Updates
@@ -1165,8 +1165,23 @@
             button.textContent = 'Submitting...';
 
             try {
+                // Fetch user details from database
+                let userName = currentUser.displayName || currentUser.email;
+                
+                try {
+                    const userDetailsRef = ref(db, `users/${currentUser.uid}/allDetails`);
+                    const userSnapshot = await get(userDetailsRef);
+                    if (userSnapshot.exists()) {
+                        userName = userSnapshot.val().name || userName;
+                    }
+                } catch (err) {
+                    console.log('Could not fetch user details from database:', err);
+                }
+
+                // Ensure userName is never null or undefined
+                userName = userName || 'Anonymous';
+
                 const timestamp = Date.now();
-                const userName = currentUser.displayName || currentUser.email;
 
                 for (let i = 0; i < order.items.length; i++) {
                     const item = order.items[i];
