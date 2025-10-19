@@ -515,28 +515,70 @@
 
         .star-rating {
             display: flex;
-            gap: 0.3rem;
-            margin-bottom: 0.6rem;
+            gap: 0.4rem;
+            margin-bottom: 0.8rem;
+            align-items: center;
         }
 
         .star {
-            font-size: 1.8rem;
+            font-size: 2rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            position: relative;
         }
 
         .star:hover {
-            transform: scale(1.2);
+            transform: scale(1.3);
+        }
+
+        .star:active {
+            transform: scale(1.1);
         }
 
         .star.filled {
             color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            animation: starFill 0.3s ease-out;
         }
 
         .star.empty {
-            color: #ddd;
+            color: #e0e0e0;
         }
+
+        .star.hover-preview {
+            color: #ffed4e;
+            transform: scale(1.15);
+        }
+
+        @keyframes starFill {
+            0% { 
+                transform: scale(0.5) rotate(-15deg); 
+                opacity: 0.5;
+            }
+            50% { 
+                transform: scale(1.3) rotate(5deg); 
+            }
+            100% { 
+                transform: scale(1) rotate(0deg); 
+                opacity: 1;
+            }
+        }
+
+        .rating-label {
+            margin-left: 0.8rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #666;
+            min-width: 80px;
+        }
+
+        .rating-label.excellent { color: #27ae60; }
+        .rating-label.good { color: #60b246; }
+        .rating-label.average { color: #f39c12; }
+        .rating-label.poor { color: #e67e22; }
+        .rating-label.bad { color: #e74c3c; }
 
         .review-textarea {
             width: 100%;
@@ -951,10 +993,14 @@
                                     <span class="review-item-emoji">${item.emoji || '🍔'}</span>
                                     <span class="review-item-name">${escapeHtml(item.name)}</span>
                                 </div>
-                                <div class="star-rating" data-item-index="${idx}">
+                                <div class="star-rating" data-item-index="${idx}" data-current-rating="0">
                                     ${[1, 2, 3, 4, 5].map(star => `
-                                        <span class="star empty" data-rating="${star}" onclick="setRating('${order.id}', ${idx}, ${star})">⭐</span>
+                                        <span class="star empty" data-rating="${star}" 
+                                              onmouseover="previewRating('${order.id}', ${idx}, ${star})"
+                                              onmouseout="resetPreview('${order.id}', ${idx})"
+                                              onclick="setRating('${order.id}', ${idx}, ${star})">⭐</span>
                                     `).join('')}
+                                    <span class="rating-label" id="rating-label-${order.id}-${idx}"></span>
                                 </div>
                                 <textarea 
                                     class="review-textarea" 
@@ -997,9 +1043,48 @@
             }
         }
 
+        window.previewRating = function(orderId, itemIndex, rating) {
+            const container = document.querySelector(`[data-item-index="${itemIndex}"]`);
+            const currentRating = parseInt(container.getAttribute('data-current-rating')) || 0;
+            
+            if (currentRating === 0) {
+                const stars = container.querySelectorAll('.star');
+                stars.forEach((star, idx) => {
+                    if (idx < rating) {
+                        star.classList.remove('empty');
+                        star.classList.add('hover-preview');
+                    } else {
+                        star.classList.add('empty');
+                        star.classList.remove('hover-preview');
+                    }
+                });
+                
+                updateRatingLabel(orderId, itemIndex, rating);
+            }
+        };
+
+        window.resetPreview = function(orderId, itemIndex) {
+            const container = document.querySelector(`[data-item-index="${itemIndex}"]`);
+            const currentRating = parseInt(container.getAttribute('data-current-rating')) || 0;
+            
+            if (currentRating === 0) {
+                const stars = container.querySelectorAll('.star');
+                stars.forEach(star => {
+                    star.classList.remove('hover-preview');
+                    star.classList.add('empty');
+                });
+                updateRatingLabel(orderId, itemIndex, 0);
+            }
+        };
+
         window.setRating = function(orderId, itemIndex, rating) {
-            const stars = document.querySelectorAll(`[data-item-index="${itemIndex}"] .star`);
+            const container = document.querySelector(`[data-item-index="${itemIndex}"]`);
+            const stars = container.querySelectorAll('.star');
+            
+            container.setAttribute('data-current-rating', rating);
+            
             stars.forEach((star, idx) => {
+                star.classList.remove('hover-preview');
                 if (idx < rating) {
                     star.classList.remove('empty');
                     star.classList.add('filled');
@@ -1013,7 +1098,35 @@
                 itemReviews[orderId] = {};
             }
             itemReviews[orderId][itemIndex] = rating;
+            
+            updateRatingLabel(orderId, itemIndex, rating);
         };
+
+        function updateRatingLabel(orderId, itemIndex, rating) {
+            const label = document.getElementById(`rating-label-${orderId}-${itemIndex}`);
+            if (!label) return;
+            
+            const labels = {
+                0: '',
+                1: 'Bad',
+                2: 'Poor',
+                3: 'Average',
+                4: 'Good',
+                5: 'Excellent'
+            };
+            
+            const classes = {
+                0: '',
+                1: 'bad',
+                2: 'poor',
+                3: 'average',
+                4: 'good',
+                5: 'excellent'
+            };
+            
+            label.textContent = labels[rating];
+            label.className = 'rating-label ' + classes[rating];
+        }
 
         window.submitReviews = async function(orderId, itemCount) {
             if (!currentUser) {
