@@ -543,13 +543,25 @@
             animation: starFill 0.3s ease-out;
         }
 
+        .star.filled::before {
+            content: '★';
+        }
+
         .star.empty {
             color: #e0e0e0;
+        }
+
+        .star.empty::before {
+            content: '☆';
         }
 
         .star.hover-preview {
             color: #ffed4e;
             transform: scale(1.15);
+        }
+
+        .star.hover-preview::before {
+            content: '★';
         }
 
         @keyframes starFill {
@@ -998,7 +1010,7 @@
                                         <span class="star empty" data-rating="${star}" 
                                               onmouseover="previewRating('${order.id}', ${idx}, ${star})"
                                               onmouseout="resetPreview('${order.id}', ${idx})"
-                                              onclick="setRating('${order.id}', ${idx}, ${star})">⭐</span>
+                                              onclick="setRating('${order.id}', ${idx}, ${star})"></span>
                                     `).join('')}
                                     <span class="rating-label" id="rating-label-${order.id}-${idx}"></span>
                                 </div>
