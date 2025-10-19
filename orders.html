@@ -1314,37 +1314,7 @@
         }
 
         function getStatusTimeline(currentStatus) {
-            const statuses = ['pending', 'confirmed', 'cooking', 'packing', 'outfordelivery', 'delivered'];
-            const normalizedStatus = currentStatus.toLowerCase().replace(/\s+/g, '').replace('preparing', 'cooking');
-            const currentIndex = statuses.indexOf(normalizedStatus);
-            
-            if (['cancelled', 'rejected'].includes(currentStatus.toLowerCase()) || currentIndex === -1) {
-                return '';
-            }
-
-            const timeline = [
-                { status: 'pending', icon: '⏳', text: 'Order Placed' },
-                { status: 'confirmed', icon: '✅', text: 'Confirmed' },
-                { status: 'cooking', icon: '👨‍🍳', text: 'Cooking' },
-                { status: 'packing', icon: '📦', text: 'Packing' },
-                { status: 'outfordelivery', icon: '🚚', text: 'Out for Delivery' },
-                { status: 'delivered', icon: '✔️', text: 'Delivered' }
-            ];
-
-            let timelineHTML = '<div class="status-timeline">';
-            timeline.forEach((item, index) => {
-                if (index <= currentIndex) {
-                    timelineHTML += `
-                        <div class="timeline-item">
-                            <span class="timeline-icon">${item.icon}</span>
-                            <span>${item.text}</span>
-                        </div>
-                    `;
-                }
-            });
-            timelineHTML += '</div>';
-
-            return timelineHTML;
+            return '';
         }
 
         function showNotification(order) {
