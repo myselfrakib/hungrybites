@@ -618,6 +618,7 @@
     <div class="nav-items" id="navMenu">
         <span class="nav-item" style="cursor: default; background: var(--baby-powder);">🏠 Home</span>
         <a href="orders.html" class="nav-item">📦 Orders</a>
+        <a href="profile.html" class="nav-item">👤 Profile</a>
         <span class="nav-item" onclick="logout()">🚪 Logout</span>
     </div>
 
@@ -671,7 +672,6 @@
         let currentUser = null;
         const FREE_DELIVERY_THRESHOLD = 200;
         
-        // Define category order and name mapping
         const CATEGORY_ORDER = [
             { key: 'Maagie', display: 'Maggi' },
             { key: 'Pasta', display: 'Pasta' },
@@ -781,7 +781,6 @@
             let html = '';
             let totalItems = 0;
 
-            // Organize items by normalized category
             const categorizedItems = {};
             
             Object.keys(allFoodItems).forEach(categoryName => {
@@ -821,7 +820,6 @@
                 return;
             }
 
-            // Render categories in specified order
             CATEGORY_ORDER.forEach(catConfig => {
                 const categoryData = categorizedItems[catConfig.key];
                 
@@ -843,7 +841,6 @@
                 }
             });
 
-            // Add any remaining categories not in the order
             Object.keys(categorizedItems).forEach(catName => {
                 const isInOrder = CATEGORY_ORDER.some(c => c.key === catName);
                 if (!isInOrder && categorizedItems[catName].items.length > 0) {
