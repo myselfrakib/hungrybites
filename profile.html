@@ -561,6 +561,116 @@
             cursor: not-allowed;
         }
 
+        .map-instruction {
+            background: #fffbf0;
+            border-left: 4px solid var(--sunglow);
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        #map {
+            width: 100%;
+            height: 350px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 2px solid #e0e0e0;
+        }
+
+        .location-btn {
+            background: var(--non-photo-blue);
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .location-btn:active {
+            transform: scale(0.95);
+        }
+
+        .location-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .location-status {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.3rem;
+        }
+
+        .coord-display {
+            background: #f0f9ff;
+            border: 2px solid var(--non-photo-blue);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .coord-display.warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .coord-display.error {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+            font-weight: 600;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        @media (max-width: 480px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group input.auto-filled {
+            border-color: var(--success-green);
+            background-color: #f0fff4;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--sunglow);
+        }
+
         .loading-spinner {
             display: none;
             text-align: center;
@@ -683,6 +793,9 @@
                     <p style="margin-top: 0.5rem; color: #666;">Loading addresses...</p>
                 </div>
             </div>
+            <button class="add-address-btn" onclick="APP.showAddAddressModal()">
+                + Add New Address
+            </button>
         </div>
     </div>
 
@@ -720,6 +833,74 @@
                     <input type="tel" id="newPhone" required pattern="[0-9]{10}" maxlength="10" placeholder="10 digit number">
                 </div>
                 <button type="submit" class="btn-primary" id="phoneSubmitBtn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="addAddressModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <div class="modal-title">📍 Add New Address</div>
+                <button class="close-modal" onclick="APP.closeModal('addAddressModal')">&times;</button>
+            </div>
+            
+            <div class="map-instruction">
+                <strong>⚠️ Location Required:</strong> You must set your exact delivery location on the map. Click "Use My Location" or drag the red marker to your address.
+            </div>
+            
+            <button type="button" class="location-btn" id="locationBtn" onclick="APP.getLocation()">
+                📍 Use My Location
+            </button>
+            <div class="location-status" id="locationStatus"></div>
+            
+            <div id="map"></div>
+            
+            <div class="coord-display error" id="coordDisplay">
+                ❌ Location not set - Click "Use My Location" or drag the marker
+            </div>
+            
+            <form id="addAddressForm" onsubmit="APP.saveNewAddress(event)">
+                <div class="form-group">
+                    <label for="addressName">Full Name *</label>
+                    <input type="text" id="addressName" required placeholder="Your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="addressPhone">Phone Number *</label>
+                    <input type="tel" id="addressPhone" required placeholder="10 digit number" pattern="[0-9]{10}" maxlength="10">
+                </div>
+                
+                <div class="form-group">
+                    <label for="addressStreet">Address *</label>
+                    <textarea id="addressStreet" required placeholder="House No., Street, Area" rows="2"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="addressCity">City *</label>
+                        <input type="text" id="addressCity" required placeholder="City">
+                    </div>
+                    <div class="form-group">
+                        <label for="addressPincode">Pincode *</label>
+                        <input type="text" id="addressPincode" required placeholder="6 digits" pattern="[0-9]{6}" maxlength="6">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="addressLandmark">Landmark</label>
+                    <input type="text" id="addressLandmark" placeholder="Optional">
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500;">
+                        <input type="checkbox" id="setAsDefault" style="width: auto;">
+                        <span>Set as default address</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-primary" id="addAddressBtn" disabled>
+                    <span id="addAddressBtnText">Set Location First</span>
+                </button>
             </form>
         </div>
     </div>
