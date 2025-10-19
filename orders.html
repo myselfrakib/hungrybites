@@ -771,7 +771,8 @@
 
     <div class="nav-items" id="navMenu">
         <a href="home.html" class="nav-item">Home</a>
-        <a href="orders.html" class="nav-item">Orders</a>
+        <span class="nav-item" style="cursor: default; background: var(--baby-powder);">Orders</span>
+        <a href="profile.html" class="nav-item">👤 Profile</a>
         <span class="nav-item" onclick="logout()">Logout</span>
     </div>
 
@@ -826,7 +827,6 @@
             if (user) {
                 currentUser = user;
                 
-                // Fetch user details from database
                 try {
                     const userDetailsRef = ref(db, `users/${user.uid}/allDetails`);
                     const userSnapshot = await get(userDetailsRef);
@@ -1181,7 +1181,6 @@
             button.textContent = 'Submitting...';
 
             try {
-                // Use the pre-fetched user display name
                 const userName = userDisplayName || 'User';
                 console.log('Submitting reviews with username:', userName);
 
