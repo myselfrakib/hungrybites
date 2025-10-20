@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>MidnightPlaza - My Profile</title>
+    <title>Midnight Plaza - My Profile</title>
     <style>
         :root {
             --sunglow: #fdc921;
@@ -13,713 +13,103 @@
             --blue-gray: #6798c0;
             --success-green: #60b246;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--baby-powder);
-            color: #333;
-            padding-bottom: 2rem;
-        }
-
-        .navbar {
-            background: white;
-            padding: 0.75rem 1rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logo {
-            font-size: clamp(1.2rem, 4vw, 1.5rem);
-            font-weight: bold;
-            color: var(--sunglow);
-            cursor: pointer;
-        }
-
-        .hamburger {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            cursor: pointer;
-            padding: 0.5rem;
-            touch-action: manipulation;
-        }
-
-        .hamburger span {
-            width: 22px;
-            height: 2.5px;
-            background: var(--blue-gray);
-            border-radius: 3px;
-            transition: all 0.3s;
-        }
-
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(7px, 7px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(6px, -6px);
-        }
-
-        .nav-items {
-            display: none;
-            position: fixed;
-            top: 60px;
-            left: 0;
-            right: 0;
-            background: white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            padding: 0.5rem;
-            flex-direction: column;
-            gap: 0;
-            z-index: 999;
-        }
-
-        .nav-items.active {
-            display: flex;
-        }
-
-        .nav-item {
-            cursor: pointer;
-            padding: 0.9rem;
-            border-radius: 8px;
-            transition: background 0.3s;
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            font-size: 0.95rem;
-            position: relative;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            touch-action: manipulation;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .nav-item:hover {
-            background: var(--baby-powder);
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 1.5rem auto;
-            padding: 0 0.75rem;
-        }
-
-        .profile-header {
-            background: linear-gradient(135deg, var(--blue-gray) 0%, var(--non-photo-blue) 100%);
-            color: white;
-            padding: 2rem 1.5rem;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            margin: 0 auto 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .profile-name {
-            font-size: clamp(1.5rem, 4vw, 1.8rem);
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        .profile-email {
-            font-size: clamp(0.9rem, 2.5vw, 1rem);
-            opacity: 0.9;
-        }
-
-        .section-container {
-            background: white;
-            padding: 1.25rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            margin-bottom: 1rem;
-        }
-
-        .section-title {
-            font-size: clamp(1.1rem, 3vw, 1.3rem);
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 2px solid var(--baby-powder);
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.9rem 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .info-value {
-            font-weight: 500;
-            color: #333;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .edit-btn {
-            background: var(--non-photo-blue);
-            color: white;
-            border: none;
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .edit-btn:active {
-            transform: scale(0.95);
-        }
-
-        .customer-care-card {
-            background: linear-gradient(135deg, var(--success-green) 0%, #4a9635 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .care-icon {
-            font-size: 3rem;
-            margin-bottom: 0.75rem;
-            animation: ring 2s ease-in-out infinite;
-        }
-
-        @keyframes ring {
-            0%, 100% { transform: rotate(0deg); }
-            10%, 30% { transform: rotate(-10deg); }
-            20% { transform: rotate(10deg); }
-        }
-
-        .care-title {
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        .care-subtitle {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            margin-bottom: 1rem;
-        }
-
-        .call-btn {
-            background: white;
-            color: var(--success-green);
-            border: none;
-            padding: 0.9rem 2rem;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        .call-btn:active {
-            transform: scale(0.95);
-        }
-
-        .address-card {
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-            position: relative;
-            transition: all 0.3s;
-        }
-
-        .address-card:hover {
-            border-color: var(--sunglow);
-            box-shadow: 0 4px 12px rgba(253, 201, 33, 0.2);
-        }
-
-        .default-badge {
-            background: var(--non-photo-blue);
-            color: white;
-            padding: 0.2rem 0.6rem;
-            border-radius: 5px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-        }
-
-        .address-name {
-            font-weight: 600;
-            font-size: 1rem;
-            color: #333;
-            margin-bottom: 0.3rem;
-        }
-
-        .address-phone {
-            color: #666;
-            font-size: 0.85rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .address-details {
-            color: #666;
-            line-height: 1.6;
-            font-size: 0.9rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .address-actions {
-            display: flex;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-        }
-
-        .btn-small {
-            padding: 0.4rem 0.8rem;
-            font-size: 0.8rem;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-edit {
-            background: var(--sunglow);
-            color: white;
-        }
-
-        .btn-set-default {
-            background: var(--non-photo-blue);
-            color: white;
-        }
-
-        .btn-delete {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-small:active {
-            transform: scale(0.95);
-        }
-
-        .add-address-btn {
-            width: 100%;
-            padding: 0.9rem;
-            background: var(--sunglow);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .add-address-btn:active {
-            transform: scale(0.98);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 2rem 1rem;
-            color: #666;
-        }
-
-        .empty-icon {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .toast {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 1.5rem 2rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            z-index: 10000;
-            display: none;
-            text-align: center;
-            min-width: 280px;
-            max-width: 90%;
-        }
-
-        .toast.show {
-            display: block;
-            animation: toastSlideIn 0.3s ease-out;
-        }
-
-        .toast-success {
-            border-left: 5px solid var(--success-green);
-        }
-
-        .toast-error {
-            border-left: 5px solid #dc3545;
-        }
-
-        .toast-icon {
-            font-size: 3rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .toast-message {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #333;
-        }
-
-        @keyframes toastSlideIn {
-            from {
-                transform: translate(-50%, -60%);
-                opacity: 0;
-            }
-            to {
-                transform: translate(-50%, -50%);
-                opacity: 1;
-            }
-        }
-
-        .toast-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.4);
-            z-index: 9999;
-            display: none;
-        }
-
-        .toast-overlay.show {
-            display: block;
-        }
-
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.25rem;
-        }
-
-        .modal-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            cursor: pointer;
-            color: #666;
-            line-height: 1;
-            padding: 0;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.4rem;
-            font-weight: 600;
-            color: #333;
-            font-size: 0.9rem;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-family: inherit;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--sunglow);
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 0.9rem;
-            background: var(--blue-gray);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
-
-        .btn-primary:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        .map-instruction {
-            background: #fffbf0;
-            border-left: 4px solid var(--sunglow);
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            color: #666;
-        }
-
-        #map {
-            width: 100%;
-            height: 350px;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            border: 2px solid #e0e0e0;
-        }
-
-        .location-btn {
-            background: var(--non-photo-blue);
-            color: white;
-            border: none;
-            padding: 0.6rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .location-btn:active {
-            transform: scale(0.95);
-        }
-
-        .location-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        .location-status {
-            font-size: 0.8rem;
-            color: #666;
-            margin-top: 0.3rem;
-        }
-
-        .coord-display {
-            background: #f0f9ff;
-            border: 2px solid var(--non-photo-blue);
-            border-radius: 8px;
-            padding: 0.75rem;
-            margin-top: 0.75rem;
-            font-size: 0.85rem;
-            color: #666;
-            text-align: center;
-        }
-
-        .coord-display.warning {
-            background: #fff3cd;
-            border-color: #ffc107;
-            color: #856404;
-        }
-
-        .coord-display.error {
-            background: #f8d7da;
-            border-color: #dc3545;
-            color: #721c24;
-            font-weight: 600;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 70px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
-        }
-
-        @media (max-width: 480px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .form-group input.auto-filled {
-            border-color: var(--success-green);
-            background-color: #f0fff4;
-        }
-
-        .form-group textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-family: inherit;
-            transition: border-color 0.3s;
-        }
-
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--sunglow);
-        }
-
-        .loading-spinner {
-            display: none;
-            text-align: center;
-            padding: 1rem;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--sunglow);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--baby-powder); color: #333; padding-bottom: 2rem; }
+        .navbar { background: white; padding: 0.75rem 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; }
+        .nav-left { display: flex; align-items: center; gap: 1rem; }
+        .logo { font-size: clamp(1.2rem, 4vw, 1.5rem); font-weight: bold; color: var(--sunglow); cursor: pointer; }
+        .hamburger { display: flex; flex-direction: column; gap: 4px; cursor: pointer; padding: 0.5rem; }
+        .hamburger span { width: 22px; height: 2.5px; background: var(--blue-gray); border-radius: 3px; transition: all 0.3s; }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(7px, 7px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .nav-items { display: none; position: fixed; top: 60px; left: 0; right: 0; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1); padding: 0.5rem; flex-direction: column; gap: 0; z-index: 999; }
+        .nav-items.active { display: flex; }
+        .nav-item { cursor: pointer; padding: 0.9rem; border-radius: 8px; transition: background 0.3s; text-decoration: none; color: #333; font-weight: 500; font-size: 0.95rem; border-bottom: 1px solid #f0f0f0; }
+        .nav-item:hover { background: var(--baby-powder); }
+        .container { max-width: 900px; margin: 1.5rem auto; padding: 0 0.75rem; }
+        .profile-header { background: linear-gradient(135deg, var(--blue-gray) 0%, var(--non-photo-blue) 100%); color: white; padding: 2rem 1.5rem; border-radius: 12px; text-align: center; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .profile-avatar { width: 80px; height: 80px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .profile-name { font-size: clamp(1.5rem, 4vw, 1.8rem); font-weight: bold; margin-bottom: 0.5rem; }
+        .profile-email { font-size: clamp(0.9rem, 2.5vw, 1rem); opacity: 0.9; }
+        .section-container { background: white; padding: 1.25rem; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 1rem; }
+        .section-title { font-size: clamp(1.1rem, 3vw, 1.3rem); font-weight: 600; color: #333; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--baby-powder); }
+        .info-row { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 0; border-bottom: 1px solid #f0f0f0; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { font-weight: 600; color: #666; font-size: 0.9rem; }
+        .info-value { font-weight: 500; color: #333; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .edit-btn { background: var(--non-photo-blue); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.3s; }
+        .edit-btn:active { transform: scale(0.95); }
+        .customer-care-card { background: linear-gradient(135deg, var(--success-green) 0%, #4a9635 100%); color: white; padding: 1.5rem; border-radius: 12px; text-align: center; }
+        .care-icon { font-size: 3rem; margin-bottom: 0.75rem; animation: ring 2s ease-in-out infinite; }
+        @keyframes ring { 0%, 100% { transform: rotate(0deg); } 10%, 30% { transform: rotate(-10deg); } 20% { transform: rotate(10deg); } }
+        .care-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .care-subtitle { font-size: 0.9rem; opacity: 0.9; margin-bottom: 1rem; }
+        .call-btn { background: white; color: var(--success-green); border: none; padding: 0.9rem 2rem; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .call-btn:active { transform: scale(0.95); }
+        .address-card { border: 2px solid #e0e0e0; border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; position: relative; transition: all 0.3s; }
+        .address-card:hover { border-color: var(--sunglow); box-shadow: 0 4px 12px rgba(253, 201, 33, 0.2); }
+        .default-badge { background: var(--non-photo-blue); color: white; padding: 0.2rem 0.6rem; border-radius: 5px; font-size: 0.75rem; font-weight: 600; position: absolute; top: 1rem; right: 1rem; }
+        .address-name { font-weight: 600; font-size: 1rem; color: #333; margin-bottom: 0.3rem; }
+        .address-phone { color: #666; font-size: 0.85rem; margin-bottom: 0.5rem; }
+        .address-details { color: #666; line-height: 1.6; font-size: 0.9rem; margin-bottom: 0.75rem; }
+        .address-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+        .btn-small { padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-edit { background: var(--sunglow); color: white; }
+        .btn-set-default { background: var(--non-photo-blue); color: white; }
+        .btn-delete { background: #dc3545; color: white; }
+        .btn-small:active { transform: scale(0.95); }
+        .add-address-btn { width: 100%; padding: 0.9rem; background: var(--sunglow); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .add-address-btn:active { transform: scale(0.98); }
+        .empty-state { text-align: center; padding: 2rem 1rem; color: #666; }
+        .empty-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 1.5rem 2rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 10000; display: none; text-align: center; min-width: 280px; max-width: 90%; }
+        .toast.show { display: block; animation: toastSlideIn 0.3s ease-out; }
+        .toast-success { border-left: 5px solid var(--success-green); }
+        .toast-error { border-left: 5px solid #dc3545; }
+        .toast-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+        .toast-message { font-size: 1.1rem; font-weight: 600; color: #333; margin-bottom: 0.5rem; }
+        .toast-submessage { font-size: 0.9rem; color: #666; }
+        @keyframes toastSlideIn { from { transform: translate(-50%, -60%); opacity: 0; } to { transform: translate(-50%, -50%); opacity: 1; } }
+        .toast-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 9999; display: none; }
+        .toast-overlay.show { display: block; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; padding: 1rem; animation: fadeIn 0.3s; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; border-radius: 12px; padding: 1.5rem; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+        .modal-title { font-size: 1.3rem; font-weight: 600; color: #333; }
+        .close-modal { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #666; line-height: 1; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; color: #333; font-size: 0.9rem; }
+        .form-group input, .form-group textarea { width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.95rem; font-family: inherit; transition: border-color 0.3s; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--sunglow); }
+        .form-group input.auto-filled { border-color: var(--success-green); background-color: #f0fff4; }
+        .form-group textarea { resize: vertical; min-height: 70px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+        .btn-primary { width: 100%; padding: 0.9rem; background: var(--blue-gray); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+        .map-instruction { background: #fffbf0; border-left: 4px solid var(--sunglow); padding: 0.75rem; margin-bottom: 1rem; border-radius: 4px; font-size: 0.85rem; color: #666; }
+        #map { width: 100%; height: 350px; border-radius: 8px; margin-bottom: 1rem; border: 2px solid #e0e0e0; }
+        .location-btn { background: var(--non-photo-blue); color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; }
+        .location-btn:active { transform: scale(0.95); }
+        .location-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .location-status { font-size: 0.8rem; color: #666; margin-top: 0.3rem; }
+        .coord-display { background: #f0f9ff; border: 2px solid var(--non-photo-blue); border-radius: 8px; padding: 0.75rem; margin-top: 0.75rem; font-size: 0.85rem; color: #666; text-align: center; }
+        .coord-display.warning { background: #fff3cd; border-color: #ffc107; color: #856404; }
+        .coord-display.error { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; }
+        .loading-spinner { display: none; text-align: center; padding: 1rem; }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid var(--sunglow); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @media (min-width: 768px) {
-            .hamburger {
-                display: none;
-            }
-
-            .nav-items {
-                display: flex !important;
-                position: static;
-                flex-direction: row;
-                padding: 0;
-                box-shadow: none;
-                gap: 0.75rem;
-            }
-
-            .nav-item {
-                border-bottom: none;
-                padding: 0.4rem 0.6rem;
-                min-height: 40px;
-            }
-
-            .edit-btn:hover {
-                background: #7eb3d4;
-            }
-
-            .call-btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 16px rgba(0,0,0,0.25);
-            }
+            .hamburger { display: none; }
+            .nav-items { display: flex !important; position: static; flex-direction: row; padding: 0; box-shadow: none; gap: 0.75rem; }
+            .nav-item { border-bottom: none; padding: 0.4rem 0.6rem; }
+            .edit-btn:hover { background: #7eb3d4; }
+            .call-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.25); }
         }
     </style>
 </head>
@@ -727,20 +117,18 @@
     <div class="navbar">
         <div class="nav-left">
             <div class="hamburger" onclick="APP.toggleMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span>
             </div>
-            <div class="logo" onclick="window.location.href='home.html'">🍔 Midnight Plaza</div>
+            <div class="logo" onclick="window.location.href='home.html'">Midnight Plaza</div>
         </div>
     </div>
 
     <div class="nav-items" id="navMenu">
-        <a href="home.html" class="nav-item">🏠 Home</a>
-        <a href="orders.html" class="nav-item">📦 Orders</a>
-        <a href="checkout.html" class="nav-item">🛒 Cart</a>
-        <span class="nav-item" style="cursor: default; background: var(--baby-powder);">👤 Profile</span>
-        <span class="nav-item" onclick="APP.logout()">🚪 Logout</span>
+        <a href="home.html" class="nav-item">Home</a>
+        <a href="orders.html" class="nav-item">Orders</a>
+        <a href="checkout.html" class="nav-item">Cart</a>
+        <span class="nav-item" style="cursor: default; background: var(--baby-powder);">Profile</span>
+        <span class="nav-item" onclick="APP.logout()">Logout</span>
     </div>
 
     <div class="container">
@@ -779,9 +167,7 @@
                 <div class="care-icon">📞</div>
                 <div class="care-title">Need Help?</div>
                 <div class="care-subtitle">Our customer care team is here for you</div>
-                <a href="tel:9883780399" class="call-btn">
-                    📱 Call 9883780399
-                </a>
+                <a href="tel:9883780399" class="call-btn">📱 Call 9883780399</a>
             </div>
         </div>
 
@@ -793,9 +179,7 @@
                     <p style="margin-top: 0.5rem; color: #666;">Loading addresses...</p>
                 </div>
             </div>
-            <button class="add-address-btn" onclick="APP.showAddAddressModal()">
-                + Add New Address
-            </button>
+            <button class="add-address-btn" onclick="APP.showAddAddressModal()">+ Add New Address</button>
         </div>
     </div>
 
@@ -803,6 +187,7 @@
     <div class="toast" id="toast">
         <div class="toast-icon" id="toastIcon"></div>
         <div class="toast-message" id="toastMessage"></div>
+        <div class="toast-submessage" id="toastSubMessage"></div>
     </div>
 
     <div class="modal-overlay" id="editNameModal">
@@ -838,7 +223,7 @@
     </div>
 
     <div class="modal-overlay" id="addAddressModal">
-        <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">📍 Add New Address</div>
                 <button class="close-modal" onclick="APP.closeModal('addAddressModal')">&times;</button>
@@ -848,16 +233,12 @@
                 <strong>⚠️ Location Required:</strong> You must set your exact delivery location on the map. Click "Use My Location" or drag the red marker to your address.
             </div>
             
-            <button type="button" class="location-btn" id="locationBtn" onclick="APP.getLocation()">
-                📍 Use My Location
-            </button>
+            <button type="button" class="location-btn" id="locationBtn" onclick="APP.getLocation()">📍 Use My Location</button>
             <div class="location-status" id="locationStatus"></div>
             
             <div id="map"></div>
             
-            <div class="coord-display error" id="coordDisplay">
-                ❌ Location not set - Click "Use My Location" or drag the marker
-            </div>
+            <div class="coord-display error" id="coordDisplay">❌ Location not set - Click "Use My Location" or drag the marker</div>
             
             <form id="addAddressForm" onsubmit="APP.saveNewAddress(event)">
                 <div class="form-group">
@@ -908,7 +289,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        import { getDatabase, ref, get, set, update, remove } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { getDatabase, ref, get, set, update, remove, push } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -916,7 +297,7 @@
             projectId: "hungrybites-c7930",
             storageBucket: "hungrybites-c7930.firebasestorage.app",
             messagingSenderId: "346758544945",
-            appId: "1:346758544945:web:4bcad30016540d18e79f10",
+            appId: "1:346758544945:web:4bcad40016540d18e79f10",
             measurementId: "G-B5GP5SYMRC",
             databaseURL: "https://hungrybites-c7930-default-rtdb.firebaseio.com"
         };
@@ -955,81 +336,59 @@
 
             loadGoogleMaps() {
                 if (window.google?.maps) {
-                    console.log('Google Maps already loaded');
+                    this.googleMapsLoaded = true;
                     return;
                 }
-                
-                // Create callback function globally
-                window.initGoogleMap = () => {
-                    console.log('Google Maps callback triggered');
-                    this.googleMapsLoaded = true;
-                };
-                
                 const script = document.createElement('script');
-                script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDsn16p7w8b-x8pEA_WTO5F2oUk4MHwcUc&callback=initGoogleMap&loading=async';
+                script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDsn16p7w8b-x8pEA_WTO5F2oUk4MHwcUc&callback=APP.onMapsLoaded';
                 script.async = true;
                 script.defer = true;
-                script.onerror = () => {
-                    console.error('Failed to load Google Maps');
-                    this.showToast('error', 'Failed to load Google Maps. Please refresh the page.');
-                };
                 document.head.appendChild(script);
             },
 
+            onMapsLoaded() {
+                this.googleMapsLoaded = true;
+                console.log('Google Maps loaded');
+            },
+
             initMap() {
-                if (!window.google?.maps) {
-                    console.error('Google Maps not loaded');
-                    return;
-                }
+                if (!window.google?.maps) return;
 
-                try {
-                    const defaultLocation = { lat: 22.9734, lng: 78.6569 };
-                    this.map = new google.maps.Map(document.getElementById('map'), {
-                        center: defaultLocation,
-                        zoom: 5,
-                        mapTypeControl: false,
-                        streetViewControl: false,
-                        fullscreenControl: false
-                    });
+                const defaultLocation = { lat: 22.9734, lng: 78.6569 };
+                this.map = new google.maps.Map(document.getElementById('map'), {
+                    center: defaultLocation,
+                    zoom: 5,
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                    fullscreenControl: false
+                });
 
-                    this.marker = new google.maps.Marker({
-                        position: defaultLocation,
-                        map: this.map,
-                        draggable: true,
-                        animation: google.maps.Animation.DROP
-                    });
+                this.marker = new google.maps.Marker({
+                    position: defaultLocation,
+                    map: this.map,
+                    draggable: true,
+                    animation: google.maps.Animation.DROP
+                });
 
-                    this.finalPinLocation = null;
-                    this.validLocationSet = false;
+                this.finalPinLocation = null;
+                this.validLocationSet = false;
+                this.updateCoordinatesDisplay();
+                this.updateAddAddressButton();
+
+                this.map.addListener('click', (e) => this.setMarkerPosition(e.latLng, false));
+                this.marker.addListener('dragend', (e) => {
+                    this.setMarkerPosition(e.latLng, false);
+                    this.showToast('success', 'Pin location updated', '');
+                });
+                this.marker.addListener('drag', (e) => {
+                    this.finalPinLocation = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+                    this.validLocationSet = true;
                     this.updateCoordinatesDisplay();
                     this.updateAddAddressButton();
-
-                    this.map.addListener('click', (e) => {
-                        this.setMarkerPosition(e.latLng, false);
-                    });
-
-                    this.marker.addListener('dragend', (e) => {
-                        this.setMarkerPosition(e.latLng, false);
-                        this.showToast('success', 'Pin location updated');
-                    });
-
-                    this.marker.addListener('drag', (e) => {
-                        this.finalPinLocation = { lat: e.latLng.lat(), lng: e.latLng.lng() };
-                        this.validLocationSet = true;
-                        this.updateCoordinatesDisplay();
-                        this.updateAddAddressButton();
-                    });
-
-                    console.log('Google Maps initialized successfully');
-                } catch (error) {
-                    console.error('Error initializing map:', error);
-                    this.showToast('error', 'Failed to initialize map');
-                }
+                });
             },
 
             setMarkerPosition(latLng, isInitialDetection = false) {
-                if (!latLng) return;
-                
                 this.finalPinLocation = { lat: latLng.lat(), lng: latLng.lng() };
                 this.validLocationSet = true;
                 this.marker.setPosition(latLng);
@@ -1037,26 +396,14 @@
                 this.updateCoordinatesDisplay();
                 this.updateAddAddressButton();
 
-                // Geocode to get address
-                if (window.google?.maps?.Geocoder) {
-                    const geocoder = new google.maps.Geocoder();
-                    geocoder.geocode({ location: latLng }, (results, status) => {
-                        if (status === 'OK' && results && results[0]) {
-                            console.log('Geocoding successful:', results[0]);
-                            this.populateAddressFields(results[0], isInitialDetection);
-                        } else {
-                            console.error('Geocoding failed:', status);
-                        }
-                    });
-                }
+                new google.maps.Geocoder().geocode({ location: latLng }, (results, status) => {
+                    if (status === 'OK' && results[0]) {
+                        this.populateAddressFields(results[0], isInitialDetection);
+                    }
+                });
             },
 
             populateAddressFields(result, isInitialDetection) {
-                if (!result || !result.address_components) {
-                    console.log('No address components found');
-                    return;
-                }
-
                 const comps = result.address_components;
                 const addrFields = {};
 
@@ -1066,19 +413,14 @@
                     if (types.includes('postal_code')) addrFields.pin = comp.long_name;
                     if (types.includes('sublocality')) addrFields.area = comp.long_name;
                     if (types.includes('sublocality_level_1')) addrFields.subArea = comp.long_name;
-                    if (types.includes('sublocality_level_2')) addrFields.subArea2 = comp.long_name;
                     if (types.includes('route')) addrFields.street = comp.long_name;
-                    if (types.includes('premise')) addrFields.premise = comp.long_name;
                 });
-
-                console.log('Extracted address fields:', addrFields);
 
                 const updateField = (id, value, highlightIfNew = false) => {
                     const el = document.getElementById(id);
                     if (el && value) {
                         const oldVal = el.value;
                         el.value = value;
-                        console.log(`Updated ${id} with: ${value}`);
                         if (highlightIfNew && !oldVal) {
                             el.classList.add('auto-filled');
                             setTimeout(() => el.classList.remove('auto-filled'), 3000);
@@ -1086,37 +428,20 @@
                     }
                 };
 
-                // Build complete address from available parts
-                const addressParts = [
-                    addrFields.premise,
-                    addrFields.street, 
-                    addrFields.subArea2,
-                    addrFields.subArea,
-                    addrFields.area
-                ].filter(Boolean);
-                
-                const fullAddress = addressParts.length > 0 ? addressParts.join(', ') : '';
+                const addressParts = [addrFields.street, addrFields.area, addrFields.subArea].filter(Boolean);
+                const fullAddress = addressParts.join(', ');
 
-                if (fullAddress) {
-                    updateField('addressStreet', fullAddress, !isInitialDetection);
-                }
-                
-                if (addrFields.city) {
-                    updateField('addressCity', addrFields.city, !isInitialDetection);
-                }
-                
-                if (addrFields.pin) {
-                    updateField('addressPincode', addrFields.pin, !isInitialDetection);
-                }
+                updateField('addressStreet', fullAddress, !isInitialDetection);
+                updateField('addressCity', addrFields.city, !isInitialDetection);
+                updateField('addressPincode', addrFields.pin, !isInitialDetection);
 
-                if (!isInitialDetection && (fullAddress || addrFields.city || addrFields.pin)) {
-                    this.showToast('success', 'Address auto-filled from location');
+                if (!isInitialDetection) {
+                    this.showToast('success', 'Address auto-filled from location', '');
                 }
             },
 
             updateCoordinatesDisplay() {
                 const coordDisplay = document.getElementById('coordDisplay');
-                
                 if (this.finalPinLocation && this.validLocationSet) {
                     coordDisplay.className = 'coord-display';
                     coordDisplay.innerHTML = `✓ Location Set: <strong>${this.finalPinLocation.lat.toFixed(6)}, ${this.finalPinLocation.lng.toFixed(6)}</strong>`;
@@ -1129,7 +454,6 @@
             updateAddAddressButton() {
                 const btn = document.getElementById('addAddressBtn');
                 const btnText = document.getElementById('addAddressBtnText');
-                
                 if (this.validLocationSet && this.finalPinLocation) {
                     btn.disabled = false;
                     btnText.textContent = 'Save Address';
@@ -1140,47 +464,33 @@
             },
 
             getLocation() {
-                if (!navigator.geolocation) {
-                    this.showToast('error', 'Geolocation not supported by your browser');
-                    return;
-                }
-
                 const btn = document.getElementById('locationBtn');
                 const status = document.getElementById('locationStatus');
-                
-                if (!btn || !status) return;
-                
                 btn.disabled = true;
                 btn.innerHTML = '<span>⏳ Detecting...</span>';
                 status.textContent = 'Getting your location...';
-                status.style.color = '#666';
                 this.locationDetected = false;
 
                 const onSuccess = (lat, lng) => {
                     if (this.locationDetected) return;
                     this.locationDetected = true;
                     this.validLocationSet = true;
-                    
-                    console.log('Location detected:', lat, lng);
-                    
                     const latLng = new google.maps.LatLng(lat, lng);
                     this.map.setCenter(latLng);
                     this.map.setZoom(15);
                     this.setMarkerPosition(latLng, true);
-                    
                     btn.innerHTML = '<span>✓ Location Detected</span>';
                     btn.disabled = false;
-                    status.textContent = '✓ Location detected successfully';
+                    status.textContent = '✓ Location detected successfully - You can now save address';
                     status.style.color = '#60b246';
                     this.updateAddAddressButton();
                 };
 
                 const onError = (msg) => {
                     if (this.locationDetected) return;
-                    console.error('Location error:', msg);
                     btn.innerHTML = '<span>📍 Use My Location</span>';
                     btn.disabled = false;
-                    status.textContent = msg + ' - Please drag the marker to your location';
+                    status.textContent = msg + ' - You must drag the marker to your location';
                     status.style.color = '#ff6b6b';
                     this.validLocationSet = false;
                     this.finalPinLocation = null;
@@ -1188,186 +498,19 @@
                     this.updateAddAddressButton();
                 };
 
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        console.log('Geolocation success:', pos.coords);
-                        onSuccess(pos.coords.latitude, pos.coords.longitude);
-                    },
-                    (err) => {
-                        console.error('Geolocation error:', err);
-                        let msg = 'Location permission denied';
-                        if (err.code === 1) msg = 'Location permission denied';
-                        else if (err.code === 2) msg = 'Location unavailable';
-                        else if (err.code === 3) msg = 'Location request timed out';
-                        onError(msg);
-                    },
-                    { 
-                        enableHighAccuracy: true, 
-                        timeout: 15000, 
-                        maximumAge: 0 
-                    }
-                );
-            },
-
-            showAddAddressModal() {
-                const modal = document.getElementById('addAddressModal');
-                modal.classList.add('active');
-                
-                // Reset form
-                document.getElementById('addAddressForm').reset();
-                
-                // Pre-fill name and phone from user details
-                if (this.userDetails) {
-                    document.getElementById('addressName').value = this.userDetails.name || '';
-                    const phoneDigits = (this.userDetails.phoneNumber || '').replace(/^\+91/, '');
-                    document.getElementById('addressPhone').value = phoneDigits;
-                }
-                
-                // Auto-set as default if no addresses exist
-                document.getElementById('setAsDefault').checked = this.savedAddresses.length === 0;
-                
-                // Reset location state
-                this.finalPinLocation = null;
-                this.validLocationSet = false;
-                this.locationDetected = false;
-                this.updateCoordinatesDisplay();
-                this.updateAddAddressButton();
-                
-                // Initialize or refresh map
-                setTimeout(() => {
-                    if (!window.google?.maps) {
-                        console.log('Google Maps not loaded yet, waiting...');
-                        document.getElementById('coordDisplay').innerHTML = '⏳ Loading Google Maps...';
-                        
-                        // Wait for Google Maps to load
-                        const checkMaps = setInterval(() => {
-                            if (window.google?.maps) {
-                                clearInterval(checkMaps);
-                                console.log('Google Maps now available, initializing...');
-                                this.initMap();
-                                setTimeout(() => {
-                                    this.resetMapView();
-                                    this.getLocation();
-                                }, 300);
-                            }
-                        }, 500);
-                        return;
-                    }
-                    
-                    // Maps already loaded
-                    if (!this.map) {
-                        console.log('Initializing map for first time...');
-                        this.initMap();
-                    }
-                    
-                    if (this.map) {
-                        console.log('Refreshing map view...');
-                        google.maps.event.trigger(this.map, 'resize');
-                        this.resetMapView();
-                        
-                        // Auto-trigger location detection after a brief delay
-                        setTimeout(() => this.getLocation(), 500);
-                    }
-                }, 300);
-            },
-
-            resetMapView() {
-                const defaultLocation = { lat: 22.9734, lng: 78.6569 };
-                if (this.map && this.marker) {
-                    this.map.setCenter(defaultLocation);
-                    this.map.setZoom(5);
-                    this.marker.setPosition(defaultLocation);
-                    console.log('Map view reset to default location');
-                }
-            },
-
-            async saveNewAddress(event) {
-                event.preventDefault();
-                
-                if (!this.validLocationSet || !this.finalPinLocation) {
-                    return this.showToast('error', 'You must set your delivery location on the map');
-                }
-
-                const name = document.getElementById('addressName').value.trim();
-                const phone = document.getElementById('addressPhone').value.trim();
-                const street = document.getElementById('addressStreet').value.trim();
-                const city = document.getElementById('addressCity').value.trim();
-                const pincode = document.getElementById('addressPincode').value.trim();
-                const landmark = document.getElementById('addressLandmark').value.trim();
-                const setDefault = document.getElementById('setAsDefault').checked;
-
-                if (!name || !phone || !street || !city || !pincode) {
-                    return this.showToast('error', 'Fill all required fields');
-                }
-
-                if (!/^[0-9]{10}$/.test(phone)) {
-                    return this.showToast('error', 'Enter valid 10-digit phone');
-                }
-
-                if (!/^[0-9]{6}$/.test(pincode)) {
-                    return this.showToast('error', 'Enter valid 6-digit pincode');
-                }
-
-                if (!this.SERVICEABLE_PINCODES[pincode]) {
-                    return this.showToast('error', `We don't deliver to pincode ${pincode} yet`);
-                }
-
-                const btn = document.getElementById('addAddressBtn');
-                const btnText = document.getElementById('addAddressBtnText');
-                btn.disabled = true;
-                btnText.textContent = 'Saving...';
-
-                try {
-                    const isFirstAddress = this.savedAddresses.length === 0;
-                    const shouldBeDefault = setDefault || isFirstAddress;
-
-                    // If setting as default, update other addresses first
-                    if (shouldBeDefault && this.savedAddresses.length > 0) {
-                        const updates = {};
-                        this.savedAddresses.forEach(addr => {
-                            updates[`users/${this.currentUser.uid}/addresses/${addr.id}/isDefault`] = false;
-                        });
-                        await update(ref(db), updates);
-                    }
-
-                    // Create new address object matching checkout format
-                    const newAddress = {
-                        fullName: name,
-                        phone: phone,
-                        streetAddress: street,
-                        city: city,
-                        pincode: pincode,
-                        landmark: landmark,
-                        coordinates: {
-                            lat: this.finalPinLocation.lat,
-                            lng: this.finalPinLocation.lng
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => onSuccess(pos.coords.latitude, pos.coords.longitude),
+                        (err) => {
+                            let msg = 'Location permission denied';
+                            if (err.code === 1) msg = 'Location permission denied';
+                            if (err.code === 3) msg = 'Location request timed out';
+                            onError(msg);
                         },
-                        serviceable: true,
-                        createdAt: Date.now(),
-                        isDefault: shouldBeDefault
-                    };
-
-                    // Save to database using push() to generate unique key
-                    const addressesRef = ref(db, `users/${this.currentUser.uid}/addresses`);
-                    const newRef = push(addressesRef);
-                    await set(newRef, newAddress);
-                    
-                    btnText.textContent = 'Saved!';
-                    btn.style.background = '#60b246';
-                    
-                    setTimeout(async () => {
-                        this.showToast('success', 'Address saved successfully');
-                        this.closeModal('addAddressModal');
-                        await this.loadSavedAddresses();
-                        btn.disabled = false;
-                        btn.style.background = '';
-                        btnText.textContent = 'Save Address';
-                    }, 800);
-                } catch (error) {
-                    console.error('Error saving address:', error);
-                    this.showToast('error', 'Failed to save address');
-                    btn.disabled = false;
-                    btnText.textContent = 'Save Address';
+                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                    );
+                } else {
+                    onError('Geolocation unavailable');
                 }
             },
 
@@ -1389,7 +532,7 @@
                     this.renderUserDetails();
                 } catch (error) {
                     console.error('Error loading user details:', error);
-                    this.showToast('error', 'Failed to load profile details');
+                    this.showToast('error', 'Failed to load profile details', '');
                 }
             },
 
@@ -1419,7 +562,6 @@
                                 ...child.val()
                             });
                         });
-                        
                         this.savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
                     }
 
@@ -1443,7 +585,7 @@
                         <div class="empty-state">
                             <div class="empty-icon">📍</div>
                             <p>No saved addresses yet</p>
-                            <p style="font-size: 0.85rem; margin-top: 0.5rem;">Add addresses from checkout page</p>
+                            <p style="font-size: 0.85rem; margin-top: 0.5rem;">Click "Add New Address" to get started</p>
                         </div>
                     `;
                     return;
@@ -1488,10 +630,10 @@
                     
                     this.savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
                     this.renderAddresses();
-                    this.showToast('success', 'Default address updated');
+                    this.showToast('success', 'Default address updated', '');
                 } catch (error) {
                     console.error('Error setting default address:', error);
-                    this.showToast('error', 'Failed to update default address');
+                    this.showToast('error', 'Failed to update default address', '');
                 }
             },
 
@@ -1502,10 +644,10 @@
                     await remove(ref(db, `users/${this.currentUser.uid}/addresses/${id}`));
                     this.savedAddresses = this.savedAddresses.filter(a => a.id !== id);
                     this.renderAddresses();
-                    this.showToast('success', 'Address deleted successfully');
+                    this.showToast('success', 'Address deleted successfully', '');
                 } catch (error) {
                     console.error('Error deleting address:', error);
-                    this.showToast('error', 'Failed to delete address');
+                    this.showToast('error', 'Failed to delete address', '');
                 }
             },
 
@@ -1521,6 +663,42 @@
                 document.getElementById('editPhoneModal').classList.add('active');
             },
 
+            showAddAddressModal() {
+                const modal = document.getElementById('addAddressModal');
+                modal.classList.add('active');
+                
+                document.getElementById('addAddressForm').reset();
+                
+                if (this.userDetails) {
+                    document.getElementById('addressName').value = this.userDetails.name || '';
+                    const phoneDigits = (this.userDetails.phoneNumber || '').replace(/^\+91/, '');
+                    document.getElementById('addressPhone').value = phoneDigits;
+                }
+                
+                document.getElementById('setAsDefault').checked = this.savedAddresses.length === 0;
+                
+                this.finalPinLocation = null;
+                this.validLocationSet = false;
+                this.locationDetected = false;
+                this.updateCoordinatesDisplay();
+                this.updateAddAddressButton();
+                
+                setTimeout(() => {
+                    if (!this.map) {
+                        this.initMap();
+                    }
+                    
+                    if (this.map) {
+                        google.maps.event.trigger(this.map, 'resize');
+                        const defaultLocation = { lat: 22.9734, lng: 78.6569 };
+                        this.map.setCenter(defaultLocation);
+                        this.map.setZoom(5);
+                        this.marker.setPosition(defaultLocation);
+                        setTimeout(() => this.getLocation(), 500);
+                    }
+                }, 300);
+            },
+
             closeModal(modalId) {
                 document.getElementById(modalId).classList.remove('active');
             },
@@ -1530,7 +708,7 @@
                 const newName = document.getElementById('newName').value.trim();
                 
                 if (newName.length < 3) {
-                    this.showToast('error', 'Name must be at least 3 characters');
+                    this.showToast('error', 'Name must be at least 3 characters', '');
                     return;
                 }
 
@@ -1546,10 +724,10 @@
                     this.userDetails.name = newName;
                     this.renderUserDetails();
                     this.closeModal('editNameModal');
-                    this.showToast('success', 'Name updated successfully');
+                    this.showToast('success', 'Name updated successfully', '');
                 } catch (error) {
                     console.error('Error updating name:', error);
-                    this.showToast('error', 'Failed to update name');
+                    this.showToast('error', 'Failed to update name', '');
                 } finally {
                     btn.disabled = false;
                     btn.textContent = 'Save Changes';
@@ -1561,7 +739,7 @@
                 const newPhone = document.getElementById('newPhone').value.trim();
                 
                 if (!/^[0-9]{10}$/.test(newPhone)) {
-                    this.showToast('error', 'Enter a valid 10-digit phone number');
+                    this.showToast('error', 'Enter a valid 10-digit phone number', '');
                     return;
                 }
 
@@ -1578,27 +756,111 @@
                     this.userDetails.phoneNumber = fullPhone;
                     this.renderUserDetails();
                     this.closeModal('editPhoneModal');
-                    this.showToast('success', 'Phone number updated successfully');
+                    this.showToast('success', 'Phone number updated successfully', '');
                 } catch (error) {
                     console.error('Error updating phone:', error);
-                    this.showToast('error', 'Failed to update phone number');
+                    this.showToast('error', 'Failed to update phone number', '');
                 } finally {
                     btn.disabled = false;
                     btn.textContent = 'Save Changes';
                 }
             },
 
-            showToast(type, message) {
+            async saveNewAddress(event) {
+                event.preventDefault();
+                
+                if (!this.validLocationSet || !this.finalPinLocation) {
+                    return this.showToast('error', 'Location Required', 'You must set your delivery location on the map');
+                }
+
+                const name = document.getElementById('addressName').value.trim();
+                const phone = document.getElementById('addressPhone').value.trim();
+                const street = document.getElementById('addressStreet').value.trim();
+                const city = document.getElementById('addressCity').value.trim();
+                const pincode = document.getElementById('addressPincode').value.trim();
+                const landmark = document.getElementById('addressLandmark').value.trim();
+                const setDefault = document.getElementById('setAsDefault').checked;
+
+                if (!name || !phone || !street || !city || !pincode) {
+                    return this.showToast('error', 'Fill all required fields', '');
+                }
+
+                if (!/^[0-9]{10}$/.test(phone)) {
+                    return this.showToast('error', 'Enter valid 10-digit phone', '');
+                }
+
+                if (!/^[0-9]{6}$/.test(pincode)) {
+                    return this.showToast('error', 'Enter valid 6-digit pincode', '');
+                }
+
+                if (!this.SERVICEABLE_PINCODES[pincode]) {
+                    return this.showToast('error', 'Out of Service Area', `We don't deliver to pincode ${pincode} yet`);
+                }
+
+                const btn = document.getElementById('addAddressBtn');
+                const btnText = document.getElementById('addAddressBtnText');
+                btn.disabled = true;
+                btnText.textContent = 'Saving...';
+
+                try {
+                    const isFirstAddress = this.savedAddresses.length === 0;
+                    const shouldBeDefault = setDefault || isFirstAddress;
+
+                    if (shouldBeDefault && this.savedAddresses.length > 0) {
+                        const updates = {};
+                        this.savedAddresses.forEach(addr => {
+                            updates[`users/${this.currentUser.uid}/addresses/${addr.id}/isDefault`] = false;
+                        });
+                        await update(ref(db), updates);
+                    }
+
+                    const newAddress = {
+                        fullName: name,
+                        phone: phone,
+                        streetAddress: street,
+                        city: city,
+                        pincode: pincode,
+                        landmark: landmark,
+                        coordinates: {
+                            lat: this.finalPinLocation.lat,
+                            lng: this.finalPinLocation.lng
+                        },
+                        serviceable: true,
+                        createdAt: Date.now(),
+                        isDefault: shouldBeDefault
+                    };
+
+                    const addressesRef = ref(db, `users/${this.currentUser.uid}/addresses`);
+                    const newRef = push(addressesRef);
+                    await set(newRef, newAddress);
+                    
+                    btnText.textContent = 'Saved!';
+                    btn.style.background = '#60b246';
+                    
+                    setTimeout(async () => {
+                        this.showToast('success', 'Address saved successfully', '');
+                        this.closeModal('addAddressModal');
+                        await this.loadSavedAddresses();
+                        btn.disabled = false;
+                        btn.style.background = '';
+                        btnText.textContent = 'Save Address';
+                    }, 800);
+                } catch (error) {
+                    console.error('Error saving address:', error);
+                    this.showToast('error', 'Failed to save address', '');
+                    btn.disabled = false;
+                    btnText.textContent = 'Save Address';
+                }
+            },
+
+            showToast(type, msg, sub) {
                 const toast = document.getElementById('toast');
                 const overlay = document.getElementById('toastOverlay');
-                const icon = document.getElementById('toastIcon');
-                const msg = document.getElementById('toastMessage');
-
                 toast.className = `toast show toast-${type}`;
-                icon.textContent = type === 'success' ? '✓' : '✕';
-                msg.textContent = message;
                 overlay.classList.add('show');
-
+                document.getElementById('toastIcon').textContent = type === 'success' ? '✓' : '✕';
+                document.getElementById('toastMessage').textContent = msg;
+                document.getElementById('toastSubMessage').textContent = sub;
                 setTimeout(() => {
                     toast.classList.remove('show');
                     overlay.classList.remove('show');
@@ -1618,17 +880,14 @@
                         window.location.href = 'index.html';
                     } catch (error) {
                         console.error('Logout error:', error);
-                        this.showToast('error', 'Failed to logout');
+                        this.showToast('error', 'Failed to logout', '');
                     }
                 }
             }
         };
 
-        document.addEventListener('DOMContentLoaded', () => {
-            APP.init();
-        });
+        document.addEventListener('DOMContentLoaded', () => APP.init());
 
-        // Click outside modal to close
         document.getElementById('editNameModal').addEventListener('click', (e) => {
             if (e.target.id === 'editNameModal') APP.closeModal('editNameModal');
         });
