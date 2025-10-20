@@ -955,58 +955,81 @@
 
             loadGoogleMaps() {
                 if (window.google?.maps) {
+                    console.log('Google Maps already loaded');
                     return;
                 }
+                
+                // Create callback function globally
+                window.initGoogleMap = () => {
+                    console.log('Google Maps callback triggered');
+                    this.googleMapsLoaded = true;
+                };
+                
                 const script = document.createElement('script');
-                script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDsn16p7w8b-x8pEA_WTO5F2oUk4MHwcUc&callback=APP.initMap';
+                script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDsn16p7w8b-x8pEA_WTO5F2oUk4MHwcUc&callback=initGoogleMap&loading=async';
                 script.async = true;
                 script.defer = true;
+                script.onerror = () => {
+                    console.error('Failed to load Google Maps');
+                    this.showToast('error', 'Failed to load Google Maps. Please refresh the page.');
+                };
                 document.head.appendChild(script);
             },
 
             initMap() {
-                const defaultLocation = { lat: 22.9734, lng: 78.6569 };
-                this.map = new google.maps.Map(document.getElementById('map'), {
-                    center: defaultLocation,
-                    zoom: 5,
-                    mapTypeControl: false,
-                    streetViewControl: false,
-                    fullscreenControl: false
-                });
+                if (!window.google?.maps) {
+                    console.error('Google Maps not loaded');
+                    return;
+                }
 
-                this.marker = new google.maps.Marker({
-                    position: defaultLocation,
-                    map: this.map,
-                    draggable: true,
-                    animation: google.maps.Animation.DROP
-                });
+                try {
+                    const defaultLocation = { lat: 22.9734, lng: 78.6569 };
+                    this.map = new google.maps.Map(document.getElementById('map'), {
+                        center: defaultLocation,
+                        zoom: 5,
+                        mapTypeControl: false,
+                        streetViewControl: false,
+                        fullscreenControl: false
+                    });
 
-                this.finalPinLocation = null;
-                this.validLocationSet = false;
-                this.updateCoordinatesDisplay();
-                this.updateAddAddressButton();
+                    this.marker = new google.maps.Marker({
+                        position: defaultLocation,
+                        map: this.map,
+                        draggable: true,
+                        animation: google.maps.Animation.DROP
+                    });
 
-                this.map.addListener('click', (e) => {
-                    this.setMarkerPosition(e.latLng, false);
-                });
-
-                this.marker.addListener('dragend', (e) => {
-                    this.setMarkerPosition(e.latLng, false);
-                    this.showToast('success', 'Pin location updated');
-                });
-
-                this.marker.addListener('drag', (e) => {
-                    this.finalPinLocation = { lat: e.latLng.lat(), lng: e.latLng.lng() };
-                    this.validLocationSet = true;
+                    this.finalPinLocation = null;
+                    this.validLocationSet = false;
                     this.updateCoordinatesDisplay();
                     this.updateAddAddressButton();
-                });
 
-                this.googleMapsLoaded = true;
-                console.log('Google Maps initialized');
+                    this.map.addListener('click', (e) => {
+                        this.setMarkerPosition(e.latLng, false);
+                    });
+
+                    this.marker.addListener('dragend', (e) => {
+                        this.setMarkerPosition(e.latLng, false);
+                        this.showToast('success', 'Pin location updated');
+                    });
+
+                    this.marker.addListener('drag', (e) => {
+                        this.finalPinLocation = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+                        this.validLocationSet = true;
+                        this.updateCoordinatesDisplay();
+                        this.updateAddAddressButton();
+                    });
+
+                    console.log('Google Maps initialized successfully');
+                } catch (error) {
+                    console.error('Error initializing map:', error);
+                    this.showToast('error', 'Failed to initialize map');
+                }
             },
 
             setMarkerPosition(latLng, isInitialDetection = false) {
+                if (!latLng) return;
+                
                 this.finalPinLocation = { lat: latLng.lat(), lng: latLng.lng() };
                 this.validLocationSet = true;
                 this.marker.setPosition(latLng);
@@ -1014,14 +1037,26 @@
                 this.updateCoordinatesDisplay();
                 this.updateAddAddressButton();
 
-                new google.maps.Geocoder().geocode({ location: latLng }, (results, status) => {
-                    if (status === 'OK' && results[0]) {
-                        this.populateAddressFields(results[0], isInitialDetection);
-                    }
-                });
+                // Geocode to get address
+                if (window.google?.maps?.Geocoder) {
+                    const geocoder = new google.maps.Geocoder();
+                    geocoder.geocode({ location: latLng }, (results, status) => {
+                        if (status === 'OK' && results && results[0]) {
+                            console.log('Geocoding successful:', results[0]);
+                            this.populateAddressFields(results[0], isInitialDetection);
+                        } else {
+                            console.error('Geocoding failed:', status);
+                        }
+                    });
+                }
             },
 
             populateAddressFields(result, isInitialDetection) {
+                if (!result || !result.address_components) {
+                    console.log('No address components found');
+                    return;
+                }
+
                 const comps = result.address_components;
                 const addrFields = {};
 
@@ -1031,14 +1066,19 @@
                     if (types.includes('postal_code')) addrFields.pin = comp.long_name;
                     if (types.includes('sublocality')) addrFields.area = comp.long_name;
                     if (types.includes('sublocality_level_1')) addrFields.subArea = comp.long_name;
+                    if (types.includes('sublocality_level_2')) addrFields.subArea2 = comp.long_name;
                     if (types.includes('route')) addrFields.street = comp.long_name;
+                    if (types.includes('premise')) addrFields.premise = comp.long_name;
                 });
+
+                console.log('Extracted address fields:', addrFields);
 
                 const updateField = (id, value, highlightIfNew = false) => {
                     const el = document.getElementById(id);
                     if (el && value) {
                         const oldVal = el.value;
                         el.value = value;
+                        console.log(`Updated ${id} with: ${value}`);
                         if (highlightIfNew && !oldVal) {
                             el.classList.add('auto-filled');
                             setTimeout(() => el.classList.remove('auto-filled'), 3000);
@@ -1046,14 +1086,30 @@
                     }
                 };
 
-                const addressParts = [addrFields.street, addrFields.area, addrFields.subArea].filter(Boolean);
-                const fullAddress = addressParts.join(', ');
+                // Build complete address from available parts
+                const addressParts = [
+                    addrFields.premise,
+                    addrFields.street, 
+                    addrFields.subArea2,
+                    addrFields.subArea,
+                    addrFields.area
+                ].filter(Boolean);
+                
+                const fullAddress = addressParts.length > 0 ? addressParts.join(', ') : '';
 
-                updateField('addressStreet', fullAddress, !isInitialDetection);
-                updateField('addressCity', addrFields.city, !isInitialDetection);
-                updateField('addressPincode', addrFields.pin, !isInitialDetection);
+                if (fullAddress) {
+                    updateField('addressStreet', fullAddress, !isInitialDetection);
+                }
+                
+                if (addrFields.city) {
+                    updateField('addressCity', addrFields.city, !isInitialDetection);
+                }
+                
+                if (addrFields.pin) {
+                    updateField('addressPincode', addrFields.pin, !isInitialDetection);
+                }
 
-                if (!isInitialDetection) {
+                if (!isInitialDetection && (fullAddress || addrFields.city || addrFields.pin)) {
                     this.showToast('success', 'Address auto-filled from location');
                 }
             },
@@ -1084,33 +1140,47 @@
             },
 
             getLocation() {
+                if (!navigator.geolocation) {
+                    this.showToast('error', 'Geolocation not supported by your browser');
+                    return;
+                }
+
                 const btn = document.getElementById('locationBtn');
                 const status = document.getElementById('locationStatus');
+                
+                if (!btn || !status) return;
+                
                 btn.disabled = true;
                 btn.innerHTML = '<span>⏳ Detecting...</span>';
                 status.textContent = 'Getting your location...';
+                status.style.color = '#666';
                 this.locationDetected = false;
 
                 const onSuccess = (lat, lng) => {
                     if (this.locationDetected) return;
                     this.locationDetected = true;
                     this.validLocationSet = true;
+                    
+                    console.log('Location detected:', lat, lng);
+                    
                     const latLng = new google.maps.LatLng(lat, lng);
                     this.map.setCenter(latLng);
                     this.map.setZoom(15);
                     this.setMarkerPosition(latLng, true);
+                    
                     btn.innerHTML = '<span>✓ Location Detected</span>';
                     btn.disabled = false;
-                    status.textContent = '✓ Location detected successfully - You can now save address';
+                    status.textContent = '✓ Location detected successfully';
                     status.style.color = '#60b246';
                     this.updateAddAddressButton();
                 };
 
                 const onError = (msg) => {
                     if (this.locationDetected) return;
+                    console.error('Location error:', msg);
                     btn.innerHTML = '<span>📍 Use My Location</span>';
                     btn.disabled = false;
-                    status.textContent = msg + ' - You must drag the marker to your location';
+                    status.textContent = msg + ' - Please drag the marker to your location';
                     status.style.color = '#ff6b6b';
                     this.validLocationSet = false;
                     this.finalPinLocation = null;
@@ -1118,28 +1188,32 @@
                     this.updateAddAddressButton();
                 };
 
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        (pos) => onSuccess(pos.coords.latitude, pos.coords.longitude),
-                        (err) => {
-                            let msg = 'Location permission denied';
-                            if (err.code === 1) msg = 'Location permission denied';
-                            if (err.code === 3) msg = 'Location request timed out';
-                            onError(msg);
-                        },
-                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-                    );
-                } else {
-                    onError('Geolocation unavailable');
-                }
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        console.log('Geolocation success:', pos.coords);
+                        onSuccess(pos.coords.latitude, pos.coords.longitude);
+                    },
+                    (err) => {
+                        console.error('Geolocation error:', err);
+                        let msg = 'Location permission denied';
+                        if (err.code === 1) msg = 'Location permission denied';
+                        else if (err.code === 2) msg = 'Location unavailable';
+                        else if (err.code === 3) msg = 'Location request timed out';
+                        onError(msg);
+                    },
+                    { 
+                        enableHighAccuracy: true, 
+                        timeout: 15000, 
+                        maximumAge: 0 
+                    }
+                );
             },
 
             showAddAddressModal() {
-                if (!this.googleMapsLoaded && window.google?.maps) {
-                    this.initMap();
-                }
+                const modal = document.getElementById('addAddressModal');
+                modal.classList.add('active');
                 
-                document.getElementById('addAddressModal').classList.add('active');
+                // Reset form
                 document.getElementById('addAddressForm').reset();
                 
                 // Pre-fill name and phone from user details
@@ -1152,24 +1226,59 @@
                 // Auto-set as default if no addresses exist
                 document.getElementById('setAsDefault').checked = this.savedAddresses.length === 0;
                 
-                const defaultLocation = { lat: 22.9734, lng: 78.6569 };
+                // Reset location state
                 this.finalPinLocation = null;
                 this.validLocationSet = false;
+                this.locationDetected = false;
+                this.updateCoordinatesDisplay();
+                this.updateAddAddressButton();
                 
+                // Initialize or refresh map
                 setTimeout(() => {
-                    if (this.map) {
-                        google.maps.event.trigger(this.map, 'resize');
-                        this.map.setCenter(defaultLocation);
-                        this.map.setZoom(5);
-                        this.marker.setPosition(defaultLocation);
-                        this.updateCoordinatesDisplay();
-                        this.updateAddAddressButton();
-                        this.locationDetected = false;
+                    if (!window.google?.maps) {
+                        console.log('Google Maps not loaded yet, waiting...');
+                        document.getElementById('coordDisplay').innerHTML = '⏳ Loading Google Maps...';
                         
-                        // Auto-trigger location detection
+                        // Wait for Google Maps to load
+                        const checkMaps = setInterval(() => {
+                            if (window.google?.maps) {
+                                clearInterval(checkMaps);
+                                console.log('Google Maps now available, initializing...');
+                                this.initMap();
+                                setTimeout(() => {
+                                    this.resetMapView();
+                                    this.getLocation();
+                                }, 300);
+                            }
+                        }, 500);
+                        return;
+                    }
+                    
+                    // Maps already loaded
+                    if (!this.map) {
+                        console.log('Initializing map for first time...');
+                        this.initMap();
+                    }
+                    
+                    if (this.map) {
+                        console.log('Refreshing map view...');
+                        google.maps.event.trigger(this.map, 'resize');
+                        this.resetMapView();
+                        
+                        // Auto-trigger location detection after a brief delay
                         setTimeout(() => this.getLocation(), 500);
                     }
                 }, 300);
+            },
+
+            resetMapView() {
+                const defaultLocation = { lat: 22.9734, lng: 78.6569 };
+                if (this.map && this.marker) {
+                    this.map.setCenter(defaultLocation);
+                    this.map.setZoom(5);
+                    this.marker.setPosition(defaultLocation);
+                    console.log('Map view reset to default location');
+                }
             },
 
             async saveNewAddress(event) {
