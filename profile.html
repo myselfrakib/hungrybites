@@ -337,6 +337,7 @@
             loadGoogleMaps() {
                 if (window.google?.maps) {
                     this.googleMapsLoaded = true;
+                    console.log('Google Maps already loaded');
                     return;
                 }
                 const script = document.createElement('script');
@@ -348,11 +349,14 @@
 
             onMapsLoaded() {
                 this.googleMapsLoaded = true;
-                console.log('Google Maps loaded');
+                console.log('Google Maps loaded successfully');
             },
 
             initMap() {
-                if (!window.google?.maps) return;
+                if (!window.google?.maps) {
+                    console.error('Google Maps not loaded yet');
+                    return;
+                }
 
                 const defaultLocation = { lat: 22.9734, lng: 78.6569 };
                 this.map = new google.maps.Map(document.getElementById('map'), {
@@ -386,6 +390,8 @@
                     this.updateCoordinatesDisplay();
                     this.updateAddAddressButton();
                 });
+
+                console.log('Map initialized successfully');
             },
 
             setMarkerPosition(latLng, isInitialDetection = false) {
