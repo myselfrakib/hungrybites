@@ -157,50 +157,134 @@
             padding: 0 4px;
         }
 
-        .free-delivery-banner {
-            background: linear-gradient(135deg, var(--success-green) 0%, #4a9635 100%);
-            color: white;
-            padding: 0.9rem 1rem;
-            text-align: center;
-            font-weight: 600;
-            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
-            box-shadow: 0 2px 8px rgba(96, 178, 70, 0.3);
+        /* Sliding Toast Container */
+        .sliding-toast-container {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            z-index: 2000;
+            perspective: 1000px;
+        }
+
+        .sliding-toast {
+            position: absolute;
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            animation: slideDown 0.4s ease-out;
+            justify-content: space-between;
+            gap: 1rem;
+            cursor: pointer;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.6s;
+            touch-action: manipulation;
         }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .toast-delivery {
+            background: linear-gradient(135deg, var(--success-green) 0%, #4a9635 100%);
+            color: white;
+            transform: translateX(0) rotateY(0deg);
+            opacity: 1;
+            z-index: 2;
         }
 
-        .delivery-icon {
-            font-size: 1.3rem;
-            animation: bounce 2s infinite;
+        .toast-delivery.slide-out {
+            transform: translateX(-150%) rotateY(-90deg);
+            opacity: 0;
         }
 
-        @keyframes bounce {
+        .toast-call {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            transform: translateX(150%) rotateY(90deg);
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .toast-call.slide-in {
+            transform: translateX(0) rotateY(0deg);
+            opacity: 1;
+            z-index: 2;
+        }
+
+        .toast-delivery.slide-back {
+            transform: translateX(0) rotateY(0deg);
+            opacity: 1;
+            z-index: 2;
+        }
+
+        .toast-call.slide-out-right {
+            transform: translateX(150%) rotateY(90deg);
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex: 1;
+        }
+
+        .toast-icon {
+            font-size: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
             0%, 100% {
-                transform: translateY(0);
+                transform: scale(1);
             }
             50% {
-                transform: translateY(-5px);
+                transform: scale(1.1);
             }
+        }
+
+        .toast-text {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .toast-subtitle {
+            font-size: 0.85rem;
+            opacity: 0.95;
+        }
+
+        .toast-action {
+            background: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: transform 0.2s;
+        }
+
+        .toast-delivery .toast-action {
+            color: var(--success-green);
+        }
+
+        .toast-call .toast-action {
+            color: #ff6b6b;
+        }
+
+        .toast-action:active {
+            transform: scale(0.95);
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 1.5rem 0.75rem;
+            padding: 1.5rem 0.75rem 8rem 0.75rem;
         }
 
         .category-section {
@@ -407,52 +491,6 @@
             margin-bottom: 1rem;
         }
 
-        .notification {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%) translateY(150px);
-            background: var(--blue-gray);
-            color: white;
-            padding: 0.75rem 1rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            opacity: 0;
-            transition: all 0.3s;
-            z-index: 2000;
-            max-width: 90%;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .notification.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .view-cart-btn {
-            background: white;
-            color: var(--blue-gray);
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-            white-space: nowrap;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            touch-action: manipulation;
-        }
-
-        .view-cart-btn:active {
-            transform: scale(0.95);
-        }
-
         .free-delivery-toast {
             position: fixed;
             top: 50%;
@@ -503,10 +541,19 @@
 
         .toast-overlay.show {
             display: block;
-            animation: fadeIn 0.3s;
+            animation: fadeInOverlay 0.3s;
         }
 
-        .toast-icon {
+        @keyframes fadeInOverlay {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .celebration-icon {
             font-size: 4rem;
             margin-bottom: 1rem;
             animation: celebrationBounce 0.6s ease-out;
@@ -524,21 +571,21 @@
             }
         }
 
-        .toast-title {
+        .celebration-title {
             font-size: 1.5rem;
             font-weight: bold;
             color: var(--success-green);
             margin-bottom: 0.5rem;
         }
 
-        .toast-message {
+        .celebration-message {
             font-size: 1rem;
             color: #666;
             margin-bottom: 1.5rem;
             line-height: 1.5;
         }
 
-        .toast-close-btn {
+        .celebration-close-btn {
             background: var(--success-green);
             color: white;
             border: none;
@@ -550,7 +597,7 @@
             transition: all 0.3s;
         }
 
-        .toast-close-btn:active {
+        .celebration-close-btn:active {
             transform: scale(0.95);
         }
 
@@ -584,17 +631,11 @@
                 transform: scale(1.05);
             }
 
-            .notification {
-                bottom: auto;
-                top: 100px;
+            .sliding-toast-container {
                 right: 2rem;
                 left: auto;
-                transform: translateX(400px);
-                max-width: 350px;
-            }
-
-            .notification.show {
-                transform: translateX(0);
+                transform: none;
+                max-width: 420px;
             }
         }
     </style>
@@ -622,12 +663,6 @@
         <span class="nav-item" onclick="logout()">🚪 Logout</span>
     </div>
 
-    <div class="free-delivery-banner">
-        <span class="delivery-icon">🚚</span>
-        <span>FREE Delivery on orders above ₹200!</span>
-        <span class="delivery-icon">🎉</span>
-    </div>
-
     <div class="container" id="mainContainer">
         <div class="loading">
             <div class="spinner"></div>
@@ -635,16 +670,29 @@
         </div>
     </div>
 
-    <div class="notification" id="notification">
-        <a href="checkout.html" class="view-cart-btn">🛒 Order Now</a>
-    </div>
-
-    <div class="toast-overlay" id="toastOverlay" onclick="closeFreeDeliveryToast()"></div>
-    <div class="free-delivery-toast" id="freeDeliveryToast">
-        <div class="toast-icon">🎉</div>
-        <div class="toast-title">Congratulations!</div>
-        <div class="toast-message">You've unlocked <strong>FREE Delivery</strong>!<br>Your order is above ₹200.</div>
-        <button class="toast-close-btn" onclick="closeFreeDeliveryToast()">Awesome!</button>
+    <!-- Sliding Toast Container -->
+    <div class="sliding-toast-container" id="slidingToastContainer">
+        <div class="sliding-toast toast-delivery" id="toastDelivery" onclick="goToCheckout()">
+            <div class="toast-content">
+                <div class="toast-icon">🚚</div>
+                <div class="toast-text">
+                    <div class="toast-title">FREE Delivery!</div>
+                    <div class="toast-subtitle">Orders above ₹200</div>
+                </div>
+            </div>
+            <div class="toast-action">Order Now</div>
+        </div>
+        
+        <div class="sliding-toast toast-call" id="toastCall" onclick="callToOrder()">
+            <div class="toast-content">
+                <div class="toast-icon">📞</div>
+                <div class="toast-text">
+                    <div class="toast-title">Call to Order</div>
+                    <div class="toast-subtitle">98837 80399</div>
+                </div>
+            </div>
+            <div class="toast-action">Call Now</div>
+        </div>
     </div>
 
     <script type="module">
@@ -670,7 +718,7 @@
         let cart = [];
         let allFoodItems = {};
         let currentUser = null;
-        const FREE_DELIVERY_THRESHOLD = 200;
+        let toastInterval;
         
         const CATEGORY_ORDER = [
             { key: 'Maagie', display: 'Maggi' },
@@ -684,8 +732,7 @@
         
         loadCart();
         updateCartBadge();
-        updateNotificationVisibility();
-        loadFreeDeliveryToastState();
+        startToastRotation();
 
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
@@ -694,6 +741,38 @@
                 syncCartFromDB(user.uid);
             }
         });
+
+        // Toast Rotation System
+        function startToastRotation() {
+            const deliveryToast = document.getElementById('toastDelivery');
+            const callToast = document.getElementById('toastCall');
+            let showingDelivery = true;
+
+            toastInterval = setInterval(() => {
+                if (showingDelivery) {
+                    // Slide out delivery, slide in call
+                    deliveryToast.classList.add('slide-out');
+                    deliveryToast.classList.remove('slide-back');
+                    callToast.classList.add('slide-in');
+                    callToast.classList.remove('slide-out-right');
+                } else {
+                    // Slide out call, slide in delivery
+                    callToast.classList.add('slide-out-right');
+                    callToast.classList.remove('slide-in');
+                    deliveryToast.classList.add('slide-back');
+                    deliveryToast.classList.remove('slide-out');
+                }
+                showingDelivery = !showingDelivery;
+            }, 4000);
+        }
+
+        window.goToCheckout = function() {
+            window.location.href = 'checkout.html';
+        };
+
+        window.callToOrder = function() {
+            window.location.href = 'tel:9883780399';
+        };
 
         function syncCartFromDB(userId) {
             const userCartRef = ref(db, `carts/${userId}`);
@@ -709,7 +788,6 @@
                         cart = newCart;
                         saveCart();
                         updateCartBadge();
-                        updateNotificationVisibility();
                         renderAllCategories();
                     }
                 } else {
@@ -926,66 +1004,6 @@
             });
         }
 
-        function checkFreeDeliveryUnlocked() {
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const wasAboveThreshold = getFreeDeliveryToastState();
-            
-            if (subtotal >= FREE_DELIVERY_THRESHOLD && !wasAboveThreshold) {
-                saveFreeDeliveryToastState(true);
-                showFreeDeliveryToast();
-            } else if (subtotal < FREE_DELIVERY_THRESHOLD && wasAboveThreshold) {
-                saveFreeDeliveryToastState(false);
-            }
-        }
-
-        function showFreeDeliveryToast() {
-            const toast = document.getElementById('freeDeliveryToast');
-            const overlay = document.getElementById('toastOverlay');
-            
-            overlay.classList.add('show');
-            toast.classList.add('show');
-            
-            setTimeout(() => {
-                closeFreeDeliveryToast();
-            }, 5000);
-        }
-
-        window.closeFreeDeliveryToast = function() {
-            const toast = document.getElementById('freeDeliveryToast');
-            const overlay = document.getElementById('toastOverlay');
-            
-            toast.classList.remove('show');
-            overlay.classList.remove('show');
-        };
-
-        function saveFreeDeliveryToastState(shown) {
-            try {
-                sessionStorage.setItem('freeDeliveryToastShown', shown.toString());
-            } catch (error) {
-                console.error('Error saving toast state:', error);
-            }
-        }
-
-        function getFreeDeliveryToastState() {
-            try {
-                return sessionStorage.getItem('freeDeliveryToastShown') === 'true';
-            } catch (error) {
-                console.error('Error loading toast state:', error);
-                return false;
-            }
-        }
-
-        function loadFreeDeliveryToastState() {
-            try {
-                const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                if (subtotal >= FREE_DELIVERY_THRESHOLD) {
-                    saveFreeDeliveryToastState(true);
-                }
-            } catch (error) {
-                console.error('Error loading toast state:', error);
-            }
-        }
-
         window.addToCart = function(id, name, price, emoji, category) {
             const existingItem = cart.find(item => item.id === id);
             
@@ -1005,9 +1023,7 @@
             saveCart();
             syncCartToDB();
             updateCartBadge();
-            updateNotificationVisibility();
             updateButtonUI(id, existingItem ? existingItem.quantity : 1);
-            checkFreeDeliveryUnlocked();
         };
 
         window.increaseQuantity = function(id) {
@@ -1017,9 +1033,7 @@
                 saveCart();
                 syncCartToDB();
                 updateCartBadge();
-                updateNotificationVisibility();
                 updateButtonUI(id, item.quantity);
-                checkFreeDeliveryUnlocked();
             }
         };
 
@@ -1031,17 +1045,13 @@
                     saveCart();
                     syncCartToDB();
                     updateCartBadge();
-                    updateNotificationVisibility();
                     updateButtonUI(id, item.quantity);
-                    checkFreeDeliveryUnlocked();
                 } else {
                     cart = cart.filter(item => item.id !== id);
                     saveCart();
                     syncCartToDB();
                     updateCartBadge();
-                    updateNotificationVisibility();
                     updateButtonUI(id, 0);
-                    checkFreeDeliveryUnlocked();
                 }
             }
         };
@@ -1104,17 +1114,6 @@
             }
         }
 
-        function updateNotificationVisibility() {
-            const notification = document.getElementById('notification');
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            
-            if (totalItems > 0) {
-                notification.classList.add('show');
-            } else {
-                notification.classList.remove('show');
-            }
-        }
-
         window.toggleMenu = function() {
             const hamburger = document.querySelector('.hamburger');
             const navMenu = document.getElementById('navMenu');
@@ -1127,8 +1126,8 @@
             if (confirm('Are you sure you want to logout?')) {
                 signOut(auth).then(() => {
                     localStorage.removeItem('midnightPlazaCart');
-                    sessionStorage.removeItem('freeDeliveryToastShown');
                     cart = [];
+                    clearInterval(toastInterval);
                     window.location.href = 'index.html';
                 }).catch((error) => {
                     console.error('Logout error:', error);
