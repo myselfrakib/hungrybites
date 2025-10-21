@@ -2320,7 +2320,11 @@
             const phone = order.deliveryAddress?.phone || '';
             const customerName = order.deliveryAddress?.fullName || 'N/A';
             
-            const mapUrl = fullAddress ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}` : '';
+            // Better approach using coordinates
+const coords = order.deliveryAddress?.coordinates;
+const mapUrl = coords ? 
+    `https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}` : 
+    (fullAddress ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}` : '');
             const callUrl = phone ? `tel:${phone}` : '';
             
             let ctaButtons = '';
@@ -3084,3 +3088,4 @@
     </script>
 </body>
 </html>
+
