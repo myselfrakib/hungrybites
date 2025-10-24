@@ -25,6 +25,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--baby-powder);
             color: #333;
+            overflow-x: hidden;
         }
 
         .navbar {
@@ -157,67 +158,74 @@
             padding: 0 4px;
         }
 
+        /* Sliding Toast Container - FIXED */
         .sliding-toast-container {
             position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 400px;
+            bottom: 1.5rem;
+            left: 1rem;
+            right: 1rem;
             z-index: 2000;
-            perspective: 1000px;
+            max-width: 400px;
+            margin: 0 auto;
+            height: auto;
+            overflow: hidden;
         }
 
         .sliding-toast {
             position: absolute;
+            left: 0;
+            right: 0;
             width: 100%;
-            padding: 1rem 1.5rem;
+            padding: 1rem 1.2rem;
             border-radius: 16px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.25);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 1rem;
+            gap: 0.75rem;
             cursor: pointer;
-            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.6s;
+            transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
             touch-action: manipulation;
         }
 
         .toast-delivery {
             background: linear-gradient(135deg, var(--success-green) 0%, #4a9635 100%);
             color: white;
-            transform: translateX(0) rotateY(0deg);
+            transform: translateX(0);
             opacity: 1;
             z-index: 2;
+            position: relative;
         }
 
         .toast-delivery.slide-out {
-            transform: translateX(-150%) rotateY(-90deg);
+            transform: translateX(-100%);
             opacity: 0;
         }
 
         .toast-call {
             background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
             color: white;
-            transform: translateX(150%) rotateY(90deg);
+            transform: translateX(100%);
             opacity: 0;
             z-index: 1;
+            position: absolute;
+            top: 0;
         }
 
         .toast-call.slide-in {
-            transform: translateX(0) rotateY(0deg);
+            transform: translateX(0);
             opacity: 1;
             z-index: 2;
         }
 
         .toast-delivery.slide-back {
-            transform: translateX(0) rotateY(0deg);
+            transform: translateX(0);
             opacity: 1;
             z-index: 2;
         }
 
         .toast-call.slide-out-right {
-            transform: translateX(150%) rotateY(90deg);
+            transform: translateX(100%);
             opacity: 0;
             z-index: 1;
         }
@@ -227,11 +235,13 @@
             align-items: center;
             gap: 0.75rem;
             flex: 1;
+            min-width: 0;
         }
 
         .toast-icon {
-            font-size: 2rem;
+            font-size: clamp(1.5rem, 5vw, 2rem);
             animation: pulse 2s infinite;
+            flex-shrink: 0;
         }
 
         @keyframes pulse {
@@ -245,27 +255,29 @@
 
         .toast-text {
             flex: 1;
+            min-width: 0;
         }
 
         .toast-title {
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: clamp(0.95rem, 3vw, 1.1rem);
             margin-bottom: 0.2rem;
         }
 
         .toast-subtitle {
-            font-size: 0.85rem;
+            font-size: clamp(0.8rem, 2.5vw, 0.85rem);
             opacity: 0.95;
         }
 
         .toast-action {
             background: white;
-            padding: 0.6rem 1.2rem;
+            padding: 0.6rem 1rem;
             border-radius: 10px;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
             white-space: nowrap;
             transition: transform 0.2s;
+            flex-shrink: 0;
         }
 
         .toast-delivery .toast-action {
@@ -490,6 +502,116 @@
             margin-bottom: 1rem;
         }
 
+        .free-delivery-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            z-index: 10000;
+            display: none;
+            text-align: center;
+            min-width: 300px;
+            max-width: 90%;
+            opacity: 0;
+            border-left: 6px solid var(--success-green);
+        }
+
+        .free-delivery-toast.show {
+            display: block;
+            animation: toastPop 0.5s ease-out forwards;
+        }
+
+        @keyframes toastPop {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .toast-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            display: none;
+        }
+
+        .toast-overlay.show {
+            display: block;
+            animation: fadeInOverlay 0.3s;
+        }
+
+        @keyframes fadeInOverlay {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .celebration-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: celebrationBounce 0.6s ease-out;
+        }
+
+        @keyframes celebrationBounce {
+            0%, 100% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.2) rotate(-10deg);
+            }
+            75% {
+                transform: scale(1.2) rotate(10deg);
+            }
+        }
+
+        .celebration-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--success-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .celebration-message {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .celebration-close-btn {
+            background: var(--success-green);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .celebration-close-btn:active {
+            transform: scale(0.95);
+        }
+
         @media (min-width: 768px) {
             .hamburger {
                 display: none;
@@ -523,8 +645,40 @@
             .sliding-toast-container {
                 right: 2rem;
                 left: auto;
-                transform: none;
+                bottom: 2rem;
+                margin: 0;
                 max-width: 420px;
+                width: 420px;
+            }
+
+            .sliding-toast {
+                padding: 1rem 1.5rem;
+            }
+
+            .toast-action {
+                padding: 0.6rem 1.2rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .sliding-toast-container {
+                bottom: 1rem;
+                left: 0.75rem;
+                right: 0.75rem;
+            }
+
+            .sliding-toast {
+                padding: 0.85rem 1rem;
+                gap: 0.5rem;
+            }
+
+            .toast-action {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.75rem;
+            }
+
+            .toast-icon {
+                font-size: 1.4rem;
             }
         }
     </style>
@@ -559,6 +713,7 @@
         </div>
     </div>
 
+    <!-- Sliding Toast Container -->
     <div class="sliding-toast-container" id="slidingToastContainer">
         <div class="sliding-toast toast-delivery" id="toastDelivery" onclick="goToCheckout()">
             <div class="toast-content">
@@ -630,6 +785,7 @@
             }
         });
 
+        // Toast Rotation System
         function startToastRotation() {
             const deliveryToast = document.getElementById('toastDelivery');
             const callToast = document.getElementById('toastCall');
@@ -637,11 +793,13 @@
 
             toastInterval = setInterval(() => {
                 if (showingDelivery) {
+                    // Slide out delivery, slide in call
                     deliveryToast.classList.add('slide-out');
                     deliveryToast.classList.remove('slide-back');
                     callToast.classList.add('slide-in');
                     callToast.classList.remove('slide-out-right');
                 } else {
+                    // Slide out call, slide in delivery
                     callToast.classList.add('slide-out-right');
                     callToast.classList.remove('slide-in');
                     deliveryToast.classList.add('slide-back');
@@ -677,6 +835,11 @@
                     }
                 } else {
                     if (cart.length > 0) {
+                        cart.forEach(item => {
+                            if (!item.addedAt) {
+                                item.addedAt = new Date().toISOString();
+                            }
+                        });
                         syncCartToDB();
                     }
                 }
@@ -873,9 +1036,9 @@
                 return;
             }
             
-            const cartData = {};
-            const timestamp = Date.now();
+            const timestamp = new Date().toISOString();
             
+            const cartData = {};
             cart.forEach(item => {
                 cartData[item.id] = {
                     name: item.name,
@@ -883,6 +1046,7 @@
                     emoji: item.emoji,
                     category: item.category,
                     quantity: item.quantity,
+                    addedAt: item.addedAt || timestamp,
                     updatedAt: timestamp
                 };
             });
@@ -894,9 +1058,11 @@
 
         window.addToCart = function(id, name, price, emoji, category) {
             const existingItem = cart.find(item => item.id === id);
+            const timestamp = new Date().toISOString();
             
             if (existingItem) {
                 existingItem.quantity += 1;
+                existingItem.updatedAt = timestamp;
             } else {
                 cart.push({
                     id: id,
@@ -904,7 +1070,9 @@
                     price: price,
                     emoji: emoji,
                     category: category,
-                    quantity: 1
+                    quantity: 1,
+                    addedAt: timestamp,
+                    updatedAt: timestamp
                 });
             }
 
@@ -918,6 +1086,7 @@
             const item = cart.find(item => item.id === id);
             if (item) {
                 item.quantity += 1;
+                item.updatedAt = new Date().toISOString();
                 saveCart();
                 syncCartToDB();
                 updateCartBadge();
@@ -930,6 +1099,7 @@
             if (item) {
                 if (item.quantity > 1) {
                     item.quantity -= 1;
+                    item.updatedAt = new Date().toISOString();
                     saveCart();
                     syncCartToDB();
                     updateCartBadge();
