@@ -157,7 +157,6 @@
             padding: 0 4px;
         }
 
-        /* Sliding Toast Container */
         .sliding-toast-container {
             position: fixed;
             bottom: 2rem;
@@ -491,116 +490,6 @@
             margin-bottom: 1rem;
         }
 
-        .free-delivery-toast {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.8);
-            background: white;
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            z-index: 10000;
-            display: none;
-            text-align: center;
-            min-width: 300px;
-            max-width: 90%;
-            opacity: 0;
-            border-left: 6px solid var(--success-green);
-        }
-
-        .free-delivery-toast.show {
-            display: block;
-            animation: toastPop 0.5s ease-out forwards;
-        }
-
-        @keyframes toastPop {
-            0% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.8);
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.05);
-            }
-            100% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-        }
-
-        .toast-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 9999;
-            display: none;
-        }
-
-        .toast-overlay.show {
-            display: block;
-            animation: fadeInOverlay 0.3s;
-        }
-
-        @keyframes fadeInOverlay {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .celebration-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            animation: celebrationBounce 0.6s ease-out;
-        }
-
-        @keyframes celebrationBounce {
-            0%, 100% {
-                transform: scale(1);
-            }
-            25% {
-                transform: scale(1.2) rotate(-10deg);
-            }
-            75% {
-                transform: scale(1.2) rotate(10deg);
-            }
-        }
-
-        .celebration-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--success-green);
-            margin-bottom: 0.5rem;
-        }
-
-        .celebration-message {
-            font-size: 1rem;
-            color: #666;
-            margin-bottom: 1.5rem;
-            line-height: 1.5;
-        }
-
-        .celebration-close-btn {
-            background: var(--success-green);
-            color: white;
-            border: none;
-            padding: 0.75rem 2rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-
-        .celebration-close-btn:active {
-            transform: scale(0.95);
-        }
-
         @media (min-width: 768px) {
             .hamburger {
                 display: none;
@@ -670,7 +559,6 @@
         </div>
     </div>
 
-    <!-- Sliding Toast Container -->
     <div class="sliding-toast-container" id="slidingToastContainer">
         <div class="sliding-toast toast-delivery" id="toastDelivery" onclick="goToCheckout()">
             <div class="toast-content">
@@ -742,7 +630,6 @@
             }
         });
 
-        // Toast Rotation System
         function startToastRotation() {
             const deliveryToast = document.getElementById('toastDelivery');
             const callToast = document.getElementById('toastCall');
@@ -750,13 +637,11 @@
 
             toastInterval = setInterval(() => {
                 if (showingDelivery) {
-                    // Slide out delivery, slide in call
                     deliveryToast.classList.add('slide-out');
                     deliveryToast.classList.remove('slide-back');
                     callToast.classList.add('slide-in');
                     callToast.classList.remove('slide-out-right');
                 } else {
-                    // Slide out call, slide in delivery
                     callToast.classList.add('slide-out-right');
                     callToast.classList.remove('slide-in');
                     deliveryToast.classList.add('slide-back');
@@ -989,13 +874,16 @@
             }
             
             const cartData = {};
+            const timestamp = Date.now();
+            
             cart.forEach(item => {
                 cartData[item.id] = {
                     name: item.name,
                     price: item.price,
                     emoji: item.emoji,
                     category: item.category,
-                    quantity: item.quantity
+                    quantity: item.quantity,
+                    updatedAt: timestamp
                 };
             });
             
