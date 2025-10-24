@@ -162,8 +162,8 @@
             bottom: 7rem;
             left: 50%;
             transform: translateX(-50%);
-            width: 85%;
-            max-width: 360px;
+            width: 90%;
+            max-width: 400px;
             z-index: 2000;
             perspective: 1000px;
         }
@@ -171,13 +171,13 @@
         .sliding-toast {
             position: absolute;
             width: 100%;
-            padding: 0.75rem 1rem;
-            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.25);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 0.75rem;
+            gap: 1rem;
             cursor: pointer;
             transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.6s;
             touch-action: manipulation;
@@ -225,12 +225,12 @@
         .toast-content {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
             flex: 1;
         }
 
         .toast-icon {
-            font-size: 1.5rem;
+            font-size: 2rem;
             animation: pulse 2s infinite;
         }
 
@@ -249,21 +249,21 @@
 
         .toast-title {
             font-weight: 700;
-            font-size: 0.95rem;
-            margin-bottom: 0.15rem;
+            font-size: 1.1rem;
+            margin-bottom: 0.2rem;
         }
 
         .toast-subtitle {
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             opacity: 0.95;
         }
 
         .toast-action {
             background: white;
-            padding: 0.5rem 0.9rem;
-            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
             font-weight: 700;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             white-space: nowrap;
             transition: transform 0.2s;
         }
@@ -490,116 +490,6 @@
             margin-bottom: 1rem;
         }
 
-        .free-delivery-toast {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.8);
-            background: white;
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            z-index: 10000;
-            display: none;
-            text-align: center;
-            min-width: 300px;
-            max-width: 90%;
-            opacity: 0;
-            border-left: 6px solid var(--success-green);
-        }
-
-        .free-delivery-toast.show {
-            display: block;
-            animation: toastPop 0.5s ease-out forwards;
-        }
-
-        @keyframes toastPop {
-            0% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.8);
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.05);
-            }
-            100% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-        }
-
-        .toast-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 9999;
-            display: none;
-        }
-
-        .toast-overlay.show {
-            display: block;
-            animation: fadeInOverlay 0.3s;
-        }
-
-        @keyframes fadeInOverlay {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .celebration-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            animation: celebrationBounce 0.6s ease-out;
-        }
-
-        @keyframes celebrationBounce {
-            0%, 100% {
-                transform: scale(1);
-            }
-            25% {
-                transform: scale(1.2) rotate(-10deg);
-            }
-            75% {
-                transform: scale(1.2) rotate(10deg);
-            }
-        }
-
-        .celebration-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--success-green);
-            margin-bottom: 0.5rem;
-        }
-
-        .celebration-message {
-            font-size: 1rem;
-            color: #666;
-            margin-bottom: 1.5rem;
-            line-height: 1.5;
-        }
-
-        .celebration-close-btn {
-            background: var(--success-green);
-            color: white;
-            border: none;
-            padding: 0.75rem 2rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-
-        .celebration-close-btn:active {
-            transform: scale(0.95);
-        }
-
         @media (min-width: 768px) {
             .hamburger {
                 display: none;
@@ -794,12 +684,14 @@
         }
 
         function escapeHtml(text) {
+            if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
 
         function normalizeCategory(categoryName) {
+            if (!categoryName) return 'Other';
             const normalized = categoryName.toLowerCase().trim();
             const mapping = {
                 'maagie': 'Maagie',
@@ -942,30 +834,35 @@
             const cartItem = cart.find(c => c.id === itemId);
             const quantity = cartItem ? cartItem.quantity : 0;
             
+            const safeCategory = categoryName || 'Other';
+            const safeName = item.name || 'Unnamed Item';
+            const safePrice = item.price || 0;
+            const safeEmoji = item.emoji || '🍔';
+            
             const imageHTML = item.imageurl 
-                ? `<img src="${escapeHtml(item.imageurl)}" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'; this.parentElement.querySelector('.food-image-emoji').style.display='flex';">
-                   <div class="food-image-emoji" style="display: none; position: absolute;">${item.emoji || '🍔'}</div>`
-                : `<div class="food-image-emoji">${item.emoji || '🍔'}</div>`;
+                ? `<img src="${escapeHtml(item.imageurl)}" alt="${escapeHtml(safeName)}" onerror="this.style.display='none'; this.parentElement.querySelector('.food-image-emoji').style.display='flex';">
+                   <div class="food-image-emoji" style="display: none; position: absolute;">${safeEmoji}</div>`
+                : `<div class="food-image-emoji">${safeEmoji}</div>`;
             
             let buttonHTML;
             if (quantity > 0) {
                 buttonHTML = `<div class="quantity-control">
-                       <button class="quantity-btn" onclick="decreaseQuantity(\`${itemId}\`)">−</button>
+                       <button class="quantity-btn" onclick="decreaseQuantity('${escapeHtml(itemId)}')">−</button>
                        <span class="quantity-display">${quantity}</span>
-                       <button class="quantity-btn" onclick="increaseQuantity(\`${itemId}\`)">+</button>
+                       <button class="quantity-btn" onclick="increaseQuantity('${escapeHtml(itemId)}')">+</button>
                    </div>`;
             } else {
-                buttonHTML = `<button class="add-btn" onclick="addToCart(\`${itemId}\`, \`${escapeHtml(item.name)}\`, ${item.price}, \`${item.emoji || '🍔'}\`, \`${escapeHtml(categoryName)}\`)">Add +</button>`;
+                buttonHTML = `<button class="add-btn" onclick="addToCart('${escapeHtml(itemId)}', '${escapeHtml(safeName)}', ${safePrice}, '${safeEmoji}', '${escapeHtml(safeCategory)}')">Add +</button>`;
             }
             
             return `
-                <div class="food-card" data-food-id="${escapeHtml(itemId)}" data-name="${escapeHtml(item.name)}" data-price="${item.price}" data-emoji="${item.emoji || '🍔'}" data-category="${escapeHtml(categoryName)}">
+                <div class="food-card" data-food-id="${escapeHtml(itemId)}" data-name="${escapeHtml(safeName)}" data-price="${safePrice}" data-emoji="${safeEmoji}" data-category="${escapeHtml(safeCategory)}">
                     <div class="food-image">${imageHTML}</div>
                     <div class="food-details">
-                        <div class="food-name">${escapeHtml(item.name)}</div>
+                        <div class="food-name">${escapeHtml(safeName)}</div>
                         <div class="food-description">${escapeHtml(item.description || 'Delicious food item')}</div>
                         <div class="food-footer">
-                            <div class="food-price">₹${parseFloat(item.price).toFixed(2)}</div>
+                            <div class="food-price">₹${parseFloat(safePrice).toFixed(2)}</div>
                             ${buttonHTML}
                         </div>
                     </div>
@@ -988,11 +885,11 @@
             
             cart.forEach(item => {
                 cartData[item.id] = {
-                    name: item.name,
-                    price: item.price,
-                    emoji: item.emoji,
-                    category: item.category,
-                    quantity: item.quantity,
+                    name: item.name || 'Unnamed Item',
+                    price: item.price || 0,
+                    emoji: item.emoji || '🍔',
+                    category: item.category || 'Other',
+                    quantity: item.quantity || 1,
                     timestamp: item.timestamp || timestamp,
                     lastUpdated: timestamp
                 };
@@ -1013,10 +910,10 @@
             } else {
                 cart.push({
                     id: id,
-                    name: name,
-                    price: price,
-                    emoji: emoji,
-                    category: category,
+                    name: name || 'Unnamed Item',
+                    price: price || 0,
+                    emoji: emoji || '🍔',
+                    category: category || 'Other',
                     quantity: 1,
                     timestamp: timestamp,
                     lastUpdated: timestamp
@@ -1071,9 +968,9 @@
             if (quantity > 0) {
                 const quantityControl = `
                     <div class="quantity-control">
-                        <button class="quantity-btn" onclick="decreaseQuantity(\`${id}\`)">−</button>
+                        <button class="quantity-btn" onclick="decreaseQuantity('${escapeHtml(id)}')">−</button>
                         <span class="quantity-display">${quantity}</span>
-                        <button class="quantity-btn" onclick="increaseQuantity(\`${id}\`)">+</button>
+                        <button class="quantity-btn" onclick="increaseQuantity('${escapeHtml(id)}')">+</button>
                     </div>
                 `;
                 footer.innerHTML = price.outerHTML + quantityControl;
@@ -1082,7 +979,7 @@
                 const priceVal = card.dataset.price;
                 const emoji = card.dataset.emoji;
                 const category = card.dataset.category;
-                const addBtn = `<button class="add-btn" onclick="addToCart(\`${id}\`, \`${escapeHtml(name)}\`, ${priceVal}, \`${emoji}\`, \`${escapeHtml(category)}\`)">Add +</button>`;
+                const addBtn = `<button class="add-btn" onclick="addToCart('${escapeHtml(id)}', '${escapeHtml(name)}', ${priceVal}, '${emoji}', '${escapeHtml(category)}')">Add +</button>`;
                 footer.innerHTML = price.outerHTML + addBtn;
             }
         }
