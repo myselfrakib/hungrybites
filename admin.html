@@ -2201,8 +2201,7 @@
                     const getLatestUpdate = (cart) => {
                         let latest = 0;
                         Object.values(cart).forEach(item => {
-                            const timestamp = item.updatedAt ? new Date(item.updatedAt).getTime() : 
-                                            item.addedAt ? new Date(item.addedAt).getTime() : 0;
+                            const timestamp = item.lastUpdated || item.timestamp || 0;
                             if (timestamp > latest) latest = timestamp;
                         });
                         return latest;
@@ -3109,5 +3108,6 @@ const mapUrl = coords ?
     </script>
 </body>
 </html>
+
 
 
