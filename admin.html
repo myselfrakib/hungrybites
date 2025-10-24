@@ -2192,8 +2192,30 @@
                 
                 await Promise.all(fetchPromises);
                 
+                // Sort carts by last update time (most recent first)
+                const sortedUserIds = userIds.sort((a, b) => {
+                    const cartA = allCarts[a];
+                    const cartB = allCarts[b];
+                    
+                    // Get the most recent updatedAt from all items in each cart
+                    const getLatestUpdate = (cart) => {
+                        let latest = 0;
+                        Object.values(cart).forEach(item => {
+                            const timestamp = item.updatedAt ? new Date(item.updatedAt).getTime() : 
+                                            item.addedAt ? new Date(item.addedAt).getTime() : 0;
+                            if (timestamp > latest) latest = timestamp;
+                        });
+                        return latest;
+                    };
+                    
+                    const latestA = getLatestUpdate(cartA);
+                    const latestB = getLatestUpdate(cartB);
+                    
+                    return latestB - latestA; // Most recent first
+                });
+                
                 container.innerHTML = '';
-                userIds.forEach(uid => {
+                sortedUserIds.forEach(uid => {
                     const cartCard = createCartCard(uid, allCarts[uid], allUsers[uid]);
                     container.appendChild(cartCard);
                 });
@@ -2201,7 +2223,6 @@
                 container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-text">Error loading carts. Please refresh.</div></div>';
             }
         }
-
         function createCartCard(userId, cartItems, user) {
             const card = document.createElement('div');
             card.className = 'cart-card';
@@ -3088,4 +3109,5 @@ const mapUrl = coords ?
     </script>
 </body>
 </html>
+
 
